@@ -159,7 +159,7 @@ static void decode_dji_motor(dji_motor_object_t *motor, uint8_t *data)
  static void motor_lost_callback(void *motor_ptr)
  {
      dji_motor_object_t *motor = (dji_motor_object_t *)motor_ptr;
-     dji_motor_stop(motor);
+//     dji_motor_stop(motor);
      LOG_W("[dji_motor] Motor lost, can bus [%s] , id 0x[%x]", motor->can_dev->parent.name, motor->rx_id);
  }
 
