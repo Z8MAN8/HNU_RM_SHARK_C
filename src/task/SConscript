@@ -1,0 +1,16 @@
+from building import *
+import os
+
+cwd     = GetCurrentDir()
+
+src = [cwd + '/robot.c']
+
+path = [cwd]
+
+if GetDepend(['BSP_USING_EXAMPLE_TASK']):
+    src += [cwd + '/example/example_task.c']
+    path += [cwd + '/example']
+
+group = DefineGroup('RM_Task', src, depend = [''], CPPPATH = path)
+
+Return('group')

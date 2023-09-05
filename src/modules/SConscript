@@ -1,0 +1,24 @@
+from building import *
+import os
+
+cwd     = GetCurrentDir()
+path = [cwd]
+src  = []
+
+if GetDepend(['BSP_USING_MOTOR']):
+    src += [cwd + '/motor/motor_task.c']
+    path += [cwd + '/motor']
+
+if GetDepend(['BSP_USING_DJI_MOTOR']):
+    src += [cwd + '/motor/DJI_motor/dji_motor.c']
+    path += [cwd + '/motor/DJI_motor']
+
+if GetDepend(['BSP_USING_DWT']):
+    src += [cwd + '/dwt/drv_dwt.c']
+    path += [cwd + '/dwt']
+
+src  += [cwd + '/usr_callback.c']
+
+group = DefineGroup('RM_Modules', src, depend = [''], CPPPATH = path)
+
+Return('group')
