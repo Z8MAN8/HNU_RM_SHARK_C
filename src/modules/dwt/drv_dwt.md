@@ -17,13 +17,13 @@ deltaT=dwt_get_delta(&cnt);
 
 ```c
 float start,end;
-start=DWT_DetTimeline_ms();
+start=dwt_get_time_ms();
 
 // some proc to go... 
 for(uint8_t i=0;i<10;i++)
  foo();
 
-end = DWT_DetTimeline_ms()-start;
+end = dwt_get_time_ms()-start;
 ```
 
 我们还提供了一个宏用于调试计时:

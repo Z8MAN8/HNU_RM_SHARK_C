@@ -220,6 +220,10 @@ menu "RoboMaster Modules"
         bool "Enable DWT"
         default y
 
+    config BSP_USING_PS_MSG
+        bool "Enable Pub Sub Message"
+        default y
+
 endmenu
 
 menu "RoboMaster Algorithms"

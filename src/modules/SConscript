@@ -17,6 +17,10 @@ if GetDepend(['BSP_USING_DWT']):
     src += [cwd + '/dwt/drv_dwt.c']
     path += [cwd + '/dwt']
 
+if GetDepend(['BSP_USING_PS_MSG']):
+    src += [cwd + '/msg/drv_msg.c']
+    path += [cwd + '/msg']
+
 src  += [cwd + '/usr_callback.c']
 
 group = DefineGroup('RM_Modules', src, depend = [''], CPPPATH = path)

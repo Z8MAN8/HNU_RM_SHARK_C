@@ -25,6 +25,9 @@
 #endif /* BSP_USING_DJI_MOTOR */
 #ifdef BSP_USING_DWT
 #include "drv_dwt.h"
-#endif /* BSP_USING_DWT */
+#endif /* BSP_USING_PS_MSG */
+#ifdef BSP_USING_PS_MSG
+#include "drv_msg.h"
+#endif /* BSP_USING_PS_MSG */
 
 #endif /* _RM_MODULE_H */

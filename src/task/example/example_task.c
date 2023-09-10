@@ -19,7 +19,7 @@ static struct chassis_controller_t{
 
 static struct gimbal_controller_t{
     pid_object_t *speed_pid;
-    pid_object_t *angle_PID;
+    pid_object_t *angle_pid;
 }gimbal_controlelr;
 
 static dji_motor_object_t *chassis_motor;

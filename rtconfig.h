@@ -257,6 +257,7 @@
 #define BSP_USING_MOTOR
 #define BSP_USING_DJI_MOTOR
 #define BSP_USING_DWT
+#define BSP_USING_PS_MSG
 
 /* RoboMaster Algorithms */
 

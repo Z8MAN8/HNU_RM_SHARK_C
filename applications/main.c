@@ -54,7 +54,7 @@ static int can_device_init(void){
         return RT_ERROR;
     }
     /* 设置 CAN 设备接收回调处理 */
-    rt_device_set_rx_indicate(can_dev, can_rx_call);
+    rt_device_set_rx_indicate(can_dev, can1_rx_call);
     /* 设置 CAN 通信的波特率为 1Mbit/s*/
     rt_device_control(can_dev, RT_CAN_CMD_SET_BAUD, (void *)CAN1MBaud);
     /* 启动对应 CAN 设备 */
@@ -69,7 +69,7 @@ static int can_device_init(void){
         return RT_ERROR;
     }
     /* 设置 CAN 设备接收回调处理 */
-    rt_device_set_rx_indicate(can_dev, can_rx_call);
+    rt_device_set_rx_indicate(can_dev, can2_rx_call);
     /* 设置 CAN 通信的波特率为 1Mbit/s*/
     rt_device_control(can_dev, RT_CAN_CMD_SET_BAUD, (void *)CAN1MBaud);
     /* 启动对应 CAN 设备 */

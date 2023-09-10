@@ -68,7 +68,6 @@ typedef struct dji_motor_object
 
     /* 电机控制相关 */
     void *controller;            // 电机控制器
-//    void *motor_settings;      // 电机设置
     int16_t (*control)(dji_motor_measure_t measure);   // 控制电机的接口 用户可以自定义,返回值为16位的电压或电流值
 } dji_motor_object_t;
 

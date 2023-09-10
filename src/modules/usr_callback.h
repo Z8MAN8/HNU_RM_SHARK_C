@@ -9,6 +9,11 @@
 
 #include <rtthread.h>
 
-rt_err_t can_rx_call(rt_device_t dev, rt_size_t size);
+#ifdef BSP_USING_CAN1
+rt_err_t can1_rx_call(rt_device_t dev, rt_size_t size);
+#endif /* BSP_USING_CAN1 */
+#ifdef BSP_USING_CAN2
+rt_err_t can2_rx_call(rt_device_t dev, rt_size_t size);
+#endif /* BSP_USING_CAN2 */
 
 #endif //RTTHREAD_USR_CALLBACK_H
