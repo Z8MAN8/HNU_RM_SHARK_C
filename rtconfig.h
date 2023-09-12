@@ -89,6 +89,8 @@
 #define RT_SERIAL_USING_DMA
 #define RT_SERIAL_RB_BUFSZ 64
 #define RT_USING_CAN
+#define RT_USING_I2C
+#define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
 
 /* Using USB */
@@ -251,6 +253,12 @@
 #define BSP_USING_CAN
 #define BSP_USING_CAN1
 #define BSP_USING_CAN2
+#define BSP_USING_I2C1
+
+/* Notice: PF0 --> 80; PF1 --> 81 */
+
+#define BSP_I2C1_SCL_PIN 8
+#define BSP_I2C1_SDA_PIN 41
 
 /* RoboMaster Modules */
 
@@ -258,6 +266,8 @@
 #define BSP_USING_DJI_MOTOR
 #define BSP_USING_DWT
 #define BSP_USING_PS_MSG
+#define BSP_USING_MAG
+#define BSP_USING_IST8310
 
 /* RoboMaster Algorithms */
 

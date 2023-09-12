@@ -79,3 +79,22 @@ static int can_device_init(void){
     return RT_EOK;
 }
 INIT_COMPONENT_EXPORT(can_device_init);
+
+/*!
+ * @brief i2c 设备初始化函数，仅调用一次
+ * @return RT_EOK or RT_ERROR
+ */
+static int i2c_device_init(void){
+    rt_device_t i2c_dev = RT_NULL;
+
+#ifdef BSP_USING_I2C1
+    i2c_dev = rt_device_find("i2c1");
+
+    RT_ASSERT(i2c_dev != NULL);
+
+    rt_device_open(i2c_dev, RT_DEVICE_OFLAG_RDWR);
+#endif /* BSP_USING_CAN1 */
+
+    return RT_EOK;
+}
+INIT_COMPONENT_EXPORT(i2c_device_init);

@@ -21,6 +21,13 @@ if GetDepend(['BSP_USING_PS_MSG']):
     src += [cwd + '/msg/drv_msg.c']
     path += [cwd + '/msg']
 
+if GetDepend(['BSP_USING_MAG']):
+    path += [cwd + '/mag']
+
+if GetDepend(['BSP_USING_IST8310']):
+    src += [cwd + '/mag/ist8310/ist8310.c']
+    path += [cwd + '/mag/ist8310']
+
 src  += [cwd + '/usr_callback.c']
 
 group = DefineGroup('RM_Modules', src, depend = [''], CPPPATH = path)

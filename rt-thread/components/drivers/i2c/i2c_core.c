@@ -144,3 +144,82 @@ rt_ssize_t rt_i2c_master_recv(struct rt_i2c_bus_device *bus,
 
     return (ret == 1) ? count : ret;
 }
+
+rt_err_t i2c_read_reg(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t* buffer)
+{
+    rt_size_t ret;
+    struct rt_i2c_msg msgs[2];
+
+    msgs[0].addr = slave_addr;
+    msgs[0].flags = RT_I2C_WR | bus->flags;
+    msgs[0].buf = &reg;
+    msgs[0].len = 1;
+
+    msgs[1].addr = slave_addr;
+    msgs[1].flags = RT_I2C_RD | bus->flags;
+    msgs[1].buf = buffer;
+    msgs[1].len = 1;
+
+    ret = rt_i2c_transfer(bus, msgs, 2);
+
+    return ret == 2 ? RT_EOK : RT_ERROR;
+}
+
+rt_err_t i2c_write_reg(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t val)
+{
+    rt_size_t ret;
+    rt_uint8_t buffer[2];
+    struct rt_i2c_msg msgs;
+
+    buffer[0] = reg;
+    buffer[1] = val;
+
+    msgs.addr = slave_addr;
+    msgs.flags = RT_I2C_WR | bus->flags;
+    msgs.buf = buffer;
+    msgs.len = 2;
+
+    ret = rt_i2c_transfer(bus, &msgs, 1);
+
+    return ret == 1 ? RT_EOK : RT_ERROR;
+}
+
+rt_err_t i2c_read_regs(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t* buffer, uint16_t count)
+{
+    rt_size_t ret;
+    struct rt_i2c_msg msgs[2];
+
+    msgs[0].addr = slave_addr;
+    msgs[0].flags = RT_I2C_WR | bus->flags;
+    msgs[0].buf = &reg;
+    msgs[0].len = 1;
+
+    msgs[1].addr = slave_addr;
+    msgs[1].flags = RT_I2C_RD | bus->flags;
+    msgs[1].buf = buffer;
+    msgs[1].len = count;
+
+    ret = rt_i2c_transfer(bus, msgs, 2);
+
+    return ret == 2 ? RT_EOK : RT_ERROR;
+}
+
+rt_err_t i2c_write_regs(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t* vals, uint16_t count)
+{
+    rt_size_t ret;
+    struct rt_i2c_msg msgs[2];
+
+    msgs[0].addr = slave_addr;
+    msgs[0].flags = RT_I2C_WR | bus->flags;
+    msgs[0].buf = &reg;
+    msgs[0].len = 1;
+
+    msgs[1].addr = slave_addr;
+    msgs[1].flags = RT_I2C_WR | bus->flags;
+    msgs[1].buf = vals;
+    msgs[1].len = count;
+
+    ret = rt_i2c_transfer(bus, msgs, 2);
+
+    return ret == 2 ? RT_EOK : RT_ERROR;
+}

@@ -97,6 +97,11 @@ rt_inline rt_err_t rt_i2c_bus_unlock(struct rt_i2c_bus_device *bus)
     return rt_mutex_release(&bus->lock);
 }
 
+rt_err_t i2c_read_reg(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t* buffer);
+rt_err_t i2c_write_reg(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t val);
+rt_err_t i2c_read_regs(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t* buffer, uint16_t count);
+rt_err_t i2c_write_regs(struct rt_i2c_bus_device *bus, uint16_t slave_addr, uint8_t reg, uint8_t* vals, uint16_t count);
+
 #ifdef __cplusplus
 }
 #endif
