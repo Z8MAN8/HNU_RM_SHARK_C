@@ -14,12 +14,12 @@
 #include <rtdbg.h>
 
 static struct chassis_controller_t{
-    pid_object_t *speed_pid;
+    pid_obj_t *speed_pid;
 }chassis_controller;
 
 static struct gimbal_controller_t{
-    pid_object_t *speed_pid;
-    pid_object_t *angle_pid;
+    pid_obj_t *speed_pid;
+    pid_obj_t *angle_pid;
 }gimbal_controlelr;
 
 static dji_motor_object_t *chassis_motor;

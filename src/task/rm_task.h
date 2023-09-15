@@ -18,6 +18,9 @@
 
 #ifdef BSP_USING_EXAMPLE_TASK
 #include "example_task.h"
-#endif /* BSP_USING_PID */
+#endif /* BSP_USING_EXAMPLE_TASK */
+#ifdef BSP_USING_INS_TASK
+#include "ins_task.h"
+#endif /* BSP_USING_INS_TASK */
 
 #endif /* _RM_TASK_H */

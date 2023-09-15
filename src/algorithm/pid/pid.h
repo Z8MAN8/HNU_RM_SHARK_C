@@ -17,21 +17,21 @@
 #include <rtthread.h>
 #include <math.h>
 
-#ifndef abs
-#define abs(x) ((x > 0) ? x : -x)
+#ifndef usr_abs
+#define usr_abs(x) ((x > 0) ? x : -x)
 #endif
 
 /* PID 优化环节使能标志位,通过位与可以判断启用的优化环节 */
 typedef enum
 {
     PID_IMPROVE_NONE = 0X00,                // 0000 0000
-    PID_Integral_Limit = 0x01,              // 0000 0001
-    PID_Derivative_On_Measurement = 0x02,   // 0000 0010
-    PID_Trapezoid_Intergral = 0x04,         // 0000 0100
+    PID_Integral_Limit = 0x01,              // 0000 0001 积分限幅
+    PID_Derivative_On_Measurement = 0x02,   // 0000 0010 微分先行
+    PID_Trapezoid_Intergral = 0x04,         // 0000 0100 梯形积分
     PID_Proportional_On_Measurement = 0x08, // 0000 1000
-    PID_OutputFilter = 0x10,                // 0001 0000
-    PID_ChangingIntegrationRate = 0x20,     // 0010 0000
-    PID_DerivativeFilter = 0x40,            // 0100 0000
+    PID_OutputFilter = 0x10,                // 0001 0000 输出滤波
+    PID_ChangingIntegrationRate = 0x20,     // 0010 0000 变速积分
+    PID_DerivativeFilter = 0x40,            // 0100 0000 微分滤波器
     PID_ErrorHandle = 0x80,                 // 1000 0000
 } pid_improvement_e;
 
@@ -90,7 +90,7 @@ typedef struct
     float dt;
 
     pid_ErrorHandler_t ERRORHandler;
-} pid_object_t;
+} pid_obj_t;
 
 /* 用于PID初始化的结构体*/
 typedef struct // config parameter
@@ -115,7 +115,7 @@ typedef struct // config parameter
  * @brief 初始化PID实例,并返回PID实例指针
  * @param config PID初始化配置
  */
-pid_object_t *pid_register(pid_config_t *config);
+pid_obj_t *pid_register(pid_config_t *config);
 
 /**
  * @brief 计算PID输出
@@ -125,13 +125,13 @@ pid_object_t *pid_register(pid_config_t *config);
  * @param ref     设定值
  * @return float  PID计算输出
  */
-float pid_calculate(pid_object_t *pid, float measure, float ref);
+float pid_calculate(pid_obj_t *pid, float measure, float ref);
 
 /**
  * @brief 清空一个pid的历史数据
  *
  * @param pid    PID实例
  */
-void pid_clear(pid_object_t *pid);
+void pid_clear(pid_obj_t *pid);
 
 #endif /* _PID_H */

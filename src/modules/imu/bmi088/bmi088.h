@@ -1,5 +1,5 @@
 /******************************************************************************
- * Copyright 2020-2023 The Firmament Authors. All Rights Reserved.
+ * Copyright 2022 The Firmament Authors. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *****************************************************************************/
-
-#ifndef MAG_H__
-#define MAG_H__
+#ifndef BMI088_H__
+#define BMI088_H__
 
 #include <rtthread.h>
+#include <rtdevice.h>
+#include "imu.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#ifdef BSP_USING_IST8310
-#include "ist8310.h"
-#endif /* BSP_USING_IST8310 */
+extern struct imu_ops imu_ops;
+extern float bmi088_g_norm;   // 通过校准得出的重力加速度,数据融合时会用到
 
-#define MAG_RANGE_2GA  2
-#define MAG_RANGE_4GA  4
-#define MAG_RANGE_8GA  6
-#define MAG_RANGE_12GA 12
-#define MAG_RANGE_16GA 16
-
-struct mag_configure {
-    rt_uint32_t sample_rate_hz; /* sample rate in Hz */
-    rt_uint16_t dlpf_freq_hz;   /* internal low-pass filter cur-off freq in Hz */
-    rt_uint32_t mag_range_ga;   /* mag measure range in gauss */
-};
-
-struct mag_ops{
-    rt_err_t (*mag_init)(const char* i2c_bus_name);
-    rt_err_t (*mag_read)(float data[3]);
-};
+/* Re-implement this function to define customized rotation */
+__attribute__((weak)) void bmi088_acc_rotate_to_frd(float* data);
+/* Re-implement this function to define customized rotation */
+__attribute__((weak)) void bmi088_gyro_rotate_to_frd(float* data);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* BMI088_H__ */

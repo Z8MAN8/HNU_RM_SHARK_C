@@ -286,6 +286,75 @@ rt_inline rt_size_t rt_spi_send(struct rt_spi_device *device,
     return rt_spi_transfer(device, send_buf, RT_NULL, length);
 }
 
+#define SPI_DIR_READ  0x80
+#define SPI_DIR_WRITE 0x00
+
+/**
+ * This function write a 8 bit reg.
+ *
+ * @param device the SPI device attached to SPI bus
+ * 
+ * @param reg Register address
+ * 
+ * @param val The value to be written
+ *
+ * @return RT_EOK if write successfully.
+ */
+rt_inline rt_err_t spi_write_reg8(rt_device_t spi_device, uint8_t reg, uint8_t val)
+{
+    uint8_t buffer[2];
+    rt_size_t w_byte;
+
+    buffer[0] = SPI_DIR_WRITE | reg;
+    buffer[1] = val;
+
+    w_byte = rt_spi_transfer((struct rt_spi_device*)spi_device, buffer, NULL, 2);
+
+    return (w_byte == 2) ? RT_EOK : RT_ERROR;
+}
+
+/**
+ * This function read a 8 bit reg.
+ *
+ * @param device the SPI device attached to SPI bus
+ * 
+ * @param reg Register address
+ * 
+ * @param buffer Buffer of read data
+ *
+ * @return RT_EOK if read successfully.
+ */
+rt_inline rt_err_t spi_read_reg8(rt_device_t spi_device, uint8_t reg, uint8_t* buffer)
+{
+    uint8_t reg_addr;
+
+    reg_addr = SPI_DIR_READ | reg;
+
+    return rt_spi_send_then_recv((struct rt_spi_device*)spi_device, (void*)&reg_addr, 1, (void*)buffer, 1);
+}
+
+/**
+ * This function read multiple contiguous 8 bit regs.
+ *
+ * @param device the SPI device attached to SPI bus
+ * 
+ * @param reg Start register address
+ * 
+ * @param buffer Buffer of read data
+ *
+ * @param len The number of read registers
+ * 
+ * @return RT_EOK if read successfully.
+ */
+rt_inline rt_err_t spi_read_multi_reg8(rt_device_t spi_device, uint8_t reg, uint8_t* buffer, uint8_t len)
+{
+    uint8_t reg_addr;
+
+    reg_addr = SPI_DIR_READ | reg;
+
+    return rt_spi_send_then_recv((struct rt_spi_device*)spi_device, (void*)&reg_addr, 1, (void*)buffer, len);
+}
+
 /**
  * This function appends a message to the SPI message list.
  *

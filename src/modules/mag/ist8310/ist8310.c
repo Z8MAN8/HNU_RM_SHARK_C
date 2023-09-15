@@ -147,7 +147,14 @@ static rt_err_t ist8310_init(void)
     return RT_EOK;
 }
 
-rt_err_t ist8310_read(float data[3])
+/**
+ * @brief 调用此函数读取 ist8310 数据
+ *
+ * @param data[3] 存储读取数据的数组
+ *
+ * @return 读取成功 RT_EOK ; 读取失败 -RT_ERROR
+ */
+static rt_err_t ist8310_read(float data[3])
 {
     if (data == RT_NULL) {
         return -RT_ERROR;
@@ -160,7 +167,14 @@ rt_err_t ist8310_read(float data[3])
     return RT_EOK;
 }
 
-rt_err_t drv_ist8310_init(const char* i2c_bus_name)
+/**
+ * @brief 调用此函数初始化 ist8310
+ *
+ * @param i2c_bus_name ist8310 所挂载的总线名称
+ *
+ * @return RT_EOK
+ */
+static rt_err_t drv_ist8310_init(const char* i2c_bus_name)
 {
     i2c_bus = (struct rt_i2c_bus_device *)rt_device_find(i2c_bus_name);
     RT_ASSERT(i2c_bus != NULL);
@@ -169,3 +183,8 @@ rt_err_t drv_ist8310_init(const char* i2c_bus_name)
 
     return RT_EOK;
 }
+
+struct mag_ops mag = {
+    .mag_init = drv_ist8310_init,
+    .mag_read = ist8310_read,
+};

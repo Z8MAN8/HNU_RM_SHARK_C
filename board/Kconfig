@@ -149,6 +149,15 @@ menu "On-chip Peripheral Drivers"
                         default n
                 endif
 
+            menuconfig BSP_USING_PWM10
+                bool "Enable timer10 output PWM"
+                default n
+                if BSP_USING_PWM10
+                    config BSP_USING_PWM10_CH1
+                        bool "Enable PWM10 channel1 (imu)"
+                        default n
+                endif
+
         endif
 
     menuconfig BSP_USING_ADC
@@ -169,6 +178,21 @@ menu "On-chip Peripheral Drivers"
         default n
         select RT_USING_SPI
         if BSP_USING_SPI
+            config BSP_USING_SPI1
+                bool "Enable SPI1 BUS"
+                default n
+
+            config BSP_SPI1_TX_USING_DMA
+                bool "Enable SPI1 TX DMA"
+                depends on BSP_USING_SPI1
+                default n
+
+            config BSP_SPI1_RX_USING_DMA
+                bool "Enable SPI1 RX DMA"
+                depends on BSP_USING_SPI1
+                select BSP_SPI1_TX_USING_DMA
+                default n
+
             config BSP_USING_SPI2
                 bool "Enable SPI2 BUS"
                 default n
@@ -233,6 +257,20 @@ menu "RoboMaster Modules"
                 default n
         endif
 
+    menuconfig BSP_USING_IMU
+        bool "Enable IMU"
+        default n
+        if BSP_USING_IMU
+            config BSP_USING_BMI088
+                bool "Using BMI088"
+                default n
+                if BSP_USING_BMI088
+                    config BSP_BMI088_CALI
+                    bool "Calibrate BMI088 (Get more info in BMI088 README)"
+                    default n
+                endif
+        endif
+
 endmenu
 
 menu "RoboMaster Algorithms"
@@ -245,6 +283,10 @@ endmenu
 menu "RoboMaster Tasks"
     config BSP_USING_EXAMPLE_TASK
         bool "Select USING Example Task"
+        default y
+
+    config BSP_USING_INS_TASK
+        bool "Select USING Ins Task"
         default y
 
 endmenu

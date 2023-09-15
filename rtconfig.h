@@ -92,6 +92,8 @@
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
+#define RT_USING_PWM
+#define RT_USING_SPI
 
 /* Using USB */
 
@@ -253,9 +255,14 @@
 #define BSP_USING_CAN
 #define BSP_USING_CAN1
 #define BSP_USING_CAN2
+#define BSP_USING_PWM
+#define BSP_USING_PWM10
+#define BSP_USING_PWM10_CH1
+#define BSP_USING_SPI
+#define BSP_USING_SPI1
 #define BSP_USING_I2C1
 
-/* Notice: PF0 --> 80; PF1 --> 81 */
+/* Notice: PA8 --> 8; PC9 --> 41 */
 
 #define BSP_I2C1_SCL_PIN 8
 #define BSP_I2C1_SDA_PIN 41
@@ -268,6 +275,8 @@
 #define BSP_USING_PS_MSG
 #define BSP_USING_MAG
 #define BSP_USING_IST8310
+#define BSP_USING_IMU
+#define BSP_USING_BMI088
 
 /* RoboMaster Algorithms */
 
@@ -276,6 +285,7 @@
 /* RoboMaster Tasks */
 
 #define BSP_USING_EXAMPLE_TASK
+#define BSP_USING_INS_TASK
 
 /* Board extended module Drivers */
 

@@ -18,23 +18,22 @@
 
 #include <rtthread.h>
 #include <rtdevice.h>
+#include "mag.h"
+
+extern struct mag_ops mag;
 
 /**
- * @brief 调用此函数初始化 ist8310
+ * @brief 磁力计校准函数，如需要校准，用户自定义即可
  *
- * @param i2c_bus_name ist8310 所挂载的总线名称
- *
- * @return RT_EOK
+ * @param data[3] 读取到的磁力计数据
  */
-rt_err_t drv_ist8310_init(const char* i2c_bus_name);
+__attribute__((weak)) void ist8310_user_calibrate(float data[3]);
 
 /**
- * @brief 调用此函数读取 ist8310 数据
+ * @brief Re-implement this function to define customized rotation
  *
- * @param data[3] 存储读取数据的数组
- *
- * @return 读取成功 RT_EOK ; 读取失败 -RT_ERROR
+ * @param data 读取到的磁力计数据
  */
-rt_err_t ist8310_read(float data[3]);
+__attribute__((weak)) void ist8310_rotate_to_frd(float* data);
 
-#endif
+#endif /* IST8310_H__ */

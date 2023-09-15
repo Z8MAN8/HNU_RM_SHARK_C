@@ -28,6 +28,13 @@ if GetDepend(['BSP_USING_IST8310']):
     src += [cwd + '/mag/ist8310/ist8310.c']
     path += [cwd + '/mag/ist8310']
 
+if GetDepend(['BSP_USING_IMU']):
+    path += [cwd + '/imu']
+
+if GetDepend(['BSP_USING_BMI088']):
+    src += [cwd + '/imu/bmi088/bmi088.c']
+    path += [cwd + '/imu/bmi088']
+
 src  += [cwd + '/usr_callback.c']
 
 group = DefineGroup('RM_Modules', src, depend = [''], CPPPATH = path)

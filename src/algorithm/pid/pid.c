@@ -14,38 +14,38 @@
 
 static uint8_t idx = 0; // register idx,是该文件的全局PID索引,在注册时使用
 /* PID控制器的实例,此处仅保存指针,内存的分配将通过实例初始化时通过malloc()进行 */
-static pid_object_t *pid_obj[] = {NULL};
+static pid_obj_t *pid_obj[] = {NULL};
 
 /* ----------------------------以下是pid优化环节的实现---------------------------- */
 
 // 梯形积分
-static void f_Trapezoid_Intergral(pid_object_t *pid)
+static void f_Trapezoid_Intergral(pid_obj_t *pid)
 {
     // 计算梯形的面积,(上底+下底)*高/2
     pid->ITerm = pid->Ki * ((pid->Err + pid->Last_Err) / 2) * pid->dt;
 }
 
 // 变速积分(误差小时积分作用更强)
-static void f_Changing_Integration_Rate(pid_object_t *pid)
+static void f_Changing_Integration_Rate(pid_obj_t *pid)
 {
     if (pid->Err * pid->Iout > 0)
     {
         // 积分呈累积趋势
-        if (abs(pid->Err) <= pid->CoefB)
+        if (usr_abs(pid->Err) <= pid->CoefB)
             return; // Full integral
-        if (abs(pid->Err) <= (pid->CoefA + pid->CoefB))
-            pid->ITerm *= (pid->CoefA - abs(pid->Err) + pid->CoefB) / pid->CoefA;
+        if (usr_abs(pid->Err) <= (pid->CoefA + pid->CoefB))
+            pid->ITerm *= (pid->CoefA - usr_abs(pid->Err) + pid->CoefB) / pid->CoefA;
         else // 最大阈值,不使用积分
             pid->ITerm = 0;
     }
 }
 
-static void f_Integral_Limit(pid_object_t *pid)
+static void f_Integral_Limit(pid_obj_t *pid)
 {
     static float temp_Output, temp_Iout;
     temp_Iout = pid->Iout + pid->ITerm;
     temp_Output = pid->Pout + pid->Iout + pid->Dout;
-    if (abs(temp_Output) > pid->MaxOut)
+    if (usr_abs(temp_Output) > pid->MaxOut)
     {
         if (pid->Err * pid->Iout > 0) // 积分却还在累积
         {
@@ -66,27 +66,27 @@ static void f_Integral_Limit(pid_object_t *pid)
 }
 
 // 微分先行(仅使用反馈值而不计参考输入的微分)
-static void f_Derivative_On_Measurement(pid_object_t *pid)
+static void f_Derivative_On_Measurement(pid_obj_t *pid)
 {
     pid->Dout = pid->Kd * (pid->Last_Measure - pid->Measure) / pid->dt;
 }
 
 // 微分滤波(采集微分时,滤除高频噪声)
-static void f_Derivative_Filter(pid_object_t *pid)
+static void f_Derivative_Filter(pid_obj_t *pid)
 {
     pid->Dout = pid->Dout * pid->dt / (pid->Derivative_LPF_RC + pid->dt) +
                 pid->Last_Dout * pid->Derivative_LPF_RC / (pid->Derivative_LPF_RC + pid->dt);
 }
 
 // 输出滤波
-static void f_Output_Filter(pid_object_t *pid)
+static void f_Output_Filter(pid_obj_t *pid)
 {
     pid->Output = pid->Output * pid->dt / (pid->Output_LPF_RC + pid->dt) +
                   pid->Last_Output * pid->Output_LPF_RC / (pid->Output_LPF_RC + pid->dt);
 }
 
 // 输出限幅
-static void f_Output_Limit(pid_object_t *pid)
+static void f_Output_Limit(pid_obj_t *pid)
 {
     if (pid->Output > pid->MaxOut)
     {
@@ -99,7 +99,7 @@ static void f_Output_Limit(pid_object_t *pid)
 }
 
 // 电机堵转检测
-static void f_PID_ErrorHandle(pid_object_t *pid)
+static void f_PID_ErrorHandle(pid_obj_t *pid)
 {
     /*Motor Blocked Handle*/
     if (fabsf(pid->Output) < pid->MaxOut * 0.001f || fabsf(pid->Ref) < 0.0001f)
@@ -128,10 +128,10 @@ static void f_PID_ErrorHandle(pid_object_t *pid)
  * @brief 初始化PID实例,并返回PID实例指针
  * @param config PID初始化设置
  */
-pid_object_t *pid_register(pid_config_t *config)
+pid_obj_t *pid_register(pid_config_t *config)
 {
-    pid_object_t *object = (pid_object_t *)rt_malloc(sizeof(pid_object_t));
-    rt_memset(object, 0, sizeof(pid_object_t));
+    pid_obj_t *object = (pid_obj_t *)rt_malloc(sizeof(pid_obj_t));
+    rt_memset(object, 0, sizeof(pid_obj_t));
 
     // basic parameter
     object->Kp = config->Kp;
@@ -161,7 +161,7 @@ pid_object_t *pid_register(pid_config_t *config)
  * @param[in]      期望值
  * @retval         返回空
  */
-float pid_calculate(pid_object_t *pid, float measure, float ref)
+float pid_calculate(pid_obj_t *pid, float measure, float ref)
 {
     // 堵转检测
     if (pid->Improve & PID_ErrorHandle)
@@ -175,7 +175,7 @@ float pid_calculate(pid_object_t *pid, float measure, float ref)
     pid->Err = pid->Ref - pid->Measure;
 
     // 如果在死区外,则计算PID
-    if (abs(pid->Err) > pid->DeadBand)
+    if (usr_abs(pid->Err) > pid->DeadBand)
     {
         // 基本的pid计算,使用位置式
         pid->Pout = pid->Kp * pid->Err;
@@ -229,7 +229,7 @@ float pid_calculate(pid_object_t *pid, float measure, float ref)
  *
  * @param pid    PID实例
  */
-void pid_clear(pid_object_t *pid)
+void pid_clear(pid_obj_t *pid)
 {
     pid->Measure = 0;
     pid->Last_Measure = 0;

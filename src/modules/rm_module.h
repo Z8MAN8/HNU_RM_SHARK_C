@@ -28,12 +28,12 @@
 #endif /* BSP_USING_PS_MSG */
 #ifdef BSP_USING_PS_MSG
 #include "drv_msg.h"
-#endif /* BSP_USING_MAG */
+#endif /* BSP_USING_IST8310 */
 #ifdef BSP_USING_MAG
 #include "mag.h"
 #endif /* BSP_USING_IST8310 */
-#ifdef BSP_USING_IST8310
-#include "ist8310.h"
-#endif /* BSP_USING_IST8310 */
+#ifdef BSP_USING_IMU
+#include "imu.h"
+#endif /* BSP_USING_BMI088 */
 
 #endif /* _RM_MODULE_H */

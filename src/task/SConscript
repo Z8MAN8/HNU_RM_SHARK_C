@@ -8,8 +8,12 @@ src = [cwd + '/robot.c']
 path = [cwd]
 
 if GetDepend(['BSP_USING_EXAMPLE_TASK']):
-    src += [cwd + '/example/example_task.c']
+    src += Glob(cwd + '/example/*.c')
     path += [cwd + '/example']
+
+if GetDepend(['BSP_USING_INS_TASK']):
+    src += Glob(cwd + '/ins/*.c')
+    path += [cwd + '/ins']
 
 group = DefineGroup('RM_Task', src, depend = [''], CPPPATH = path)
 
