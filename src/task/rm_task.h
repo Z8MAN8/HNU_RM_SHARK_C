@@ -23,4 +23,16 @@
 #include "ins_task.h"
 #endif /* BSP_USING_INS_TASK */
 
+struct ins_msg
+{
+    // IMU量测值
+    float gyro[3];  // 角速度
+    float accel[3]; // 加速度
+    // 位姿
+    float roll;
+    float pitch;
+    float yaw;
+    float yaw_total_angle;
+};
+
 #endif /* _RM_TASK_H */

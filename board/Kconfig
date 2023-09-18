@@ -278,6 +278,15 @@ menu "RoboMaster Algorithms"
         bool "Select USING PID Controller"
         default y
 
+    config BSP_USING_QUATERNIONESF
+       bool "Select USING QuaternionEKF"
+       default y
+       select BSP_USING_KALMAN_FILTER
+
+    config BSP_USING_KALMAN_FILTER
+       bool "Select USING KalmanFilter"
+       default y
+
 endmenu
 
 menu "RoboMaster Tasks"
