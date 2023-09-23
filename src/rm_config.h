@@ -22,4 +22,7 @@
 #define SPI_ACC        "spi1"
 #define SPI_ACC_CS     4
 
+/* 遥控器所挂载的 usart 设备名称 */
+#define USART_RC       "uart3"
+
 #endif /* _RM_CONFIG_H */

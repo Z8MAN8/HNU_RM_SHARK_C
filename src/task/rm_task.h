@@ -22,6 +22,9 @@
 #ifdef BSP_USING_INS_TASK
 #include "ins_task.h"
 #endif /* BSP_USING_INS_TASK */
+#ifdef BSP_USING_MOTOR_TASK
+#include "motor_task.h"
+#endif /* BSP_USING_MOTOR_TASK */
 
 struct ins_msg
 {

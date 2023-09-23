@@ -34,6 +34,9 @@
 #endif /* BSP_USING_IST8310 */
 #ifdef BSP_USING_IMU
 #include "imu.h"
-#endif /* BSP_USING_BMI088 */
+#endif /* BSP_USING_RC_SBUS */
+#ifdef BSP_USING_RC_SBUS
+#include "rc_sbus.h"
+#endif /* BSP_USING_RC_SBUS */
 
 #endif /* _RM_MODULE_H */

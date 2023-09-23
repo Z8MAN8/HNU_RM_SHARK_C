@@ -277,6 +277,7 @@
 #define BSP_USING_IST8310
 #define BSP_USING_IMU
 #define BSP_USING_BMI088
+#define BSP_USING_RC_SBUS
 
 /* RoboMaster Algorithms */
 
@@ -288,6 +289,7 @@
 
 #define BSP_USING_EXAMPLE_TASK
 #define BSP_USING_INS_TASK
+#define BSP_USING_MOTOR_TASK
 
 /* Board extended module Drivers */
 

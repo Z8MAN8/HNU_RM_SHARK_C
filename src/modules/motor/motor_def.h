@@ -53,7 +53,7 @@ typedef struct
     const char *can_name;
     uint32_t tx_id;                // 发送id(主发)
     uint32_t rx_id;                // 接收id(主收)
-    void *controller;        // 电机控制器
+    void *controller;              // 电机控制器
 } motor_config_t;
 
 #endif // _MOTOR_DEF_H

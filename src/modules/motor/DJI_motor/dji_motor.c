@@ -246,7 +246,7 @@ void dji_motor_control()
  * @param config 电机配置
  * @return dji_motor_object_t* 电机实例指针
  */
-dji_motor_object_t *dji_motor_register(motor_config_t *config, void *controller)
+dji_motor_object_t *dji_motor_register(motor_config_t *config, void *control)
 {
     dji_motor_object_t *object = (dji_motor_object_t *)rt_malloc(sizeof(dji_motor_object_t));
     rt_memset(object, 0, sizeof(dji_motor_object_t));
@@ -254,7 +254,7 @@ dji_motor_object_t *dji_motor_register(motor_config_t *config, void *controller)
     // 对接用户配置的 motor_config
     object->motor_type = config->motor_type;                         // 6020 or 2006 or 3508
     object->rx_id = config->rx_id;                                   // 电机接收报文的ID
-    object->control = controller;                                    // 电机控制器
+    object->control = control;                                       // 电机控制器执行
 
     /* 查找 CAN 设备 */
     object->can_dev = rt_device_find(config->can_name);
@@ -263,8 +263,7 @@ dji_motor_object_t *dji_motor_register(motor_config_t *config, void *controller)
     motor_send_grouping(object, config);
 
     // 电机离线检测定时器相关
-
-    object->timer = rt_timer_create("motor1",
+    object->timer = rt_timer_create("motor",
                              motor_lost_callback,
                              object, 20,
                              RT_TIMER_FLAG_PERIODIC);

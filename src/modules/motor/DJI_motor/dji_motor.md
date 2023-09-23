@@ -1,7 +1,5 @@
 # dji_motor
 
-<p align='right'>neozng1@hnu.edu.cn</p>
-
 > TODO:
 >
 > - [ ] 对电机离线增加对应对声光提示；
@@ -11,8 +9,6 @@
 > 单条总线挂载电机数量有限（实测1kHZ极限挂载7个），挂载数量过多容易出现帧错误和仲裁失败的情况。
 
 ## 总览和封装说明
-
-> 如果你不需要理解该模块的工作原理，你只需要查看这一小节。
 
 dji_motor模块对DJI智能电机，包括M2006，M3508以及GM6020进行了详尽的封装。你不再需要关心CAN报文的发送和接收解析。
 
@@ -28,45 +24,52 @@ dji_motor模块对DJI智能电机，包括M2006，M3508以及GM6020进行了详�
 
 **注意：**6020的id 1-4和2006/3508的id 5-8会发生冲突（即1!5,2!6,3!7,4!8），不能同时注册在同一总线。
 
-初始化电机时，你需要传入的参数包括：
+通过 `dji_motor_register` 初始化电机时，你需要传入的参数包括：
 
-- **电机挂载的CAN总线设置**，CAN1 or CAN2，以及电机的id，使用`can_object_config_s`封装，只需要设置这两个参数:
+- `motor_config_t` 配置实例，包括：
 
-  ```c
-  CAN_HandleTypeDef *can_handle;
-  uint32_t tx_id; // tx_id设置为电机id,不需要查说明书计算，直接为电调的闪动次数或拨码开关值，为1-8
-  ```
-
-- **电机类型**，使用`motor_type_e`：
-
-  ```c
-  GM6020 = 0
-  M3508  = 1
-  M2006  = 2
-  ```
-
-- **电机控制设置**
-
-  - 是否反转
+  - **电机类型**：使用`motor_type_e`：
 
     ```c
-    MOTOR_DIRECTION_NORMAL 
-    MOTOR_DIRECTION_REVERSE
+    GM6020 = 0
+    M3508  = 1
+    M2006  = 2
     ```
+
+  - **电机挂载的CAN总线名称**：字符串，如“can1”
+
+  - **电机的id**：接收 ID，根据电机手册，如：
+
+    ```c
+    .rx_id = 0x201
+    ```
+
+  - **电机使用的控制器实例** ：如：
+
+    ```c
+    static struct gimbal_controller_t{
+        pid_obj_t *speed_pid;
+        pid_obj_t *angle_pid;
+    }gimbal_controlelr;
     
+    .controller = &gimbal_controlelr;
+    ```
 
 
----
+- `control`： 使用控制器实例进行的具体运算处理，如：
 
-## 代码结构
-
-.h文件内包括了外部接口和类型定义,以及模块对应的宏。c文件内为私有函数和外部接口的定义。
-
-motor_def.h内包含了一些电机通用的定义。
+  ```c
+  rt_int16_t gimbal_control(dji_motor_measure_t measure){
+      static rt_int16_t set = 0;
+      set = pid_calculate(gimbal_controlelr.speed_pid, measure.speed_rpm, 0);
+      return set;
+  }
+  ```
 
 ## 类型定义
 
 ```c
+/* 滤波系数设置为1的时候即关闭滤波 */
 #define SPEED_SMOOTH_COEF 0.85f      // 最好大于0.85
 #define CURRENT_SMOOTH_COEF 0.9f     // 必须大于0.9
 #define ECD_ANGLE_COEF_DJI 0.043945f // (360/8192),将编码器值转化为角度制
@@ -94,11 +97,13 @@ typedef struct
 /**
  * @brief DJI intelligent motor typedef
  */
-typedef struct
+typedef struct dji_motor_object
 {
+    rt_device_t  can_dev;                   // 电机CAN实例
     dji_motor_measure_t measure;            // 电机测量值
-    can_obj_t *can_dev;            // 电机CAN实例
 
+    uint32_t tx_id;                         // 发送id(主发)
+    uint32_t rx_id;                         // 接收id(主收)
     /* 分组发送设置 */
     uint8_t send_group;                     // 同一帧报文分组
     uint8_t message_num;                    // 一帧报文中位置
@@ -109,11 +114,9 @@ typedef struct
     /* 监控线程相关 */
     rt_timer_t timer;                       // 电机监控定时器
 
-// TODO: 在用户配置文件中对接，考虑配置文件设为.c和.h文件,.c文件中存放相关对接函数的具体实现，.h文件中进行config结构体的配置，意图用户最终在user_config.c/.h中进行开发即可
     /* 电机控制相关 */
-    void *motor_settings;      // 电机设置
-    void *motor_controller;    // 电机控制器
-    void (*control)(dji_motor_object_t *motor);   // 控制电机的接口 用户可以自定义
+    void *controller;            // 电机控制器
+    int16_t (*control)(dji_motor_measure_t measure);   // 控制电机的接口 用户可以自定义,返回值为16位的电压或电流值
 } dji_motor_object_t;
 ```
 
@@ -125,32 +128,28 @@ typedef struct
 ## 外部接口
 
 ```c
-dji_motor_object *dji_motor_register(can_object_config config,
-                                 Motor_Control_Setting_s motor_setting,
-                                 Motor_Controller_Init_s controller_init,
-                                 motor_type_e type);
+dji_motor_object_t *dji_motor_register(motor_config_t *config, void *control);
 
 void dji_motor_control();
 
 void dji_motor_stop(dji_motor_object *motor);
 
 void dji_motor_enable(dji_motor_object *motor);
+
+void dji_motot_rx_callback(uint32_t id, uint8_t *data);
 ```
 
-- `dji_motor_register()`是用于初始化电机对象的接口，传入包括电机can配置、电机控制配置、电机控制器配置以及电机类型在内的初始化参数。**它将会返回一个电机实例指针**，你应当在应用层保存这个指针，这样才能操控这个电机。
+- `dji_motor_register()`是用于初始化电机对象的接口，传入包括电机can配置、电机控制配置、电机控制器配置以及电机类型在内的初始化参数。**它将会返回一个电机实例指针**；
 
-- `dji_motor_control()`是根据电机的配置计算控制值的函数。该函数在`motor_task.c`中被调用，应当在freeRTOS中以一定频率运行。此函数为PID的计算进行了彻底的封装，要修改电机的参考输入，请在app层的应用中调用`DJIMotorSetRef()`。
+- `dji_motor_control()`是根据电机的配置计算控制值的函数。该函数在`motor_task.c`中被调用，应当在freeRTOS中以一定频率运行。
 
   该函数的具体实现请参照代码，注释已经较为清晰。流程大致为：
 
   1. 根据电机的初始化控制配置，计算各个控制闭环
-  2. 根据反转标志位，确定是否将输出反转
   3. 根据每个电机的发送分组，将最终输出值填入对应的分组buff
   4. 检查每一个分组，若该分组有电机，发送报文
   
 - `dji_motor_stop()`和`dji_motor_enable()`用于控制电机的启动和停止。当电机被设为stop的时候，不会响应任何的参考输入。
-
-- `DJIMotorOuterLoop()`用于修改电机的外部闭环类型，即电机的真实闭环目标。
 
 ## 私有函数和变量
 
@@ -175,11 +174,13 @@ static dji_motor_object *dji_motor_info[DJI_MOTOR_CNT] = {NULL};
  *
  * can1: [0]:0x1FF,[1]:0x200,[2]:0x2FF
  * can2: [0]:0x1FF,[1]:0x200,[2]:0x2FF */
-static can_object send_msg[6] =
-{
-        [0] = {.can_handle = &hcan1, .txconf.StdId = 0x1ff, .txconf.IDE = CAN_ID_STD, .txconf.RTR = CAN_RTR_DATA, .txconf.DLC = 0x08, .tx_buff = {0}},
-  ...
-        ...
+static struct rt_can_msg send_msg[6] = {
+    [0] = {.id = 0x1ff, .ide  = RT_CAN_STDID, .rtr = RT_CAN_DTR, .len  = 0x08, .data = {0}},
+    [1] = {.id = 0x200, .ide  = RT_CAN_STDID, .rtr = RT_CAN_DTR, .len  = 0x08, .data = {0}},
+    [2] = {.id = 0x2ff, .ide  = RT_CAN_STDID, .rtr = RT_CAN_DTR, .len  = 0x08, .data = {0}},
+    [3] = {.id = 0x1ff, .ide  = RT_CAN_STDID, .rtr = RT_CAN_DTR, .len  = 0x08, .data = {0}},
+    [4] = {.id = 0x200, .ide  = RT_CAN_STDID, .rtr = RT_CAN_DTR, .len  = 0x08, .data = {0}},
+    [5] = {.id = 0x2ff, .ide  = RT_CAN_STDID, .rtr = RT_CAN_DTR, .len  = 0x08, .data = {0}},
 };
 
 static uint8_t sender_enable_flag[6] = {0};
@@ -195,7 +196,7 @@ static void motor_send_grouping(can_object_config *config)
 static void decode_dji_motor(can_object *object)
 ```
 
-- `IDcrash_Handler()`在电机id发生冲突的时候会被`motor_send_grouping()`调用，陷入死循环之中，并把冲突的id保存在函数里。这样就可以通过debug确定是否发生冲突以及冲突的编号。
+- 在电机id发生冲突的时候会被`motor_send_grouping()`调用，陷入死循环之中，并把冲突的id保存在函数里。这样就可以通过debug确定是否发生冲突以及冲突的编号。
 
 - `motor_send_grouping()`被`dji_motor_register()`调用，他将会根据电机id计算出CAN的发送和接收ID，并根据发送ID对电机进行分组。
 
@@ -212,46 +213,37 @@ static void decode_dji_motor(can_object *object)
 ## 使用范例
 
 ```c
-//初始化设置
-motor_config_t config = {
-  .motor_type = GM6020,
-  .can_init_config = {
-   .can_handle = &hcan1,
-   .tx_id = 6
-        },
-  .controller_setting_init_config = {
-            .angle_feedback_source = MOTOR_FEED, 
-            .outer_loop_type = SPEED_LOOP,
-            .close_loop_type = SPEED_LOOP | ANGLE_LOOP, 
-            .speed_feedback_source = MOTOR_FEED, 
-            .motor_reverse_flag = MOTOR_DIRECTION_NORMAL
-        },
-  .controller_param_init_config = {
-            .angle_PID = {
-                .Improve = 0, 
-                .Kp = 1, 
-                .Ki = 0, 
-                .Kd = 0, 
-                .DeadBand = 0, 
-                .MaxOut = 4000}, 
-            .speed_PID = {
-                .Improve = 0, 
-                .Kp = 1, 
-                .Ki = 0, 
-                .Kd = 0, 
-                .DeadBand = 0, 
-                .MaxOut = 4000
-            }
-        }
-};
-//注册电机并保存实例指针
-dji_motor_object *djimotor = dji_motor_register(&config);
-```
+static struct gimbal_controller_t{
+    pid_obj_t *speed_pid;
+    pid_obj_t *angle_pid;
+}gimbal_controlelr;
 
-然后在任务中修改电机设定值即可实现控制：
+static dji_motor_object_t *gimbal_motor;
 
-```
-DJIMotorSetRef(djimotor, 10);
-```
+rt_int16_t gimbal_control(dji_motor_measure_t measure){
+    static rt_int16_t set = 0;
+    set = pid_calculate(gimbal_controlelr.speed_pid, measure.speed_rpm, 0);
+    return set;
+}
 
-前提是已经将`dji_motor_control()`放入实时系统任务当中或以一定d。你也可以单独执行`dji_motor_control()`。
+static void example_init()
+{
+    pid_config_t gimbal_speed_config = {
+            .Kp = 50,  // 50
+            .Ki = 200, // 200
+            .Kd = 0,
+            .Improve = PID_Trapezoid_Intergral | PID_Integral_Limit | PID_Derivative_On_Measurement,
+            .IntegralLimit = 3000,
+            .MaxOut = 20000,
+    };
+    gimbal_controlelr.speed_pid = pid_register(&gimbal_speed_config);
+
+    motor_config_t gimbal_motor_config = {
+            .motor_type = GM6020,
+            .can_name = CAN_GIMBAL,
+            .rx_id = 0x206,
+            .controller = &gimbal_controlelr,
+    };
+    gimbal_motor = dji_motor_register(&gimbal_motor_config, gimbal_control);
+}
+```

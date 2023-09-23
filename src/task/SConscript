@@ -15,6 +15,10 @@ if GetDepend(['BSP_USING_INS_TASK']):
     src += Glob(cwd + '/ins/*.c')
     path += [cwd + '/ins']
 
+if GetDepend(['BSP_USING_MOTOR_TASK']):
+    src += Glob(cwd + '/motor/*.c')
+    path += [cwd + '/motor']
+
 group = DefineGroup('RM_Task', src, depend = [''], CPPPATH = path)
 
 Return('group')

@@ -83,7 +83,7 @@ void example_thread_entry(void *argument)
     for (;;)
     {
         example_start = dwt_get_time_ms();
-        motor_control();
+
         /* 用于调试监测线程调度使用 */
         example_dt = dwt_get_time_ms() - example_start;
         if (example_dt > 1)

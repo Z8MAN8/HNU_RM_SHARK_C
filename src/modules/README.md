@@ -54,3 +54,23 @@ sub = sub_register("msg_test", sizeof(struct msg_test));
 sub_get_msg(sub, &msg_s);
 ```
 
+### MAG：
+
+这是抽象出来的磁力计一类设备，具体不同的磁力计驱动程序中需要对接 init 和 read 这些操作方法：
+
+```c
+/* 以 ist8310.c 为例 */
+struct mag_ops mag = {
+    .mag_init = drv_ist8310_init,
+    .mag_read = ist8310_read,
+};
+```
+
+在应用层中实际使用磁力计设备如下即可：
+
+```c
+static float read_data[3];
+mag.mag_init("i2c1");      // 初始化 mag 设备
+mag.mag_read(read_data);  // 将设备数据读取到 read_data 中
+```
+

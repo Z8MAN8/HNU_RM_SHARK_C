@@ -6,7 +6,6 @@ path = [cwd]
 src  = []
 
 if GetDepend(['BSP_USING_MOTOR']):
-    src += [cwd + '/motor/motor_task.c']
     path += [cwd + '/motor']
 
 if GetDepend(['BSP_USING_DJI_MOTOR']):
@@ -34,6 +33,10 @@ if GetDepend(['BSP_USING_IMU']):
 if GetDepend(['BSP_USING_BMI088']):
     src += [cwd + '/imu/bmi088/bmi088.c']
     path += [cwd + '/imu/bmi088']
+    
+if GetDepend(['BSP_USING_RC_SBUS']):
+    src += Glob(cwd + '/rc/sbus/*.c')
+    path += [cwd + '/rc/sbus']
 
 src  += [cwd + '/usr_callback.c']
 

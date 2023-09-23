@@ -87,7 +87,7 @@ typedef struct dji_motor_object
  *
  * @return dji_motor_object_t*
  */
-dji_motor_object_t *dji_motor_register(motor_config_t *config, void *controller);
+dji_motor_object_t *dji_motor_register(motor_config_t *config, void *control);
 
 /**
  * @brief 该函数被motor_task调用运行在rtos上
