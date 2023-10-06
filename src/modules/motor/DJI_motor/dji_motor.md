@@ -132,7 +132,7 @@ dji_motor_object_t *dji_motor_register(motor_config_t *config, void *control);
 
 void dji_motor_control();
 
-void dji_motor_stop(dji_motor_object *motor);
+void dji_motor_relax(dji_motor_object *motor);
 
 void dji_motor_enable(dji_motor_object *motor);
 
@@ -149,7 +149,7 @@ void dji_motot_rx_callback(uint32_t id, uint8_t *data);
   3. 根据每个电机的发送分组，将最终输出值填入对应的分组buff
   4. 检查每一个分组，若该分组有电机，发送报文
   
-- `dji_motor_stop()`和`dji_motor_enable()`用于控制电机的启动和停止。当电机被设为stop的时候，不会响应任何的参考输入。
+- `dji_motor_relax()`和`dji_motor_enable()`用于控制电机的启动和停止。当电机被设为stop的时候，不会响应任何的参考输入。
 
 ## 私有函数和变量
 
@@ -218,7 +218,7 @@ static struct gimbal_controller_t{
     pid_obj_t *angle_pid;
 }gimbal_controlelr;
 
-static dji_motor_object_t *gimbal_motor;
+static dji_motor_object_t *gim_motor;
 
 rt_int16_t gimbal_control(dji_motor_measure_t measure){
     static rt_int16_t set = 0;
@@ -244,6 +244,6 @@ static void example_init()
             .rx_id = 0x206,
             .controller = &gimbal_controlelr,
     };
-    gimbal_motor = dji_motor_register(&gimbal_motor_config, gimbal_control);
+    gim_motor = dji_motor_register(&gimbal_motor_config, gimbal_control);
 }
 ```

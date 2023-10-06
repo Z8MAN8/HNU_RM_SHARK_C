@@ -16,6 +16,7 @@ void motor_thread_entry(void *argument)
 
     for (;;)
     {
+        motor_start = dwt_get_time_ms();
         // static uint8_t cnt = 0; 设定不同电机的任务频率
         // if(cnt%5==0) //200hz
         // if(cnt%10==0) //100hz
@@ -32,7 +33,7 @@ void motor_thread_entry(void *argument)
         /* 用于调试监测线程调度使用 */
         motor_dt = dwt_get_time_ms() - motor_start;
         if (motor_dt > 1){
-            LOG_E("Motor Task is being DELAY! dt = [%f]", &motor_dt);
+//            rt_kprintf("Motor Task is being DELAY! dt = [%f]\n", &motor_dt);
         }
         rt_thread_delay(1);
     }

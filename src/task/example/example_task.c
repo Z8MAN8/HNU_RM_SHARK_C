@@ -25,13 +25,13 @@ static struct gimbal_controller_t{
 static dji_motor_object_t *chassis_motor;
 static dji_motor_object_t *gimbal_motor;
 
-rt_int16_t chassis_control(dji_motor_measure_t measure){
+static rt_int16_t chassis_control(dji_motor_measure_t measure){
     static rt_int16_t set = 0;
     set = pid_calculate(chassis_controller.speed_pid, measure.speed_rpm, 1000);
     return set;
 }
 
-rt_int16_t gimbal_control(dji_motor_measure_t measure){
+static rt_int16_t gimbal_control(dji_motor_measure_t measure){
     static rt_int16_t set = 0;
     set = pid_calculate(gimbal_controlelr.speed_pid, measure.speed_rpm, 0);
     return set;

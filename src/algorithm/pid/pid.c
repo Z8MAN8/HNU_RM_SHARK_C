@@ -14,7 +14,7 @@
 
 static uint8_t idx = 0; // register idx,是该文件的全局PID索引,在注册时使用
 /* PID控制器的实例,此处仅保存指针,内存的分配将通过实例初始化时通过malloc()进行 */
-static pid_obj_t *pid_obj[] = {NULL};
+static pid_obj_t *pid_obj[PID_NUM_MAX] = {NULL};
 
 /* ----------------------------以下是pid优化环节的实现---------------------------- */
 

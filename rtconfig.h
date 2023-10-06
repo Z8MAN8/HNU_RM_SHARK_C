@@ -287,9 +287,12 @@
 
 /* RoboMaster Tasks */
 
-#define BSP_USING_EXAMPLE_TASK
 #define BSP_USING_INS_TASK
 #define BSP_USING_MOTOR_TASK
+#define BSP_USING_CMD_TASK
+#define BSP_USING_CHASSIS_TASK
+#define BSP_CHASSIS_OMNI_MODE
+#define BSP_USING_GIMBAL_TASK
 
 /* Board extended module Drivers */
 

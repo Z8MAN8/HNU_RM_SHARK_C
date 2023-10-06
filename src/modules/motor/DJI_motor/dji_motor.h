@@ -41,7 +41,7 @@ typedef struct
     /* 以下是电调直接回传的数据 */
     uint16_t ecd;             // 0-8191
     uint16_t last_ecd;        // 上一次读取的编码器值
-    int16_t  speed_rpm;       //电机的转速值
+    int16_t  speed_rpm;       // 电机的转速值
     int16_t real_current;     // 实际转矩电流
     uint8_t temperature;      // Celsius
 } dji_motor_measure_t;
@@ -97,7 +97,7 @@ void dji_motor_control();
 /**
  * @brief 停止电机,注意不是将设定值设为零,而是直接给电机发送的电流值置零
  */
-void dji_motor_stop(dji_motor_object_t *motor);
+void dji_motor_relax(dji_motor_object_t *motor);
 
 /**
  * @brief 启动电机,此时电机会响应设定值

@@ -325,7 +325,7 @@ endmenu
 menu "RoboMaster Tasks"
     config BSP_USING_EXAMPLE_TASK
         bool "Select USING Example Task"
-        default y
+        default n
 
     config BSP_USING_INS_TASK
         bool "Select USING Ins Task"
@@ -333,6 +333,26 @@ menu "RoboMaster Tasks"
 
     config BSP_USING_MOTOR_TASK
         bool "Select USING Motor Task"
+        default y
+
+    config BSP_USING_CMD_TASK
+        bool "Select USING Cmd Task"
+        default y
+
+    menuconfig BSP_USING_CHASSIS_TASK
+        bool "Select USING Chassis Task"
+        default y
+        if BSP_USING_CHASSIS_TASK
+            config BSP_CHASSIS_OMNI_MODE
+                bool "Select Chassis Omni Mode"
+                default y
+            config BSP_CHASSIS_MECANUM_MODE
+                bool "Select Chassis Mecanum Mode"
+                default n
+        endif
+    
+    config BSP_USING_GIMBAL_TASK
+        bool "Select USING Gimbal Task"
         default y
 
 endmenu

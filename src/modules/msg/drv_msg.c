@@ -42,6 +42,7 @@ publisher_t *pub_register(char *name, uint8_t len){
 
     if(!check_num){  // 如果不存在重名的话题实例
         topic_obj[idx] = (topic_t *)rt_malloc(sizeof(topic_t));
+        rt_memset(topic_obj[idx], 0, sizeof(topic_t));
         if(topic_obj[idx] == NULL){
             LOG_E("malloc failed!");
             return NULL;
@@ -59,7 +60,7 @@ publisher_t *pub_register(char *name, uint8_t len){
         idx++;
     }
     else{
-        pub->tp = topic_obj[check_num -1];
+        pub->tp = topic_obj[check_num - 1];
         pub->topic_name = topic_obj[check_num - 1]->name;
         pub->len = len;
     }

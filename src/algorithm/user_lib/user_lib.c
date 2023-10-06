@@ -12,7 +12,7 @@
  ******************************************************************************
  */
 #include "stdlib.h"
-#include "memory.h"
+#include "string.h"
 #include "user_lib.h"
 #include "math.h"
 #include "main.h"

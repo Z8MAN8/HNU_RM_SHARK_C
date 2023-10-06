@@ -15,7 +15,9 @@ static uint8_t idx = 0; // register idx,是该文件的全局电机索引,在注
 /* DJI电机的实例,此处仅保存指针,内存的分配将通过电机实例初始化时通过malloc()进行 */
 static dji_motor_object_t *dji_motor_obj[DJI_MOTOR_CNT] = {NULL};
 
+// TODO: 0x2ff容易发送失败
 /**
+ *
  * @brief 由于DJI电机发送以四个一组的形式进行,故对其进行特殊处理,用6个(2can*3group)can_object专门负责发送
  *        该变量将在 dji_motor_control() 中使用,分组在 motor_send_grouping()中进行
  *
@@ -36,7 +38,7 @@ static struct rt_can_msg send_msg[6] = {
 
 /**
  * @brief 6个用于确认是否有电机注册到sender_assignment中的标志位,防止发送空帧,此变量将在dji_motor_control()使用
- *        flag的初始化在 motor_send_grouping()中进行
+ *        flag的初始化在 motor_send_grouping()中进行,012为底盘can,345为云台can
  */
 static uint8_t sender_enable_flag[6] = {0};
 
@@ -58,7 +60,7 @@ static uint8_t sender_enable_flag[6] = {0};
      case M2006:
      case M3508:
          motor_id = motor->rx_id - 0x200; // 下标从零开始,先减一方便赋值
-         if (motor_id < 4) // 根据ID分组
+         if (motor_id <= 4) // 根据ID分组
          {
              motor_send_num = motor_id - 1;
              motor_group = rt_strcmp(config->can_name, can_chassis) ? 4 : 1;
@@ -66,7 +68,7 @@ static uint8_t sender_enable_flag[6] = {0};
          else
          {
              motor_send_num = motor_id - 5;
-             motor_group = rt_strcmp(config->can_name, can_gimbal) ? 3 : 0;
+             motor_group = rt_strcmp(config->can_name, can_chassis) ? 3 : 0;
          }
 
          // 计算接收id并设置分组发送id
@@ -89,7 +91,7 @@ static uint8_t sender_enable_flag[6] = {0};
 
      case GM6020:
          motor_id = motor->rx_id - 0x204; // 下标从零开始,先减一方便赋值
-         if (motor_id < 4)
+         if (motor_id <= 4)
          {
              motor_send_num = motor_id - 1;
              motor_group = rt_strcmp(config->can_name, can_chassis) ? 3 : 0;
@@ -97,7 +99,7 @@ static uint8_t sender_enable_flag[6] = {0};
          else
          {
              motor_send_num = motor_id - 5;
-             motor_group = rt_strcmp(config->can_name, can_gimbal) ? 5 : 2;
+             motor_group = rt_strcmp(config->can_name, can_chassis) ? 5 : 2;
          }
 
          sender_enable_flag[motor_group] = 1; // 只要有电机注册到这个分组,置为1;在发送函数中会通过此标志判断是否有电机注册
@@ -159,7 +161,7 @@ static void decode_dji_motor(dji_motor_object_t *motor, uint8_t *data)
  static void motor_lost_callback(void *motor_ptr)
  {
      dji_motor_object_t *motor = (dji_motor_object_t *)motor_ptr;
-//     dji_motor_stop(motor);
+//     dji_motor_relax(motor);
      LOG_W("[dji_motor] Motor lost, can bus [%s] , id 0x[%x]", motor->can_dev->parent.name, motor->rx_id);
  }
 
@@ -180,7 +182,7 @@ void dji_motot_rx_callback(uint32_t id, uint8_t *data){
     }
 }
 
-void dji_motor_stop(dji_motor_object_t *motor)
+void dji_motor_relax(dji_motor_object_t *motor)
 {
     motor->stop_flag = MOTOR_STOP;
 }
@@ -219,7 +221,7 @@ void dji_motor_control()
 
         // 若该电机处于停止状态,直接将buff置零
         if (motor->stop_flag == MOTOR_STOP)
-            rt_memset(send_msg[group].data + 2 * num, 0, 16u);
+            rt_memset(send_msg[group].data + 2 * num, 0, 2 * sizeof(rt_uint8_t));
     }
 
     // 遍历flag,检查是否要发送这一帧报文

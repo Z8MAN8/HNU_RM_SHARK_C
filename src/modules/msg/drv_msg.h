@@ -8,7 +8,7 @@
 
 #include <rtthread.h>
 
-#define MAX_TOPIC_COUNT 12    // 最多支持的话题数量
+#define MAX_TOPIC_COUNT 20    // 最多支持的话题数量
 #define MSG_NAME_MAX    12    // 话题名称最大长度
 
 /**

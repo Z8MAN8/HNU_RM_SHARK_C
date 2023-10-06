@@ -24,6 +24,7 @@ static rt_uint32_t period = 250000;
 static rt_uint32_t pulse = 0;
 static float temp;
 static pid_obj_t *imu_temp_pid;
+// TODO:使用宏替换
 static pid_config_t imu_temp_config = {
         .Kp = 50000, // 4.5
         .Ki = 8000,  // 0
@@ -37,7 +38,7 @@ static rt_err_t temp_pwm_init(rt_uint32_t period, rt_uint32_t pulse);
 /* ----------------------------- IMU_TEMPRETURE ----------------------------- */
 
 /* ---------------------------- Attitude_Solving ---------------------------- */
-/*static*/ ins_t ins;
+static ins_t ins;
 static imu_param_t imu_param;
 
 const float xb[3] = {1, 0, 0};
@@ -116,15 +117,18 @@ void ins_thread_entry(void *argument)
 
 
         {/* publish msg */
-            ins_msg_p.yaw = ins.yaw;
-            ins_msg_p.pitch = ins.pitch;
-            ins_msg_p.roll = ins.roll;
-            ins_msg_p.yaw_total_angle = ins.yaw_total_angle;
-            for(uint8_t i = 0; i < 3; i++)
-            {
-                ins_msg_p.accel[i] = ins.accel[i];
-                ins_msg_p.gyro[i] = ins.gyro[i];
-            }
+            // FIXME:/* 根据陀螺仪安装情况进行调整 */
+            // NOTE: yaw轴右为正，pitch轴上为正，roll轴顺时针为正
+            ins_msg_p.yaw = -ins.yaw;
+            ins_msg_p.pitch = ins.roll;
+            ins_msg_p.roll = ins.pitch;
+            ins_msg_p.yaw_total_angle = -ins.yaw_total_angle;
+            ins_msg_p.accel[0] = ins.accel[0];
+            ins_msg_p.accel[1] = ins.accel[1];
+            ins_msg_p.accel[2] = ins.accel[2];
+            ins_msg_p.gyro[0] =-ins.gyro[0];
+            ins_msg_p.gyro[1] = ins.gyro[1];
+            ins_msg_p.gyro[2] =-ins.gyro[2];
             pub_push_msg(ins_pub, &ins_msg_p);
         }
 

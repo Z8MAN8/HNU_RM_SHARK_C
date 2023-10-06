@@ -3,7 +3,7 @@
  * Date            Author          Notes
  * 2023-09-24      ChuShicheng     first version
  *                 ZhengWanshun
- *                 Yangshuo
+ *                 YangShuo
  *                 ChenSihan
  */
 #include "rc_sbus.h"

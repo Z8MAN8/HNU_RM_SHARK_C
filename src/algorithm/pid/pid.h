@@ -17,9 +17,21 @@
 #include <rtthread.h>
 #include <math.h>
 
+#define PID_NUM_MAX 30      // 最大PID实例数
+
 #ifndef usr_abs
 #define usr_abs(x) ((x > 0) ? x : -x)
 #endif
+
+#define INIT_PID_CONFIG(Kp_val, Ki_val, Kd_val, IntegralLimit_val, MaxOut_val, Improve_val) \
+    {                                                                                \
+        .Kp = Kp_val,                                                                \
+        .Ki = Ki_val,                                                                \
+        .Kd = Kd_val,                                                                \
+        .IntegralLimit = IntegralLimit_val,                                          \
+        .MaxOut = MaxOut_val,                                                        \
+        .Improve = Improve_val,                                                      \
+    }
 
 /* PID 优化环节使能标志位,通过位与可以判断启用的优化环节 */
 typedef enum
