@@ -17,11 +17,10 @@
 /**
   * @brief 遥控器拨杆值
   */
-enum
-{
-    RC_UP = 158,
-    RC_MI = 232,
-    RC_DN = 50,
+enum {
+    RC_UP = 240,
+    RC_MI = 0,
+    RC_DN = 15,
 };
 
 typedef struct
@@ -30,10 +29,13 @@ typedef struct
     int16_t ch2;   //右侧上下
     int16_t ch3;   //左侧上下
     int16_t ch4;   //左侧左右
-
-    /* 遥控器的拨杆数据，上中下分别为：158、232、50 */
-    uint8_t sw1;   //右侧拨杆
-    uint8_t sw2;   //左侧拨杆
+    int16_t ch5;   //右侧非线性旋钮
+    /* 遥控器的拨杆数据，上中下分别为：240、1024、1807 */
+    uint8_t sw1;   //右侧长拨杆
+    uint8_t sw2;   //左侧长拨杆
+    /* 遥控器的二档拨杆数据，上下分别为：240、1807 */
+    uint8_t sw3;   //右侧短拨杆
+    uint8_t sw4;   //左侧短拨杆
 } rc_obj_t;
 
 /**

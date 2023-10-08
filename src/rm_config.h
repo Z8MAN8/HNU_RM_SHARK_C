@@ -26,7 +26,7 @@
 #define USART_RC       "uart3"
 
 /* ---------------------------------- 遥控器相关 --------------------------------- */
-#define RC_MAX_VALUE      694.0f  /* 遥控器通道最大值 */
+#define RC_MAX_VALUE      784.0f  /* 遥控器通道最大值 */
 
 #define RC_RATIO          0.0009f
 
