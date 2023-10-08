@@ -20,6 +20,9 @@ if GetDepend(['BSP_USING_KALMAN_FILTER']):
     src += [cwd + '/kalman_filter/kalman_filter.c']
     path += [cwd + '/kalman_filter']
 
+if GetDepend(['BSP_USING_RAMP']):
+    src += [cwd + '/ramp/ramp.c']
+    path += [cwd + '/ramp']
 #  使用 arm_math.h 需要添加相关内核定义
 CPPDEFINES = ['ARM_MATH_CM4']
 LIBPATH = [cwd + '/arm_math']

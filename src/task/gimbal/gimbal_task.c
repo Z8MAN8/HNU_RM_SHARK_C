@@ -62,6 +62,9 @@ motor_config_t gimbal_motor_config[GIM_MOTOR_NUM] = {
 
 static rt_int16_t yaw_motor_relive, pitch_motor_relive;  // 电机相对于归中值的角度
 
+static ramp_obj_t *yaw_ramp;//yaw 轴云台控制斜坡
+static ramp_obj_t *pit_ramp;//pitch 轴云台控制斜坡
+
 static dji_motor_object_t *gim_motor[GIM_MOTOR_NUM];  // 底盘电机实例
 static float gim_motor_ref[GIM_MOTOR_NUM]; // 电机控制期望值
 
@@ -80,6 +83,9 @@ void gimbal_thread_entry(void *argument)
     gimbal_pub_init();
     gimbal_sub_init();
     gimbal_motor_init();
+    yaw_ramp = ramp_register(RAMP_COUNT, BACK_CENTER_TIME/GIMBAL_PERIOD);
+    pit_ramp = ramp_register(RAMP_COUNT, BACK_CENTER_TIME/GIMBAL_PERIOD);
+
 
     LOG_I("GIMBAL Task Start");
     for (;;)
@@ -105,6 +111,9 @@ void gimbal_thread_entry(void *argument)
                 dji_motor_relax(gim_motor[i]);
             }
             gim_fdb.back_mode = BACK_STEP;
+            yaw_ramp->reset(yaw_ramp,RAMP_COUNT,BACK_CENTER_TIME/GIMBAL_PERIOD);
+            pit_ramp->reset(pit_ramp,RAMP_COUNT,BACK_CENTER_TIME/GIMBAL_PERIOD);
+
             break;
         case GIMBAL_INIT:
             // TODO：加入斜坡算法，可以控制归中时间
@@ -242,7 +251,7 @@ static rt_int16_t motor_control_yaw(dji_motor_measure_t measure){
             pid_speed = gim_controller[YAW].pid_speed_imu;
             pid_angle = gim_controller[YAW].pid_angle_imu;
             get_speed = ins_data.gyro[Z];
-            get_angle = yaw_motor_relive;
+            get_angle = yaw_motor_relive* ( 1 - yaw_ramp->calc(yaw_ramp));
             break;
         case GIMBAL_GYRO:
             pid_speed = gim_controller[YAW].pid_speed_imu;
@@ -297,7 +306,7 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
             pid_speed = gim_controller[PITCH].pid_speed_imu;
             pid_angle = gim_controller[PITCH].pid_angle_imu;
             get_speed = ins_data.gyro[Y];
-            get_angle = pitch_motor_relive;
+            get_angle = pitch_motor_relive* ( 1 - pit_ramp->calc(pit_ramp));
             break;
         case GIMBAL_GYRO:
             pid_speed = gim_controller[PITCH].pid_speed_imu;

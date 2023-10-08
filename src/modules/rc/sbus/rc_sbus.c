@@ -37,41 +37,47 @@ static rt_timer_t rc_timer;  // 定时器，用于判断遥控器是否在线
 static rt_err_t sbus_rc_decode(uint8_t *buff){
 
     if (buff[0] == 0x0F){
-    /* 下面是正常遥控器数据的处理 */
-    rc_obj[NOW].ch1 = (buff[1] | buff[2] << 8) & 0x07FF;
-    rc_obj[NOW].ch1 -= 1000;
-    rc_obj[NOW].ch2 = (buff[2] >> 3 | buff[3] << 5) & 0x07FF;
-    rc_obj[NOW].ch2 -= 1000;
-    rc_obj[NOW].ch3 = (buff[3] >> 6 | buff[4] << 2 | buff[5] << 10) & 0x07FF;
-    rc_obj[NOW].ch3 -= 1000;
-    rc_obj[NOW].ch4 = (buff[5] >> 1 | buff[6] << 7) & 0x07FF;
-    rc_obj[NOW].ch4 -= 1000;
+        /* 下面是正常遥控器数据的处理 */
+        rc_obj[NOW].ch1 = (buff[1] | buff[2] << 8) & 0x07FF;
+        rc_obj[NOW].ch1 -= 1024;
+        rc_obj[NOW].ch2 = (buff[2] >> 3 | buff[3] << 5) & 0x07FF;
+        rc_obj[NOW].ch2 -= 1024;
+        rc_obj[NOW].ch3 = (buff[3] >> 6 | buff[4] << 2 | buff[5] << 10) & 0x07FF;
+        rc_obj[NOW].ch3 -= 1024;
+        rc_obj[NOW].ch4 = (buff[5] >> 1 | buff[6] << 7) & 0x07FF;
+        rc_obj[NOW].ch4 -= 1024;
+    /* 旋钮值获取 */
+    /* FS-i6s旋钮为非线性，左中右初始值分别为：240、1024、1807 */
+       rc_obj[NOW].ch5 =((buff[12] | buff[13] << 8) & 0x07FF);
+       rc_obj[NOW].ch5 -= 1024;
+        /* 防止遥控器零点有偏差 */
+        if(rc_obj[NOW].ch1 <= 10 && rc_obj[NOW].ch1 >= -10)
+            rc_obj[NOW].ch1 = 0;
+        if(rc_obj[NOW].ch2 <= 10 && rc_obj[NOW].ch2 >= -10)
+            rc_obj[NOW].ch2 = 0;
+        if(rc_obj[NOW].ch3 <= 10 && rc_obj[NOW].ch3 >= -10)
+            rc_obj[NOW].ch3 = 0;
+        if(rc_obj[NOW].ch4 <= 10 && rc_obj[NOW].ch4 >= -10)
+            rc_obj[NOW].ch4 = 0;
+        if(rc_obj[NOW].ch5 <= 10 && rc_obj[NOW].ch5 >= -10)
+            rc_obj[NOW].ch5 = 0;
+        /* 拨杆值获取 */
+        rc_obj[NOW].sw1 = ((buff[9] >> 2 | buff[10] << 6) & 0x07FF);
+        rc_obj[NOW].sw2 = ((buff[7] >> 7 | buff[8] << 1 | buff[9] << 9) & 0x07FF);
+        rc_obj[NOW].sw3 =((buff[10] >> 5| buff[11] << 3) & 0x07FF);
+        rc_obj[NOW].sw4 =((buff[6] >> 4 | buff[7] << 4) & 0x07FF);
+        /* 遥控器异常值处理，函数直接返回 */
+        if ((abs(rc_obj[NOW].ch1) > RC_MAX_VALUE) || \
+        (abs(rc_obj[NOW].ch2) > RC_MAX_VALUE) || \
+        (abs(rc_obj[NOW].ch3) > RC_MAX_VALUE) || \
+        (abs(rc_obj[NOW].ch4) > RC_MAX_VALUE) || \
+        (abs(rc_obj[NOW].ch5) > RC_MAX_VALUE))
+        {
+            memset(&rc_obj[NOW], 0, sizeof(rc_obj_t));
+            return -RT_ERROR;
+        }
 
-    /* 防止遥控器零点有偏差 */
-    if(rc_obj[NOW].ch1 <= 10 && rc_obj[NOW].ch1 >= -10)
-        rc_obj[NOW].ch1 = 0;
-    if(rc_obj[NOW].ch2 <= 10 && rc_obj[NOW].ch2 >= -10)
-        rc_obj[NOW].ch2 = 0;
-    if(rc_obj[NOW].ch3 <= 10 && rc_obj[NOW].ch3 >= -10)
-        rc_obj[NOW].ch3 = 0;
-    if(rc_obj[NOW].ch4 <= 10 && rc_obj[NOW].ch4 >= -10)
-        rc_obj[NOW].ch4 = 0;
-
-    /* 拨杆值获取 */
-    rc_obj[NOW].sw1 = ((buff[6] >> 4|buff[7]<<4) & 0x07FF) ;
-    rc_obj[NOW].sw2 = ((buff[7] >> 7|buff[8]<<1) & 0x07FF) ;
-
-    /* 遥控器异常值处理，函数直接返回 */
-    if ((abs(rc_obj[NOW].ch1) > 700) || \
-        (abs(rc_obj[NOW].ch2) > 700) || \
-        (abs(rc_obj[NOW].ch3) > 700) || \
-        (abs(rc_obj[NOW].ch4) > 700))
-    {
-        memset(&rc_obj[NOW], 0, sizeof(rc_obj_t));
-        return -RT_ERROR;
-    }
-
-    rc_obj[LAST] = rc_obj[NOW];
+        rc_obj[LAST] = rc_obj[NOW];
     }
 }
 

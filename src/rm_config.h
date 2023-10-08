@@ -26,7 +26,7 @@
 #define USART_RC       "uart3"
 
 /* ---------------------------------- 遥控器相关 --------------------------------- */
-#define RC_MAX_VALUE      694.0f  /* 遥控器通道最大值 */
+#define RC_MAX_VALUE      784.0f  /* 遥控器通道最大值 */
 
 #define RC_RATIO          0.0009f
 
@@ -95,6 +95,12 @@
 /* pitch轴最大俯角 */
 #define PIT_ANGLE_MIN        -32.9f
 
+/* 云台控制周期 (ms) */
+#define GIMBAL_PERIOD 1
+/* 云台回中初始化时间 (ms) */
+#define BACK_CENTER_TIME 500
+/* 云台斜坡算法计数器初始值 */
+#define RAMP_COUNT 0
 /* -------------------------------- 云台电机PID参数 ------------------------------- */
 /* 云台yaw轴电机PID参数 */
 /* imu速度环 */
