@@ -332,6 +332,7 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
 
     if(gim_cmd.ctrl_mode == GIMBAL_INIT)  // 编码器闭环
     {
+        /*串级pid的使用，角度环套在速度环上面*/
         /* 注意负号 */
         pid_out_angle = -pid_calculate(pid_angle, get_angle, gim_motor_ref[PITCH]);  // 编码器增长方向与imu相反
         send_data = -pid_calculate(pid_speed, get_speed, pid_out_angle);     // 电机转动正方向与imu相反
