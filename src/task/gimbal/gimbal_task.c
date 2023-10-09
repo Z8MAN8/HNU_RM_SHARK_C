@@ -36,6 +36,10 @@ static void gimbal_sub_pull(void);
 #define X 0
 #define Y 1
 #define Z 2
+/* 云台控制周期 (ms) */
+#define GIMBAL_PERIOD 1
+/* 云台回中初始化时间 (ms) */
+#define BACK_CENTER_TIME /*6000*/500
 static struct gimbal_controller_t{
     /* 基于imu数据闭环，主要用于手动模式 */
     pid_obj_t *pid_speed_imu;
@@ -105,6 +109,8 @@ void gimbal_thread_entry(void *argument)
                 dji_motor_relax(gim_motor[i]);
             }
             gim_fdb.back_mode = BACK_STEP;
+            ramp_init(&pit_ramp, BACK_CENTER_TIME/GIMBAL_PERIOD);
+            ramp_init(&yaw_ramp, BACK_CENTER_TIME/GIMBAL_PERIOD);
             break;
         case GIMBAL_INIT:
             // TODO：加入斜坡算法，可以控制归中时间
@@ -242,7 +248,7 @@ static rt_int16_t motor_control_yaw(dji_motor_measure_t measure){
             pid_speed = gim_controller[YAW].pid_speed_imu;
             pid_angle = gim_controller[YAW].pid_angle_imu;
             get_speed = ins_data.gyro[Z];
-            get_angle = yaw_motor_relive;
+            get_angle = yaw_motor_relive* ( 1 - ramp_calc(&yaw_ramp));
             break;
         case GIMBAL_GYRO:
             pid_speed = gim_controller[YAW].pid_speed_imu;
@@ -297,7 +303,7 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
             pid_speed = gim_controller[PITCH].pid_speed_imu;
             pid_angle = gim_controller[PITCH].pid_angle_imu;
             get_speed = ins_data.gyro[Y];
-            get_angle = pitch_motor_relive;
+            get_angle = pitch_motor_relive* ( 1 - ramp_calc(&pit_ramp));
             break;
         case GIMBAL_GYRO:
             pid_speed = gim_controller[PITCH].pid_speed_imu;

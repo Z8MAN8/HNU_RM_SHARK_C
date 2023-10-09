@@ -319,6 +319,9 @@ menu "RoboMaster Algorithms"
     config BSP_USING_KALMAN_FILTER
        bool "Select USING KalmanFilter"
        default y
+    config BSP_USING_RAMP
+       bool "Select USING ramp"
+       default y
 
 endmenu
 

@@ -137,6 +137,9 @@
 /* Wiced WiFi */
 
 
+/* CYW43012 WiFi */
+
+
 /* IoT Cloud */
 
 
@@ -284,6 +287,7 @@
 #define BSP_USING_PID
 #define BSP_USING_QUATERNIONESF
 #define BSP_USING_KALMAN_FILTER
+#define BSP_USING_RAMP
 
 /* RoboMaster Tasks */
 
