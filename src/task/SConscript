@@ -31,6 +31,10 @@ if GetDepend(['BSP_USING_GIMBAL_TASK']):
     src += Glob(cwd + '/gimbal/*.c')
     path += [cwd + '/gimbal']
 
+if GetDepend(['BSP_USING_TRANSMISSION_TASK']):
+    src += Glob(cwd + '/transmission/*.c')
+    path += [cwd + '/transmission']
+
 group = DefineGroup('RM_Task', src, depend = [''], CPPPATH = path)
 
 Return('group')

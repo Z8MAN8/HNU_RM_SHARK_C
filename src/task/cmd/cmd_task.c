@@ -120,7 +120,7 @@ static void remote_to_cmd(void)
 
     // 左拨杆sw2为上时，底盘和云台均REALX；为中时，云台为GYRO；为下时，云台为AUTO。
     // 右拨杆sw1为上时，底盘为FOLLOW；为中时，底盘为OPEN；为下时，底盘为SPIN。
-    switch (rc_now->sw1)
+    switch (rc_now->sw1_ch6)
     {
     case RC_UP:
         if(gim_cmd.ctrl_mode != GIMBAL_INIT && gim_cmd.ctrl_mode != GIMBAL_RELAX)
@@ -142,7 +142,7 @@ static void remote_to_cmd(void)
         break;
     }
     /* 因为左拨杆值会影响到底盘RELAX状态，所以后判断 */
-    switch(rc_now->sw2)
+    switch(rc_now->sw2_ch7)
     {
     case RC_UP:
         gim_cmd.ctrl_mode = GIMBAL_RELAX;

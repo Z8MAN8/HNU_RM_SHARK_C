@@ -34,7 +34,9 @@
 #ifdef BSP_USING_GIMBAL_TASK
 #include "gimbal_task.h"
 #endif /* BSP_USING_GIMBAL_TASK */
-
+#ifdef BSP_USING_TRANSMISSION_TASK
+#include "transmission_task.h"
+#endif /* BSP_USING_TRANSMISSION_TASK */
 
 
 /* --------------------------------- 话题的数据格式 -------------------------------- */
