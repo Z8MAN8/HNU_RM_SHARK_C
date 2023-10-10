@@ -1,16 +1,8 @@
 //
-// Created by 欧阳小枫 on 2023/10/7.
-//
-//
 // Created by turboDog on 2021/11/21.
 //
 
 #include "ramp.h"
-
-/* yaw 轴云台控制斜坡 */
-ramp_t yaw_ramp = RAMP_GEN_DAFAULT;
-/* pitch 轴云台控制斜坡 */
-ramp_t pit_ramp = RAMP_GEN_DAFAULT;
 
 /**
   * @brief     斜坡控制结构体初始化

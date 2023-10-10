@@ -19,6 +19,7 @@ if GetDepend(['BSP_USING_QUATERNIONESF']):
 if GetDepend(['BSP_USING_KALMAN_FILTER']):
     src += [cwd + '/kalman_filter/kalman_filter.c']
     path += [cwd + '/kalman_filter']
+
 if GetDepend(['BSP_USING_RAMP']):
     src += [cwd + '/ramp/ramp.c']
     path += [cwd + '/ramp']

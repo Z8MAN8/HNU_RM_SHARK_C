@@ -29,4 +29,5 @@
 #ifdef BSP_USING_RAMP
 #include "ramp.h"
 #endif /* BSP_USING_RAMP */
+
 #endif /* _RM_ALGORITHM_H */

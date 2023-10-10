@@ -1,5 +1,5 @@
 //
-// Created by 欧阳小枫 on 2023/10/7.
+// Created by turboDog on 2021/11/21.
 //
 
 #ifndef RTTHREAD_RAMP_H
@@ -36,10 +36,5 @@ void  ramp_init(ramp_t *ramp, int32_t scale);
   * @retval    斜坡控制计算输出
   */
 float ramp_calc(ramp_t *ramp);
-
-/* yaw 轴云台控制斜坡 */
-extern ramp_t yaw_ramp;
-/* pitch 轴云台控制斜坡 */
-extern ramp_t pit_ramp;
 
 #endif //RTTHREAD_RAMP_H

@@ -36,10 +36,6 @@ static void gimbal_sub_pull(void);
 #define X 0
 #define Y 1
 #define Z 2
-/* 云台控制周期 (ms) */
-#define GIMBAL_PERIOD 1
-/* 云台回中初始化时间 (ms) */
-#define BACK_CENTER_TIME /*6000*/500
 static struct gimbal_controller_t{
     /* 基于imu数据闭环，主要用于手动模式 */
     pid_obj_t *pid_speed_imu;
@@ -65,6 +61,9 @@ motor_config_t gimbal_motor_config[GIM_MOTOR_NUM] = {
 };
 
 static rt_int16_t yaw_motor_relive, pitch_motor_relive;  // 电机相对于归中值的角度
+
+static ramp_t yaw_ramp = RAMP_GEN_DAFAULT;//yaw 轴云台控制斜坡
+static ramp_t pit_ramp = RAMP_GEN_DAFAULT;//pitch 轴云台控制斜坡
 
 static dji_motor_object_t *gim_motor[GIM_MOTOR_NUM];  // 底盘电机实例
 static float gim_motor_ref[GIM_MOTOR_NUM]; // 电机控制期望值
