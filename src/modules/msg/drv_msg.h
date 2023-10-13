@@ -48,10 +48,10 @@ typedef struct publisher
  * @brief 订阅name的话题消息
  *
  * @param name 话题名称
- * @param data 消息长度,通过sizeof()获取
+ * @param len 消息长度,通过sizeof()获取
  * @return subscriber_t* 返回订阅者实例
  */
-subscriber_t *sub_register(char *name, uint8_t data);
+subscriber_t *sub_register(char *name, uint8_t len);
 
 /**
  * @brief 注册成为消息发布者

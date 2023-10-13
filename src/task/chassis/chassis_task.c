@@ -83,14 +83,14 @@ void chassis_thread_entry(void *argument)
             chassis_cmd.vw = pid_calculate(follow_pid, chassis_cmd.offset_angle, 0);
             /* 底盘运动学解算 */
             absolute_cal(&chassis_cmd, chassis_cmd.offset_angle);
-            omni_calc(&chassis_cmd, motor_ref);
+            chassis_calc_moto_speed(&chassis_cmd, motor_ref);
             break;
         case CHASSIS_SPIN:
             absolute_cal(&chassis_cmd, chassis_cmd.offset_angle);
-            omni_calc(&chassis_cmd, motor_ref);
+            chassis_calc_moto_speed(&chassis_cmd, motor_ref);
             break;
         case CHASSIS_OPEN_LOOP:
-            omni_calc(&chassis_cmd, motor_ref);
+            chassis_calc_moto_speed(&chassis_cmd, motor_ref);
             break;
         case CHASSIS_STOP:
             rt_memset(motor_ref, 0, sizeof(motor_ref));
