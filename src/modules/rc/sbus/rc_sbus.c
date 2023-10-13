@@ -47,9 +47,10 @@ static rt_err_t sbus_rc_decode(uint8_t *buff){
         rc_obj[NOW].ch4 = (buff[5] >> 1 | buff[6] << 7) & 0x07FF;
         rc_obj[NOW].ch4 -= 1024;
     /* 旋钮值获取 */
-    /* FS-i6s旋钮为非线性，左中右初始值分别为：240、1024、1807 */
        rc_obj[NOW].ch5 =((buff[12] | buff[13] << 8) & 0x07FF);
        rc_obj[NOW].ch5 -= 1024;
+       rc_obj[NOW].ch6 =((buff[13] >> 3 | buff[14] << 5) & 0x07FF);
+       rc_obj[NOW].ch6 -= 1024;
         /* 防止遥控器零点有偏差 */
         if(rc_obj[NOW].ch1 <= 10 && rc_obj[NOW].ch1 >= -10)
             rc_obj[NOW].ch1 = 0;
@@ -61,6 +62,8 @@ static rt_err_t sbus_rc_decode(uint8_t *buff){
             rc_obj[NOW].ch4 = 0;
         if(rc_obj[NOW].ch5 <= 10 && rc_obj[NOW].ch5 >= -10)
             rc_obj[NOW].ch5 = 0;
+        if(rc_obj[NOW].ch6 <= 10 && rc_obj[NOW].ch6 >= -10)
+            rc_obj[NOW].ch6 = 0;
         /* 拨杆值获取 */
         rc_obj[NOW].sw1 = ((buff[9] >> 2 | buff[10] << 6) & 0x07FF);
         rc_obj[NOW].sw2 = ((buff[7] >> 7 | buff[8] << 1 | buff[9] << 9) & 0x07FF);
@@ -71,7 +74,8 @@ static rt_err_t sbus_rc_decode(uint8_t *buff){
         (abs(rc_obj[NOW].ch2) > RC_MAX_VALUE) || \
         (abs(rc_obj[NOW].ch3) > RC_MAX_VALUE) || \
         (abs(rc_obj[NOW].ch4) > RC_MAX_VALUE) || \
-        (abs(rc_obj[NOW].ch5) > RC_MAX_VALUE))
+        (abs(rc_obj[NOW].ch5) > RC_MAX_VALUE) || \
+        (abs(rc_obj[NOW].ch6) > RC_MAX_VALUE))
         {
             memset(&rc_obj[NOW], 0, sizeof(rc_obj_t));
             return -RT_ERROR;
