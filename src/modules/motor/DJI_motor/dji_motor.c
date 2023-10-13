@@ -72,7 +72,6 @@ static uint8_t sender_enable_flag[6] = {0};
          }
 
          // 计算接收id并设置分组发送id
-         config->rx_id = 0x200 + motor_id + 1;   // 把ID+1,进行分组设置
          sender_enable_flag[motor_group] = 1; // 设置发送标志位,防止发送空帧
          motor->message_num = motor_send_num;
          motor->send_group = motor_group;
