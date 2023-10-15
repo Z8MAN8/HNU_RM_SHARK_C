@@ -62,8 +62,8 @@ motor_config_t gimbal_motor_config[GIM_MOTOR_NUM] = {
 
 static rt_int16_t yaw_motor_relive, pitch_motor_relive;  // 电机相对于归中值的角度
 
-static ramp_config_t *yaw_ramp;//yaw 轴云台控制斜坡
-static ramp_config_t *pit_ramp;//pitch 轴云台控制斜坡
+static ramp_obj_t *yaw_ramp;//yaw 轴云台控制斜坡
+static ramp_obj_t *pit_ramp;//pitch 轴云台控制斜坡
 
 static dji_motor_object_t *gim_motor[GIM_MOTOR_NUM];  // 底盘电机实例
 static float gim_motor_ref[GIM_MOTOR_NUM]; // 电机控制期望值

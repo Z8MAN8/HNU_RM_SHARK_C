@@ -6,14 +6,14 @@
 
 static uint8_t idx = 0; // register idx,是该文件的全局ramp索引,在注册时使用
 /* ramp斜坡算法的实例,此处仅保存指针,内存的分配将通过实例初始化时通过malloc()进行 */
-static ramp_config_t *ramp_config[RAMP_NUM_MAX] = {NULL};
+static ramp_obj_t *ramp_obj[RAMP_NUM_MAX] = {NULL};
 
 /**
   * @brief     斜坡控制结构体初始化
   * @param[in] ramp: 斜坡数据结构体指针
   * @param[in] scale: 控制数据变化斜率
   */
-void ramp_reset(ramp_config_t *ramp, int32_t count,int32_t scale)
+void ramp_reset(ramp_obj_t *ramp, int32_t count,int32_t scale)
 {
     ramp->count = count;
     ramp->scale = scale;
@@ -24,7 +24,7 @@ void ramp_reset(ramp_config_t *ramp, int32_t count,int32_t scale)
   * @param[in] ramp: 斜坡数据结构体指针
   * @retval    斜坡控制计算输出
   */
-float ramp_calc(ramp_config_t *ramp)
+float ramp_calc(ramp_obj_t *ramp)
 {
     if (ramp->scale <= 0)
         return 0;
@@ -40,16 +40,16 @@ float ramp_calc(ramp_config_t *ramp)
  * @brief 初始化ramp实例,并返回ramp实例指针
  * @param config PID初始化设置
  */
-ramp_config_t *ramp_register(int32_t count,int32_t scale)
+ramp_obj_t *ramp_register(int32_t count,int32_t scale)
 {
-    ramp_config_t *object = (ramp_config_t *)rt_malloc(sizeof(ramp_config_t));
-    rt_memset(object, 0, sizeof(ramp_config_t));
+    ramp_obj_t *object = (ramp_obj_t *)rt_malloc(sizeof(ramp_obj_t));
+    rt_memset(object, 0, sizeof(ramp_obj_t));
 
     object->count = count;
     object->scale = scale;
     object->reset = &ramp_reset;
     object->calc = &ramp_calc;
 
-    ramp_config[idx++] = object;
+    ramp_obj[idx++] = object;
     return object;
 }
