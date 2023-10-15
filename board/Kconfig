@@ -286,6 +286,13 @@ menu "RoboMaster Modules"
                 default y
         endif
 
+    config BSP_USING_BUZZER
+        bool "Enable Buzzer on Board"
+        select BSP_USING_PWM
+        select BSP_USING_PWM4
+        select BSP_USING_PWM4_CH3
+        default n
+
     menuconfig BSP_USING_IMU
         bool "Enable IMU"
         default y

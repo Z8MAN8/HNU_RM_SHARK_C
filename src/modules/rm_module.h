@@ -38,5 +38,8 @@
 #ifdef BSP_USING_RC_SBUS
 #include "rc_sbus.h"
 #endif /* BSP_USING_RC_SBUS */
+#ifdef BSP_USING_BUZZER
+#include "buzzer.h"
+#endif /* BSP_USING_BUZZER */
 
 #endif /* _RM_MODULE_H */

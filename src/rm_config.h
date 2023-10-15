@@ -22,6 +22,10 @@
 #define SPI_ACC        "spi1"
 #define SPI_ACC_CS     4
 
+/* 蜂鸣器所挂载的 PWM 设备名称 */
+#define PWM_BUZZER     "pwm4"
+#define BUZZER_CHANNEL 3
+
 /* 遥控器所挂载的 usart 设备名称 */
 #define USART_RC       "uart3"
 
