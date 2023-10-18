@@ -70,7 +70,7 @@ static rt_int16_t motor_control_yaw(dji_motor_measure_t measure);
 static rt_int16_t motor_control_pitch(dji_motor_measure_t measure);
 static rt_int16_t get_relative_pos(rt_int16_t raw_ecd, rt_int16_t center_offset);
 
-
+static uint8_t relative_flag;
 /* --------------------------------- 云台线程入口 --------------------------------- */
 void gimbal_thread_entry(void *argument)
 {
@@ -131,6 +131,16 @@ void gimbal_thread_entry(void *argument)
             gim_fdb.yaw_relative_angle = -yaw_motor_relive;
             break;
         // TODO: add auto mode
+        case GIMBAL_AUTO:
+            gim_cmd.ctrl_mode =GIMBAL_AUTO;
+            if(relative_flag)
+            { //相对角度
+                gim_motor_ref[YAW] =gim_cmd.yaw;
+                gim_motor_ref[PITCH] =gim_cmd.pitch;
+            } else{//绝对角度
+                gim_motor_ref[YAW] = gim_cmd.yaw -gim_fdb.yaw_offset_angle;
+                gim_motor_ref[PITCH] = gim_cmd.pitch -gim_fdb.pit_offset_angle;
+            }
         default:
             for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
             {
