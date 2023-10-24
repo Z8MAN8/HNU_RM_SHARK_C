@@ -13,9 +13,6 @@
 #define _MOTOR_DEF_H
 
 #include <rtthread.h>
-#ifdef BSP_USING_DJI_MOTOR
-#include "dji_motor.h"
-#endif /* BSP_USING_DJI_MOTOR */
 
 #ifndef PI
 #define PI 3.1415926535f

@@ -11,6 +11,13 @@
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
+#define DJI_MOTOR_CNT 14             // 默认波特率下，实测挂载电机极限数量
+
+/* 滤波系数设置为1的时候即关闭滤波 */
+#define SPEED_SMOOTH_COEF 0.85f      // 最好大于0.85
+#define CURRENT_SMOOTH_COEF 0.9f     // 必须大于0.9
+#define ECD_ANGLE_COEF_DJI 0.043945f // (360/8192),将编码器值转化为角度制
+
 static uint8_t idx = 0; // register idx,是该文件的全局电机索引,在注册时使用
 /* DJI电机的实例,此处仅保存指针,内存的分配将通过电机实例初始化时通过malloc()进行 */
 static dji_motor_object_t *dji_motor_obj[DJI_MOTOR_CNT] = {NULL};
@@ -264,7 +271,7 @@ dji_motor_object_t *dji_motor_register(motor_config_t *config, void *control)
     motor_send_grouping(object, config);
 
     // 电机离线检测定时器相关
-    object->timer = rt_timer_create("motor",
+    object->timer = rt_timer_create("dji_motor",
                              motor_lost_callback,
                              object, 20,
                              RT_TIMER_FLAG_PERIODIC);

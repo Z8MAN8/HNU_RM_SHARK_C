@@ -271,6 +271,7 @@
 
 #define BSP_USING_MOTOR
 #define BSP_USING_DJI_MOTOR
+#define BSP_USING_HT_MOTOR
 #define BSP_USING_DWT
 #define BSP_USING_PS_MSG
 #define BSP_USING_MAG
@@ -287,6 +288,7 @@
 
 /* RoboMaster Tasks */
 
+#define BSP_USING_EXAMPLE_TASK
 #define BSP_USING_INS_TASK
 #define BSP_USING_MOTOR_TASK
 #define BSP_USING_CMD_TASK
