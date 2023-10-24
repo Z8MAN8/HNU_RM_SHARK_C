@@ -267,6 +267,10 @@ menu "RoboMaster Modules"
             config BSP_USING_DJI_MOTOR
                 bool "Using DJI Motors"
                 default y
+
+            config BSP_USING_HT_MOTOR
+                bool "Using HT Motors"
+                default n
         endif
 
     config BSP_USING_DWT
