@@ -94,7 +94,7 @@ typedef struct ht_motor_object
 
 - `ht_motor_measure_t`是海泰电机的反馈信息；
 - 使用软件定时器监控电机是否离线，若超出规定时间没有接收到反馈报文并对定时器进行更新，则判定为电机离线；
-- `ht_motor_object_t` 是一个DJI电机实例。一个电机实例内包含电机的反馈信息，电机的控制设置，电机控制器，电机对应的CAN实例以及电机的类型，增加 `set_mode` api
+- `ht_motor_object_t` 是一个ht电机实例。一个电机实例内包含电机的反馈信息，电机的控制设置，电机控制器，电机对应的CAN实例以及电机的类型，增加 `set_mode` api
 
 ## 外部接口
 

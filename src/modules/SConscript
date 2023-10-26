@@ -16,6 +16,10 @@ if GetDepend(['BSP_USING_HT_MOTOR']):
     src += [cwd + '/motor/HT_motor/ht04.c']
     path += [cwd + '/motor/HT_motor']
 
+if GetDepend(['BSP_USING_LK_MOTOR']):
+    src += [cwd + '/motor/LK_motor/lk_motor.c']
+    path += [cwd + '/motor/LK_motor']
+
 if GetDepend(['BSP_USING_DWT']):
     src += [cwd + '/dwt/drv_dwt.c']
     path += [cwd + '/dwt']

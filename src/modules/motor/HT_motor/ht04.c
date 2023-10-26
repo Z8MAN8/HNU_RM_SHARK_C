@@ -14,7 +14,6 @@
 #include <rtdbg.h>
 
 #define HT_MOTOR_CNT 4
-// #define CAN_MASTER_ID 0x10  // 主控发送ID
 /* 滤波系数设置为1的时候即关闭滤波 */
 #define CURRENT_SMOOTH_COEF 0.9f
 #define SPEED_BUFFER_SIZE 5

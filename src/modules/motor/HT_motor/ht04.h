@@ -49,7 +49,7 @@ typedef struct
 } ht_motor_measure_t;
 
 /**
- * @brief DJI intelligent motor typedef
+ * @brief HT intelligent motor typedef
  */
 typedef struct ht_motor_object
 {

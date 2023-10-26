@@ -24,6 +24,9 @@
 #ifdef BSP_USING_HT_MOTOR
 #include "ht04.h"
 #endif /* BSP_USING_HT_MOTOR */
+#ifdef BSP_USING_LK_MOTOR
+#include "lk_motor.h"
+#endif /* BSP_USING_LK_MOTOR */
 #include "drv_dwt.h"
 #endif /* BSP_USING_PS_MSG */
 #ifdef BSP_USING_PS_MSG

@@ -41,6 +41,7 @@ typedef enum
     M3508,
     M2006,
     HT04,
+    MF9025,
 } motor_type_e;
 
 /* 电机配置结构体 */
