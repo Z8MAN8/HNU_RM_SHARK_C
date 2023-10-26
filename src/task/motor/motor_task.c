@@ -20,17 +20,20 @@ void motor_thread_entry(void *argument)
         // static uint8_t cnt = 0; 设定不同电机的任务频率
         // if(cnt%5==0) //200hz
         // if(cnt%10==0) //100hz
+#ifdef BSP_USING_DJI_MOTOR
         dji_motor_control();
-
-        /* 如果有对应的电机则取消注释,可以加入条件编译或者register对应的idx判断是否注册了电机 */
-        // LKMotorControl();
-
+#endif /* BSP_USING_DJI_MOTOR */
+#ifdef BSP_USING_LK_MOTOR
+        lk_motor_control();
+#endif /* BSP_USING_LK_MOTOR */
+#ifdef BSP_USING_HT_MOTOR
         ht_motor_control();
+#endif /* BSP_USING_HT_MOTOR */
 
         /* 用于调试监测线程调度使用 */
         motor_dt = dwt_get_time_ms() - motor_start;
         if (motor_dt > 1){
-//            rt_kprintf("Motor Task is being DELAY! dt = [%f]\n", &motor_dt);
+           rt_kprintf("Motor Task is being DELAY! dt = [%f]\n", &motor_dt);
         }
         rt_thread_delay(1);
     }
