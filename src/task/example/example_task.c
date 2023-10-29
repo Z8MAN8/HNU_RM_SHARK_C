@@ -15,31 +15,57 @@
 
 static struct chassis_controller_t{
     pid_obj_t *speed_pid;
-}chassis_controller;
+}chassis_controller[2];
 
-static struct gimbal_controller_t{
-    pid_obj_t *speed_pid;
-    pid_obj_t *angle_pid;
-}gimbal_controlelr;
+static ht_motor_object_t *ht_chassis_motor[2];
+static lk_motor_object_t *lk_chassis_motor[2];
 
-static dji_motor_object_t *chassis_motor;
-static dji_motor_object_t *gimbal_motor;
+static int16_t lk_control1(lk_motor_measure_t measure){
+    static int16_t set;
 
-static rt_int16_t chassis_control(dji_motor_measure_t measure){
-    static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller.speed_pid, measure.speed_rpm, 1000);
+    set = pid_calculate(chassis_controller[0].speed_pid, measure.speed_rads, measure.target);
+
     return set;
 }
 
-static rt_int16_t gimbal_control(dji_motor_measure_t measure){
-    static rt_int16_t set = 0;
-    set = pid_calculate(gimbal_controlelr.speed_pid, measure.speed_rpm, 0);
+static int16_t lk_control2(lk_motor_measure_t measure){
+    static int16_t set;
+
+    set = pid_calculate(chassis_controller[0].speed_pid, measure.speed_rads, measure.target);
+
+    return set;
+}
+
+
+static ht_motor_para_t chassis_control(ht_motor_measure_t measure){
+    static ht_motor_para_t set;
+
+    {
+        set.p = 0;
+        set.kp = 0;
+        set.v = -1;
+        set.kd = 1;
+        set.t = 0;
+    }
+    return set;
+}
+
+static ht_motor_para_t chassis_control2(ht_motor_measure_t measure){
+    static ht_motor_para_t set;
+
+    {
+        set.p = 0;
+        set.kp = 0;
+        set.v = 4;
+        set.kd = 1;
+        set.t = 0;
+    }
     return set;
 }
 
 static void example_init()
 {
-    pid_config_t chassis_speed_config = {
+    pid_config_t lk_speed_config = {
             .Kp = 10, // 4.5
             .Ki = 0,  // 0
             .Kd = 0,  // 0
@@ -47,31 +73,42 @@ static void example_init()
             .Improve = PID_Trapezoid_Intergral | PID_Integral_Limit | PID_Derivative_On_Measurement,
             .MaxOut = 12000,
     };
-    pid_config_t gimbal_speed_config = {
-            .Kp = 50,  // 50
-            .Ki = 200, // 200
-            .Kd = 0,
-            .Improve = PID_Trapezoid_Intergral | PID_Integral_Limit | PID_Derivative_On_Measurement,
-            .IntegralLimit = 3000,
-            .MaxOut = 20000,
-    };
-    chassis_controller.speed_pid = pid_register(&chassis_speed_config);
-    gimbal_controlelr.speed_pid = pid_register(&gimbal_speed_config);
+    chassis_controller[0].speed_pid = pid_register(&lk_speed_config);
+    chassis_controller[1].speed_pid = pid_register(&lk_speed_config);
 
-    motor_config_t chassis_motor_config = {
-            .motor_type = M3508,
+/*    motor_config_t chassis_motor_config = {
+            .motor_type = HT04,
             .can_name = CAN_CHASSIS,
-            .rx_id = 0x201,
+            .tx_id = 0x01,
+            .rx_id = 0x10,
             .controller = &chassis_controller,
     };
-    motor_config_t gimbal_motor_config = {
-            .motor_type = GM6020,
-            .can_name = CAN_GIMBAL,
-            .rx_id = 0x206,
-            .controller = &gimbal_controlelr,
+    motor_config_t chassis_motor2_config = {
+            .motor_type = HT04,
+            .can_name = CAN_CHASSIS,
+            .tx_id = 0x02,
+            .rx_id = 0x10,
+            .controller = &chassis_controller,
     };
-    chassis_motor = dji_motor_register(&chassis_motor_config, chassis_control);
-    gimbal_motor = dji_motor_register(&gimbal_motor_config, gimbal_control);
+    ht_chassis_motor[0] = ht_motor_register(&chassis_motor_config, chassis_control);
+    ht_chassis_motor[1] = ht_motor_register(&chassis_motor2_config, chassis_control2);*/
+
+    motor_config_t lk_motor1_config = {
+            .motor_type = MF9025,
+            .can_name = CAN_CHASSIS,
+            .tx_id = 0x280,
+            .rx_id = 0x141,
+            .controller = &chassis_controller[0],
+    };
+    motor_config_t lk_motor2_config = {
+            .motor_type = MF9025,
+            .can_name = CAN_CHASSIS,
+            .tx_id = 0x280,
+            .rx_id = 0x142,
+            .controller = &chassis_controller[1],
+    };
+    lk_chassis_motor[0] = lk_motor_register(&lk_motor1_config, lk_control1);
+//    lk_chassis_motor[1] = lk_motor_register(&lk_motor2_config, lk_control2);
 }
 
 void example_thread_entry(void *argument)
