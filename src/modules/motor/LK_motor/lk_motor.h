@@ -76,9 +76,10 @@ void lk_motor_enable(lk_motor_object_t *motor);
 /**
  * @brief 电机反馈报文接收回调函数,该函数被can_rx_call调用
  *
+ * @param dev 接收到报文的CAN设备
  * @param id 接收到的报文的id
  * @param data 接收到的报文的数据
  */
-void lk_motot_rx_callback(uint32_t id, uint8_t *data);
+void lk_motot_rx_callback(rt_device_t dev, uint32_t id, uint8_t *data);
 
 #endif /* _LK_MOTOR_H */

@@ -20,10 +20,10 @@ rt_err_t can1_rx_call(rt_device_t dev, rt_size_t size)
     dji_motot_rx_callback(dev, rxmsg.id, rxbuff);
 #endif /* BSP_USING_DJI_MOTOR */
 #ifdef BSP_USING_HT_MOTOR
-    ht_motot_rx_callback(rxmsg.id, rxbuff);
+    ht_motot_rx_callback(dev, rxmsg.id, rxbuff);
 #endif /* BSP_USING_HT_MOTOR */
 #ifdef BSP_USING_LK_MOTOR
-    lk_motot_rx_callback(rxmsg.id, rxbuff);
+    lk_motot_rx_callback(dev, rxmsg.id, rxbuff);
 #endif /* BSP_USING_LK_MOTOR */
 
     return RT_EOK;
@@ -42,6 +42,12 @@ rt_err_t can2_rx_call(rt_device_t dev, rt_size_t size)
 #ifdef BSP_USING_DJI_MOTOR
     dji_motot_rx_callback(dev, rxmsg.id, rxbuff);
 #endif /* BSP_USING_DJI_MOTOR */
+#ifdef BSP_USING_HT_MOTOR
+    ht_motot_rx_callback(dev, rxmsg.id, rxbuff);
+#endif /* BSP_USING_HT_MOTOR */
+#ifdef BSP_USING_LK_MOTOR
+    lk_motot_rx_callback(dev, rxmsg.id, rxbuff);
+#endif /* BSP_USING_LK_MOTOR */
 
     return RT_EOK;
 }

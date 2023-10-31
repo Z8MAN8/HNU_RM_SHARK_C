@@ -123,14 +123,15 @@ static void motor_lost_callback(void *motor_ptr)
 /**
  * @brief 电机反馈报文接收回调函数,该函数被can_rx_call调用
  *
+ * @param dev 接收到报文的CAN设备
  * @param id 接收到的报文的id
  * @param data 接收到的报文的数据
  */
-void ht_motot_rx_callback(uint32_t id, uint8_t *data){
+void ht_motot_rx_callback(rt_device_t dev, uint32_t id, uint8_t *data){
     // 找到对应的实例后再调用motor_decode进行解析
     for (size_t i = 0; i < idx; ++i)
     {   /* 详见HT04电机手册反馈报文 */
-        if (ht_motor_obj[i]->tx_id == data[0])
+        if (ht_motor_obj[i]->can_dev == dev && ht_motor_obj[i]->tx_id == data[0])
         {
             motor_decode(ht_motor_obj[i], data);
         }
