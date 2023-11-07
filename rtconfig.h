@@ -280,6 +280,7 @@
 #define BSP_USING_IMU
 #define BSP_USING_BMI088
 #define BSP_USING_RC_SBUS
+#define BSP_USING_LEG
 
 /* RoboMaster Algorithms */
 
@@ -296,6 +297,9 @@
 #define BSP_USING_CHASSIS_TASK
 #define BSP_CHASSIS_OMNI_MODE
 #define BSP_USING_GIMBAL_TASK
+
+/* RoboMaster Robot Types */
+
 
 /* Board extended module Drivers */
 

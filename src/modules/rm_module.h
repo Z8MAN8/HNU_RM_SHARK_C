@@ -41,5 +41,8 @@
 #ifdef BSP_USING_RC_SBUS
 #include "rc_sbus.h"
 #endif /* BSP_USING_RC_SBUS */
+#ifdef BSP_USING_LEG
+#include "drv_leg.h"
+#endif /* BSP_USING_LEG */
 
 #endif /* _RM_MODULE_H */

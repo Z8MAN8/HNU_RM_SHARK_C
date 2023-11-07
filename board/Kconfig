@@ -312,6 +312,9 @@ menu "RoboMaster Modules"
         bool "Enable RC SBUS"
         default y
 
+    config BSP_USING_LEG
+        bool "Enable Leg Solve"
+        default n
 endmenu
 
 menu "RoboMaster Algorithms"
@@ -365,6 +368,20 @@ menu "RoboMaster Tasks"
 
 endmenu
 
+menu "RoboMaster Robot Types"
+    config WHEEL_LEG_INFANTRY
+        bool "Select Wheel Leg Infantry"
+        default n
+        select BSP_USING_LEG
+        select BSP_USING_MOTOR
+        select BSP_USING_RC_SBUS
+        select BSP_USING_PID
+        select BSP_USING_KALMAN_FILTER
+        select BSP_USING_INS_TASK
+        select BSP_USING_MOTOR_TASK
+        select BSP_USING_CMD_TASK
+
+endmenu
 
 menu "Board extended module Drivers"
 

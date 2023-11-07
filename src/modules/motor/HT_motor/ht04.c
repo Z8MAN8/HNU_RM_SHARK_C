@@ -210,8 +210,8 @@ ht_motor_object_t *ht_motor_register(motor_config_t *config, void *control)
     rt_timer_start(object->timer);
 
     ht_motor_enable(object);
-    motor_set_mode(object, CMD_MOTOR_MODE);   // 初始化电机模式为MOTOR控制模式
     ht_motor_obj[idx++] = object;
+    motor_set_mode(object, CMD_MOTOR_MODE);   // 初始化电机模式为MOTOR控制模式
     return object;
 }
 
@@ -251,7 +251,7 @@ static void pack_contol_para(ht_motor_para_t para, uint8_t *buf)
 }
 
 /* 预留命令接口，可用于调试 */
-/* static void relax(void)
+ static void relax(void)
 {
     for (size_t i = 0; i < idx; i++)
     {
@@ -292,4 +292,4 @@ static void zero(void){
         motor_set_mode(ht_motor_obj[i], CMD_ZERO_POSITION);
     }
 }
-MSH_CMD_EXPORT(zero, set motor zero); */
+MSH_CMD_EXPORT(zero, set motor zero);
