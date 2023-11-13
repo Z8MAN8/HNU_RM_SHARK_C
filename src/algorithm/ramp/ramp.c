@@ -9,8 +9,8 @@ static uint8_t idx = 0; // register idx,是该文件的全局ramp索引,在注�
 static ramp_obj_t *ramp_obj[RAMP_NUM_MAX] = {NULL};
 
 /**
-  * @brief     斜坡控制结构体初始化
-  * @param[in] ramp: 斜坡数据结构体指针
+  * @brief     斜坡控制实例重置
+  * @param[in] ramp: 斜坡实例指针
   * @param[in] scale: 控制数据变化斜率
   */
 void ramp_reset(ramp_obj_t *ramp, int32_t count,int32_t scale)
@@ -21,7 +21,7 @@ void ramp_reset(ramp_obj_t *ramp, int32_t count,int32_t scale)
 
 /**
   * @brief     斜坡控制计算函数
-  * @param[in] ramp: 斜坡数据结构体指针
+  * @param[in] ramp: 斜坡实例指针
   * @retval    斜坡控制计算输出
   */
 float ramp_calc(ramp_obj_t *ramp)
