@@ -17,9 +17,6 @@
 #include <rtthread.h>
 #include "usr_callback.h"
 
-#ifdef BSP_USING_MOTOR
-#include "motor_task.h"
-#endif /* BSP_USING_DJI_MOTOR */
 #ifdef BSP_USING_DJI_MOTOR
 #include "dji_motor.h"
 #endif /* BSP_USING_DJI_MOTOR */
