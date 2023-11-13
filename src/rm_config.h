@@ -107,9 +107,8 @@
 /* 云台控制周期 (ms) */
 #define GIMBAL_PERIOD 1
 /* 云台回中初始化时间 (ms) */
-#define BACK_CENTER_TIME 500
-/* 云台斜坡算法计数器初始值 */
-#define RAMP_COUNT 0
+#define BACK_CENTER_TIME 1000
+
 /* -------------------------------- 云台电机PID参数 ------------------------------- */
 /* 云台yaw轴电机PID参数 */
 /* imu速度环 */

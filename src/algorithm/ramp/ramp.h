@@ -13,11 +13,11 @@ typedef struct ramp_obj_t ramp_obj_t;
 
 struct ramp_obj_t
 {
-    int32_t count;//计数器
-    int32_t scale;//控制数据变化斜率
-    float   out;
-    void  (*reset)(struct ramp_obj_t* ramp, int32_t count,int32_t scale);
-    float (*calc)(struct ramp_obj_t* ramp);
+    int32_t count;  // 计数器
+    int32_t scale;  // 控制数据变化斜率
+    float   out;    // 斜坡控制计算输出
+    void  (*reset)(struct ramp_obj_t* ramp, int32_t count,int32_t scale);  // 斜坡控制实例重置
+    float (*calc)(struct ramp_obj_t* ramp);  // 斜坡控制实例计算
 };
 
 /**

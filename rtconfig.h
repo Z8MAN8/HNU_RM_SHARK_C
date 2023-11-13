@@ -137,9 +137,6 @@
 /* Wiced WiFi */
 
 
-/* CYW43012 WiFi */
-
-
 /* IoT Cloud */
 
 
