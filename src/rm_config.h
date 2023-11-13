@@ -22,6 +22,10 @@
 #define SPI_ACC        "spi1"
 #define SPI_ACC_CS     4
 
+/* 弹仓盖舵机所挂载的 PWM 设备及通道号 */
+#define PWM_COVER        "pwm1"
+#define PWM_COVER_CH     2
+
 /* 遥控器所挂载的 usart 设备名称 */
 #define USART_RC       "uart3"
 
@@ -43,6 +47,11 @@
 #define GIMBAL_RC_MOVE_RATIO_PIT 0.5f
 /* 云台yaw轴速度 */
 #define GIMBAL_RC_MOVE_RATIO_YAW 0.5f
+
+/* 遥控器拨杆对应档位值 */
+#define RC_UP_VALUE 240
+#define RC_MID_VALUE 0
+#define RC_DN_VALUE 15
 
 /* ---------------------------------- 底盘相关 ---------------------------------- */
 /* 底盘轮距(mm) */
@@ -147,5 +156,45 @@
 #define PITCH_KD_A_AUTO          0
 #define PITCH_INTEGRAL_A_AUTO    0
 #define PITCH_MAX_A_AUTO         0
+
+/* ---------------------------------- 发射相关 ---------------------------------- */
+// TODO: 实际值待整定
+#define RIGHT_FRICTION_MOTOR_ID     0x201
+#define LEFT_FRICTION_MOTOR_ID   0x202
+#define TRIGGER_MOTOR_ID  0x203
+
+#define TRIGGER_MOTOR_45_TO_ANGLE 45
+/* -------------------------------- 发射电机PID参数 ------------------------------- */
+// TODO: 速度期望应改为变量应对速度切换。初次参数调整已完成
+/* 右摩擦轮M3508电机PID参数 */
+/* 速度环 */
+#define RIGHT_KP_V             18
+#define RIGHT_KI_V             2
+#define RIGHT_KD_V             0.02f
+#define RIGHT_INTEGRAL_V       2000
+#define RIGHT_MAX_V            30000
+
+/* 左摩擦轮M3508电机PID参数 */
+/* 速度环 */
+#define LEFT_KP_V           18
+#define LEFT_KI_V           2
+#define LEFT_KD_V           0.02f
+#define LEFT_INTEGRAL_V     2000
+#define LEFT_MAX_V          30000
+
+// TODO：PID参数初次微调已完成，期待后续微调
+/* 拨弹电机M2006电机PID参数 */
+/* 速度环 */
+#define TRIGGER_KP_V           10
+#define TRIGGER_KI_V           5
+#define TRIGGER_KD_V           0.01f
+#define TRIGGER_INTEGRAL_V     1500
+#define TRIGGER_MAX_V          20000
+/* 角度环 */
+#define TRIGGER_KP_A           20
+#define TRIGGER_KI_A           2
+#define TRIGGER_KD_A           0
+#define TRIGGER_INTEGRAL_A     10
+#define TRIGGER_MAX_A          5000
 
 #endif /* _RM_CONFIG_H */

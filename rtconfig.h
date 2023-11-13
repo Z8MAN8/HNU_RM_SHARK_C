@@ -256,6 +256,8 @@
 #define BSP_USING_CAN1
 #define BSP_USING_CAN2
 #define BSP_USING_PWM
+#define BSP_USING_PWM1
+#define BSP_USING_PWM1_CH2
 #define BSP_USING_PWM10
 #define BSP_USING_PWM10_CH1
 #define BSP_USING_SPI
@@ -293,6 +295,8 @@
 #define BSP_USING_CHASSIS_TASK
 #define BSP_CHASSIS_OMNI_MODE
 #define BSP_USING_GIMBAL_TASK
+#define BSP_USING_TRANSMISSION_TASK
+#define BSP_USING_SHOOT_TASK
 
 /* Board extended module Drivers */
 
