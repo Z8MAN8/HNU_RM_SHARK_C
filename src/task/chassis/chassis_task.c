@@ -13,8 +13,6 @@
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
-// TODO: 移植底盘运动逆解算
-
 /* -------------------------------- 线程间通讯话题相关 ------------------------------- */
 static struct chassis_cmd_msg chassis_cmd;
 static publisher_t *pub_chassis;
@@ -44,13 +42,23 @@ static void chassis_motor_init();
 #ifdef BSP_CHASSIS_OMNI_MODE
 static void omni_calc(struct chassis_cmd_msg *cmd, int16_t* out_speed);
 static void (*chassis_calc_moto_speed)(struct chassis_cmd_msg *cmd, int16_t* out_speed) = omni_calc;
+static struct chassis_real_speed_t omni_get_speed(dji_motor_object_t *chassis_motor[4]);
 #endif /* BSP_CHASSIS_OMNI_MODE */
 #ifdef BSP_CHASSIS_MECANUM_MODE
 void mecanum_calc(struct chassis_cmd_msg *cmd, int16_t* out_speed);
 void (*chassis_calc_moto_speed)(struct chassis_cmd_msg *cmd, int16_t* out_speed) = mecanum_calc;
 #endif /* BSP_CHASSIS_MECANUM_MODE */
-static void absolute_cal(struct chassis_cmd_msg *cmd, float angle);
 
+static void absolute_cal(struct chassis_cmd_msg *cmd, float angle);
+static struct chassis_real_speed_t
+{
+    float chassis_vx_ch;
+    float chassis_vy_ch;
+    float chassis_vw_ch;
+    float chassis_vx_gim;
+    float chassis_vy_gim;
+
+}chassis_real_speed;
 /* --------------------------------- 底盘线程入口 --------------------------------- */
 void chassis_thread_entry(void *argument)
 {
@@ -65,6 +73,8 @@ void chassis_thread_entry(void *argument)
     for (;;)
     {
         cmd_start = dwt_get_time_ms();
+        /* 计算实际速度 */
+        omni_get_speed(chassis_motor);
         /* 更新该线程所有的订阅者 */
         chassis_sub_pull();
 
@@ -257,13 +267,39 @@ static void omni_calc(struct chassis_cmd_msg *cmd, int16_t* out_speed)
     VAL_LIMIT(cmd->vy, -MAX_CHASSIS_VY_SPEED, MAX_CHASSIS_VY_SPEED);  //mm/s
     VAL_LIMIT(cmd->vw, -MAX_CHASSIS_VR_SPEED, MAX_CHASSIS_VR_SPEED);  //deg/s
 
-    wheel_rpm[0] = ( cmd->vx + cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio; //left//x，y方向速度,w底盘转动速度
-    wheel_rpm[1] = ( cmd->vx - cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio; //forward
-    wheel_rpm[2] = (-cmd->vx - cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio; //right
-    wheel_rpm[3] = (-cmd->vx + cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio; //back
+    wheel_rpm[0] = ( cmd->vx + cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio;//left//x，y方向速度,w底盘转动速度
+    wheel_rpm[1] = ( cmd->vx - cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio;//forward
+    wheel_rpm[2] = (-cmd->vx - cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio;//right
+    wheel_rpm[3] = (-cmd->vx + cmd->vy + cmd->vw * (LENGTH_A + LENGTH_B)) * wheel_rpm_ratio;//back
 
-    memcpy(out_speed, wheel_rpm, 4*sizeof(int16_t)); //copy the rpm to out_speed
+    memcpy(out_speed, wheel_rpm, 4*sizeof(int16_t));//copy the rpm to out_speed
 }
+/**
+ * @brief 全向轮底盘运动逆解算求解实际速度(x,y,w是相对于底盘的x，y，w的速度)
+ *
+ * @param TODO:具体数值正负待定，由测试得正确结果
+ * @param
+ */
+ static struct chassis_real_speed_t omni_get_speed(dji_motor_object_t *chassis_motor[4])
+{
+     //float rotate_ratio_f = ((LENGTH_A+LENGTH_B)/2.0f -chassis_cmd.offset_angle)/RADIAN_COEF;
+     //float rotate_ratio_b = ((LENGTH_A+LENGTH_B)/2.0f + chassis_cmd.offset_angle)/RADIAN_COEF;
+     float wheel_rpm_ratio = 60.0f/(WHEEL_PERIMETER*CHASSIS_DECELE_RATIO);
+     int16_t wheel_rpm[4];
+    for (int i = 0; i < 4; ++i)
+    {
+        wheel_rpm[i]=chassis_motor[i]->measure.speed_rpm;
+    }
+    struct chassis_real_speed_t real_speed;
+    real_speed.chassis_vw_ch = (wheel_rpm[0] + wheel_rpm[1] + wheel_rpm[2] + wheel_rpm[3]) / (4 * wheel_rpm_ratio * (LENGTH_A + LENGTH_B));
+    real_speed.chassis_vy_ch = (wheel_rpm[0] + wheel_rpm[3] - wheel_rpm[1] - wheel_rpm[2]) / (4 * wheel_rpm_ratio);
+    real_speed.chassis_vx_ch = (wheel_rpm[0] + wheel_rpm[1] - wheel_rpm[2] - wheel_rpm[3]) / (4 * wheel_rpm_ratio) ;
+    real_speed.chassis_vx_gim=(real_speed.chassis_vx_ch* cos(chassis_cmd.offset_angle)-real_speed.chassis_vy_ch)/
+            (cos(chassis_cmd.offset_angle)*cos(chassis_cmd.offset_angle)/ sin(chassis_cmd.offset_angle)+ cos(chassis_cmd.offset_angle));
+    real_speed.chassis_vy_gim=((real_speed.chassis_vx_ch+real_speed.chassis_vy_ch)-real_speed.chassis_vx_gim*(cos(chassis_cmd.offset_angle)-sin(chassis_cmd.offset_angle)))/
+            (sin(chassis_cmd.offset_angle)+cos(chassis_cmd.offset_angle));
+    return real_speed;
+ }
 #endif /* BSP_CHASSIS_OMNI_MODE */
 
 #ifdef BSP_CHASSIS_MECANUM_MODE

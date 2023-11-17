@@ -208,7 +208,7 @@ static void remote_to_cmd(void)
     case RC_DN:
         if (rc_now->ch6<=775)
             trigger_flag=1;
-        if (rc_now->ch6>=780&&trigger_flag)
+        if (rc_now->ch6>=775&&trigger_flag)
         {//判断是否要开火
             shoot_cmd.trigger_status = TRIGGER_ON;
             trigger_flag=0;

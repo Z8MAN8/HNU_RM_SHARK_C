@@ -85,7 +85,7 @@ void shoot_task_entry(void* argument)
 {
     static float sht_dt;
     static float sht_start;
-    static int total_angle_flag=0;//转子角度标志位，防止切换设计模式时拨弹电机反转
+    static int total_angle_flag=0;//转子角度标志位，防止切换设计模式时拨弹电机反转.从速度环控制出来要置0，角度环控制出来要置1。
     static int servo_cvt_num;
 
     shoot_motor_init();
@@ -122,6 +122,7 @@ void shoot_task_entry(void* argument)
             shoot_motor_ref[TRIGGER_MOTOR] = 0;
             shoot_motor_ref[RIGHT_FRICTION] =0;
             shoot_motor_ref[LEFT_FRICTION] = 0;
+            total_angle_flag=0;
             break;
 
         case SHOOT_ONE:
@@ -162,24 +163,17 @@ void shoot_task_entry(void* argument)
             shoot_motor_ref[RIGHT_FRICTION] = 3000;//摩擦轮常转
             shoot_motor_ref[LEFT_FRICTION] = -3000;
             shoot_motor_ref[TRIGGER_MOTOR] = shoot_cmd.shoot_freq;//自动模式的时候，只用速度环控制拨弹电机
-            /*if (shoot_cmd.shoot_frequency==LOW_FREQUENCY)
+            if (shoot_cmd.shoot_freq>=1500&&shoot_cmd.shoot_freq<=2500)
             {
-                shoot_motor_ref[TRIGGER_MOTOR] = 1000;//自动模式的时候，只用速度环控制拨弹电机
+                shoot_motor_ref[TRIGGER_MOTOR] = 2000;//自动模式的时候，只用速度环控制拨弹电机
             }
-             else if (shoot_cmd.shoot_frequency==MIDDLE_FREQUENCY)
-             {
-                 shoot_motor_ref[TRIGGER_MOTOR]=2000;//自动模式的时候，只用速度环控制拨弹电机
-                  }
-             else if (shoot_cmd.shoot_frequency==HIGH_FREQUENCY)
-                {
-                    shoot_motor_ref[TRIGGER_MOTOR] = 3000;//自动模式的时候，只用速度环控制拨弹电机
-                }
+            else if(shoot_cmd.shoot_freq>2500)
+            {
+                shoot_motor_ref[TRIGGER_MOTOR] = 4000;
+            }
              else{
-                 for (uint8_t i = 0; i < SHT_MOTOR_NUM; i++)
-                {
-                    dji_motor_relax(sht_motor[i]);
-                }
-             }*/
+                shoot_motor_ref[TRIGGER_MOTOR] = 0;
+             }
             total_angle_flag = 0;
             shoot_fdb.shoot_mode = SHOOT_OK;
             break;
