@@ -85,7 +85,7 @@ void shoot_task_entry(void* argument)
 {
     static float sht_dt;
     static float sht_start;
-    static int total_angle_flag=0;//转子角度标志位，防止切换设计模式时拨弹电机反转.从速度环控制出来要置0，角度环控制出来要置1。
+    static int total_angle_flag=0;//转子角度标志位，防止切换设计模式时拨弹电机反转
     static int servo_cvt_num;
 
     shoot_motor_init();

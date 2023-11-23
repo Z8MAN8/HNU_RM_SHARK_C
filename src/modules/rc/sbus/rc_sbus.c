@@ -66,9 +66,9 @@ static rt_err_t sbus_rc_decode(uint8_t *buff){
             rc_obj[NOW].ch6 = 0;
         /* 拨杆值获取 */
         rc_obj[NOW].sw1 = ((buff[9] >> 2 | buff[10] << 6) & 0x07FF);
-        rc_obj[NOW].sw2 = ((buff[10] >> 5 | buff[11] << 3) & 0x07FF);
-        rc_obj[NOW].sw3=((buff[12] | buff[13] << 8) & 0x07FF);
-        rc_obj[NOW].sw4 =((buff[13] >> 3 | buff[14] << 5) & 0x07FF);
+        rc_obj[NOW].sw2 = ((buff[7] >> 7 | buff[8] << 1 | buff[9] << 9) & 0x07FF);
+        rc_obj[NOW].sw3 =((buff[10] >> 5| buff[11] << 3) & 0x07FF);
+        rc_obj[NOW].sw4 =((buff[6] >> 4 | buff[7] << 4) & 0x07FF);
         /* 遥控器异常值处理，函数直接返回 */
         if ((abs(rc_obj[NOW].ch1) > RC_MAX_VALUE) || \
         (abs(rc_obj[NOW].ch2) > RC_MAX_VALUE) || \
