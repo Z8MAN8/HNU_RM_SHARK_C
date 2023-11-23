@@ -38,6 +38,12 @@ if GetDepend(['BSP_USING_RC_SBUS']):
     src += Glob(cwd + '/rc/sbus/*.c')
     path += [cwd + '/rc/sbus']
 
+if GetDepend(['BSP_USING_REFEREE']):
+    src += Glob(cwd + '/referee/*.c')
+    path += [cwd + '/referee']
+    src += Glob(cwd + '/referee/bsp_referee_UI/*.c')
+    path += [cwd + '/referee/bsp_referee_UI']
+
 src  += [cwd + '/usr_callback.c']
 
 group = DefineGroup('RM_Modules', src, depend = [''], CPPPATH = path)

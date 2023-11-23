@@ -304,6 +304,10 @@ menu "RoboMaster Modules"
         bool "Enable RC SBUS"
         default y
 
+    config BSP_USING_REFEREE
+        bool "Enable REFEREE"
+        default y
+
 endmenu
 
 menu "RoboMaster Algorithms"
