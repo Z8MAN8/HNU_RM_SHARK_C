@@ -43,8 +43,6 @@ jobs:
     - name: Install Tools
       shell: bash
       run: |
-        pip3 install tools
-        pip3 install tools.menuconfig
         sudo apt-get update
         wget https://raw.githubusercontent.com/RT-Thread/env/master/install_ubuntu.sh
         chmod 777 install_ubuntu.sh
@@ -55,7 +53,7 @@ jobs:
         echo "RTT_CC=gcc" >> $GITHUB_ENV
 
     - name: Install Arm ToolChains
-      if: ${{ github.event.inputs.bsp_tool_chain == 'sourcery-arm' && success() }}
+      if: ${{ success() }}
       shell: bash
       run: |
         wget -q https://github.com/RT-Thread/toolchains-ci/releases/download/v1.3/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux.tar.bz2
