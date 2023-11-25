@@ -20,7 +20,7 @@ rt_err_t can1_rx_call(rt_device_t dev, rt_size_t size)
     rt_device_read(dev, 0, &rxmsg, sizeof(rxmsg));
     /* CAN 接收到数据后产生中断，调用此回调函数，然后发送接收信号量 */
 #ifdef BSP_USING_DJI_MOTOR
-    dji_motot_rx_callback(rxmsg.id, rxbuff);
+    dji_motot_rx_callback(dev, rxmsg.id, rxbuff);
 #endif /* BSP_USING_DJI_MOTOR */
 
     return RT_EOK;
@@ -37,7 +37,7 @@ rt_err_t can2_rx_call(rt_device_t dev, rt_size_t size)
     rt_device_read(dev, 0, &rxmsg, sizeof(rxmsg));
     /* CAN 接收到数据后产生中断，调用此回调函数，然后发送接收信号量 */
 #ifdef BSP_USING_DJI_MOTOR
-    dji_motot_rx_callback(rxmsg.id, rxbuff);
+    dji_motot_rx_callback(dev, rxmsg.id, rxbuff);
 #endif /* BSP_USING_DJI_MOTOR */
 
     return RT_EOK;

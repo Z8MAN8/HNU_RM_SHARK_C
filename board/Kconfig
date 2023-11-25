@@ -319,6 +319,9 @@ menu "RoboMaster Algorithms"
     config BSP_USING_KALMAN_FILTER
        bool "Select USING KalmanFilter"
        default y
+    config BSP_USING_RAMP
+       bool "Select USING Ramp"
+       default y
 
 endmenu
 
@@ -355,6 +358,13 @@ menu "RoboMaster Tasks"
         bool "Select USING Gimbal Task"
         default y
 
+    config BSP_USING_TRANSMISSION_TASK
+        bool "Select USING Transmission Task"
+        default y
+
+    config BSP_USING_SHOOT_TASK
+        bool "Select USING Shoot Task"
+        default y
 endmenu
 
 

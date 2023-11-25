@@ -75,9 +75,9 @@ publisher_t *pub_register(char *name, uint8_t len){
  * @param data 消息长度,通过sizeof()获取
  * @return subscriber_t* 返回订阅者实例
  */
-subscriber_t *sub_register(char *name, uint8_t data){
+subscriber_t *sub_register(char *name, uint8_t len){
     // 和发布者同样的流程，直接调用发布者的注册函数
-    subscriber_t *sub = (subscriber_t *)pub_register(name, data);
+    subscriber_t *sub = (subscriber_t *)pub_register(name, len);
 
     return sub;
 }

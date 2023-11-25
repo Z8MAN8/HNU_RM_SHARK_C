@@ -72,7 +72,6 @@ static uint8_t sender_enable_flag[6] = {0};
          }
 
          // 计算接收id并设置分组发送id
-         config->rx_id = 0x200 + motor_id + 1;   // 把ID+1,进行分组设置
          sender_enable_flag[motor_group] = 1; // 设置发送标志位,防止发送空帧
          motor->message_num = motor_send_num;
          motor->send_group = motor_group;
@@ -168,14 +167,15 @@ static void decode_dji_motor(dji_motor_object_t *motor, uint8_t *data)
 /**
  * @brief 电机反馈报文接收回调函数,该函数被can_rx_call调用
  *
+ * @param dev 接收到报文的CAN设备
  * @param id 接收到的报文的id
  * @param data 接收到的报文的数据
  */
-void dji_motot_rx_callback(uint32_t id, uint8_t *data){
+void dji_motot_rx_callback(rt_device_t dev, uint32_t id, uint8_t *data){
     // 找到对应的实例后再调用decode_dji_motor进行解析
     for (size_t i = 0; i < idx; ++i)
     {
-        if (dji_motor_obj[i]->rx_id == id)
+        if (dji_motor_obj[i]->can_dev == dev && dji_motor_obj[i]->rx_id == id)
         {
             decode_dji_motor(dji_motor_obj[i], data);
         }

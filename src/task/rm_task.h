@@ -27,14 +27,19 @@
 #endif /* BSP_USING_MOTOR_TASK */
 #ifdef BSP_USING_CMD_TASK
 #include "cmd_task.h"
-#endif /* BSP_USING_CHASSIS_TASK */
+#endif /* BSP_USING_CMD_TASK */
 #ifdef BSP_USING_CHASSIS_TASK
 #include "chassis_task.h"
 #endif /* BSP_USING_CHASSIS_TASK */
 #ifdef BSP_USING_GIMBAL_TASK
 #include "gimbal_task.h"
 #endif /* BSP_USING_GIMBAL_TASK */
-
+#ifdef BSP_USING_TRANSMISSION_TASK
+#include "transmission_task.h"
+#endif /* BSP_USING_TRANSMISSION_TASK */
+#ifdef BSP_USING_SHOOT_TASK
+#include "shoot_task.h"
+#endif /* BSP_USING_SHOOT_TASK */
 
 
 /* --------------------------------- 话题的数据格式 -------------------------------- */
@@ -75,6 +80,20 @@ struct gimbal_cmd_msg
     gimbal_mode_e last_mode;  // 上一次云台控制模式
 };
 
+/**
+ * @brief cmd发布的云台控制数据,由shoot订阅
+ */
+struct shoot_cmd_msg
+{ // 发射器
+    shoot_mode_e ctrl_mode;  // 当前发射器控制模式
+    shoot_mode_e last_mode;  // 上一次发射器控制模式
+    trigger_mode_e trigger_status;
+    int16_t shoot_freq;      // 发射弹频
+    // TODO: 添加发射弹速控制
+    int16_t shoot_speed;     // 发射弹速
+    uint8_t cover_open;      // 弹仓盖开关
+};
+
 /* ------------------------------ gimbal反馈状态数据 ------------------------------ */
 /**
  * @brief 云台真实反馈状态数据,由gimbal发布
@@ -88,4 +107,12 @@ struct gimbal_fdb_msg
     float yaw_relative_angle;  //云台相对于初始位置的yaw轴角度
 };
 
+/* ------------------------------ shoot反馈状态数据 ------------------------------ */
+/**
+ * @brief 发射机真实反馈状态数据,由shoot发布
+ */
+struct shoot_fdb_msg
+{
+    shoot_back_e shoot_mode;  // shoot状态反馈
+};
 #endif /* _RM_TASK_H */
