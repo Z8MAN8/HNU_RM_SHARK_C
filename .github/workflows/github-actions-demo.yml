@@ -47,6 +47,7 @@ jobs:
         wget https://raw.githubusercontent.com/RT-Thread/env/master/install_ubuntu.sh
         chmod 777 install_ubuntu.sh
         ./install_ubuntu.sh
+        source ~/.env/env.sh
         git config --global http.postBuffer 524288000
         python -c "import tools.menuconfig; tools.menuconfig.touch_env()"
         echo "RTT_ROOT=${{ github.workspace }}" >> $GITHUB_ENV
