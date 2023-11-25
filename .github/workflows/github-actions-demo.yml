@@ -44,6 +44,7 @@ jobs:
       shell: bash
       run: |
         pip3 install tools
+        pip3 install tools.menuconfig
         sudo apt-get update
         wget https://raw.githubusercontent.com/RT-Thread/env/master/install_ubuntu.sh
         chmod 777 install_ubuntu.sh
