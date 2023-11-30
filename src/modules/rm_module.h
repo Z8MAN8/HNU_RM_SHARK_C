@@ -21,6 +21,12 @@
 #include "dji_motor.h"
 #endif /* BSP_USING_DJI_MOTOR */
 #ifdef BSP_USING_DWT
+#ifdef BSP_USING_HT_MOTOR
+#include "ht04.h"
+#endif /* BSP_USING_HT_MOTOR */
+#ifdef BSP_USING_LK_MOTOR
+#include "lk_motor.h"
+#endif /* BSP_USING_LK_MOTOR */
 #include "drv_dwt.h"
 #endif /* BSP_USING_PS_MSG */
 #ifdef BSP_USING_PS_MSG
@@ -35,5 +41,8 @@
 #ifdef BSP_USING_RC_SBUS
 #include "rc_sbus.h"
 #endif /* BSP_USING_RC_SBUS */
+#ifdef BSP_USING_LEG
+#include "drv_leg.h"
+#endif /* BSP_USING_LEG */
 
 #endif /* _RM_MODULE_H */

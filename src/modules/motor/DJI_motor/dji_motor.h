@@ -19,13 +19,6 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 
-#define DJI_MOTOR_CNT 14             // 默认波特率下，实测挂载电机极限数量
-
-/* 滤波系数设置为1的时候即关闭滤波 */
-#define SPEED_SMOOTH_COEF 0.85f      // 最好大于0.85
-#define CURRENT_SMOOTH_COEF 0.9f     // 必须大于0.9
-#define ECD_ANGLE_COEF_DJI 0.043945f // (360/8192),将编码器值转化为角度制
-
 /**
  * @brief DJI motor feedback
  */
