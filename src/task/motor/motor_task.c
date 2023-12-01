@@ -6,9 +6,10 @@
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
+static float motor_dt;
+
 void motor_thread_entry(void *argument)
 {
-    static float motor_dt;
     static float motor_start;
     LOG_I("Motor Task Start");
 
@@ -32,7 +33,7 @@ void motor_thread_entry(void *argument)
 
         /* 用于调试监测线程调度使用 */
         motor_dt = dwt_get_time_ms() - motor_start;
-        if (motor_dt > 1){
+        if (motor_dt > 3){
            rt_kprintf("Motor Task is being DELAY! dt = [%f]\n", &motor_dt);
         }
         rt_thread_delay(1);

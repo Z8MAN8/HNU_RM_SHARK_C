@@ -52,9 +52,10 @@ void (*chassis_calc_moto_speed)(struct chassis_cmd_msg *cmd, int16_t* out_speed)
 static void absolute_cal(struct chassis_cmd_msg *cmd, float angle);
 
 /* --------------------------------- 底盘线程入口 --------------------------------- */
+static float cmd_dt;
+
 void chassis_thread_entry(void *argument)
 {
-    static float cmd_dt;
     static float cmd_start;
 
     chassis_pub_init();

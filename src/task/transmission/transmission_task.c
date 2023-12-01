@@ -27,9 +27,11 @@ static void trans_sub_pull(void)
 {
 }
 
+/* --------------------------------- 通讯线程入口 --------------------------------- */
+static float trans_dt;
+
 void transmission_task_entry(void* argument)
 {
-    static float trans_dt;
     static float trans_start;
 
     /*订阅数据初始化*/

@@ -22,6 +22,8 @@ static uint8_t idx = 0; // register idx,是该文件的全局电机索引,在注
 /* DJI电机的实例,此处仅保存指针,内存的分配将通过电机实例初始化时通过malloc()进行 */
 static dji_motor_object_t *dji_motor_obj[DJI_MOTOR_CNT] = {NULL};
 
+static rt_device_t chassis_can, gimbal_can;
+
 // TODO: 0x2ff容易发送失败
 /**
  *
@@ -207,10 +209,6 @@ void dji_motor_control()
     uint8_t group, num; // 电机组号和组内编号
     int16_t set = 0; // 电机控制器计算得到的输出值
     uint8_t size = 0;
-    static rt_device_t chassis_can;
-    static rt_device_t gimbal_can;
-    chassis_can = rt_device_find(CAN_CHASSIS);
-    gimbal_can = rt_device_find(CAN_GIMBAL);
 
     // 遍历所有电机实例,运行控制算法并填入报文
     for (size_t i = 0; i < idx; ++i)
@@ -265,6 +263,8 @@ dji_motor_object_t *dji_motor_register(motor_config_t *config, void *control)
     object->rx_id = config->rx_id;                                   // 电机接收报文的ID
     object->control = control;                                       // 电机控制器执行
 
+    chassis_can = rt_device_find(CAN_CHASSIS);
+    gimbal_can = rt_device_find(CAN_GIMBAL);
     /* 查找 CAN 设备 */
     object->can_dev = rt_device_find(config->can_name);
 

@@ -75,9 +75,10 @@ static rt_int16_t get_relative_pos(rt_int16_t raw_ecd, rt_int16_t center_offset)
 
 
 /* --------------------------------- 云台线程入口 --------------------------------- */
+static float gim_dt;
+
 void gimbal_thread_entry(void *argument)
 {
-    static float gim_dt;
     static float gim_start;
 
     gimbal_pub_init();
