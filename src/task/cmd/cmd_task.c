@@ -141,6 +141,8 @@ static void remote_to_cmd(void)
     /* 限制云台角度 */
     VAL_LIMIT(gim_cmd.pitch, PIT_ANGLE_MIN, PIT_ANGLE_MAX);
 
+
+
     /*-------------------------------------------------底盘_云台状态机--------------------------------------------------------------*/
     // 左拨杆sw2为上时，底盘和云台均RELAX；为中时，云台为GYRO；为下时，云台为AUTO。
     // 右拨杆sw1为上时，底盘为FOLLOW；为中时，底盘为OPEN；为下时，底盘为SPIN。
@@ -153,24 +155,37 @@ static void remote_to_cmd(void)
         }
         else
         {
-            chassis_cmd.ctrl_mode = CHASSIS_OPEN_LOOP;
+            //TODO:把开环模式改成释放，让云台归中到底盘
+            //chassis_cmd.ctrl_mode = CHASSIS_OPEN_LOOP;
+            chassis_cmd.ctrl_mode = CHASSIS_RELAX;
         }
         break;
 /*    case RC_MI:
         chassis_cmd.ctrl_mode = CHASSIS_OPEN_LOOP;
         break;*/
     case RC_DN:
-        chassis_cmd.ctrl_mode = CHASSIS_SPIN;
-        // TODO：考虑将陀螺转速改为变量，可以手动或自动调整转速
-        chassis_cmd.vw = 2; // 小陀螺转速
+        if(gim_cmd.ctrl_mode != GIMBAL_INIT && gim_cmd.ctrl_mode != GIMBAL_RELAX)
+        {
+            chassis_cmd.ctrl_mode = CHASSIS_SPIN;
+            // TODO：考虑将陀螺转速改为变量，可以手动或自动调整转速
+            chassis_cmd.vw = (float)(rc_now->ch5) / 784.0 * 5.0; // 小陀螺转速
+        }
+        else
+        {
+            chassis_cmd.ctrl_mode = CHASSIS_RELAX;
+        }
         break;
     }
     /* 因为左拨杆值会影响到底盘RELAX状态，所以后判断 */
+
     switch(rc_now->sw3)
     {
     case RC_UP:
         gim_cmd.ctrl_mode = GIMBAL_RELAX;
         chassis_cmd.ctrl_mode = CHASSIS_RELAX;
+        shoot_cmd.ctrl_mode=SHOOT_STOP;
+        gim_cmd.pitch=0;
+        gim_cmd.yaw=0;
         break;
     case RC_MI:
         if(gim_cmd.last_mode == GIMBAL_RELAX)
@@ -201,7 +216,7 @@ static void remote_to_cmd(void)
     }
 
     /*--------------------------------------------------发射模块状态机--------------------------------------------------------------*/
-    switch (rc_now->sw1)
+     switch (rc_now->sw1)
     {
     /*判断是否处于可发射状态*/
     //TODO:由于遥控器拨杆档位限制,目前连发模式还未写进状态机。两档拨杆具体值由遥控器确定，现在待定。

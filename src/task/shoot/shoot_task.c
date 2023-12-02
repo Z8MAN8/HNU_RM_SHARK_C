@@ -87,6 +87,7 @@ void shoot_task_entry(void* argument)
     static float sht_start;
     static int total_angle_flag=0;//转子角度标志位，防止切换设计模式时拨弹电机反转
     static int servo_cvt_num;
+    static int reverse_cnt;
 
     shoot_motor_init();
     shoot_pub_init();
@@ -113,6 +114,16 @@ void shoot_task_entry(void* argument)
         for (uint8_t i = 0; i < SHT_MOTOR_NUM; i++)
         {
             dji_motor_enable(sht_motor[i]);
+        }
+
+        //检测是否堵弹，堵弹反转一次
+        if (sht_motor[TRIGGER_MOTOR]->measure.real_current>=8000||reverse_cnt!=0)
+        {
+           shoot_cmd.ctrl_mode=SHOOT_REVERSE;
+            if (reverse_cnt<100)
+                reverse_cnt++;
+            else
+                reverse_cnt=0;
         }
 
         /*控制模式判断*/
@@ -165,17 +176,25 @@ void shoot_task_entry(void* argument)
             shoot_motor_ref[TRIGGER_MOTOR] = shoot_cmd.shoot_freq;//自动模式的时候，只用速度环控制拨弹电机
             if (shoot_cmd.shoot_freq>=1500&&shoot_cmd.shoot_freq<=2500)
             {
-                shoot_motor_ref[TRIGGER_MOTOR] = 2000;//自动模式的时候，只用速度环控制拨弹电机
+                shoot_motor_ref[TRIGGER_MOTOR] = 2500;//自动模式的时候，只用速度环控制拨弹电机
             }
             else if(shoot_cmd.shoot_freq>2500)
             {
-                shoot_motor_ref[TRIGGER_MOTOR] = 4000;
+                shoot_motor_ref[TRIGGER_MOTOR] = 5000;
             }
-             else{
+             else
+             {
                 shoot_motor_ref[TRIGGER_MOTOR] = 0;
              }
             total_angle_flag = 0;
             shoot_fdb.shoot_mode = SHOOT_OK;
+            break;
+
+        case SHOOT_REVERSE:
+            shoot_motor_ref[RIGHT_FRICTION] = 3000;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -3000;
+            shoot_motor_ref[TRIGGER_MOTOR]=  -2500;
+            total_angle_flag = 0;
             break;
 
         default:
@@ -285,7 +304,7 @@ static rt_int16_t motor_control_trigger(dji_motor_measure_t measure){
         send_data = (int16_t) pid_calculate(pid_speed, get_speed, pid_out_angle);     // 电机转动正方向与imu相反
     }
     /*pid计算输出*/
-    else if(shoot_cmd.ctrl_mode==SHOOT_COUNTINUE||shoot_cmd.ctrl_mode==SHOOT_STOP)//自动模式的时候，只用速度环控制拨弹电机
+    else if(shoot_cmd.ctrl_mode==SHOOT_COUNTINUE||shoot_cmd.ctrl_mode==SHOOT_STOP||shoot_cmd.ctrl_mode==SHOOT_REVERSE)//自动模式的时候，只用速度环控制拨弹电机
     {
         send_data = (int16_t) pid_calculate(pid_speed, get_speed, shoot_motor_ref[TRIGGER_MOTOR] );
     }

@@ -55,14 +55,14 @@
 
 /* ---------------------------------- 底盘相关 ---------------------------------- */
 /* 底盘轮距(mm) */
-#define WHEELTRACK        300
+#define WHEELTRACK        340
 /* 底盘轴距(mm) */
 #define WHEELBASE         388
 /* 底盘轮子周长(mm) */
 #define WHEEL_PERIMETER   481
 
-#define LENGTH_A 278 //底盘长的一半(mm)
-#define LENGTH_B 294 //底盘宽的一半(mm)
+#define LENGTH_A 170 //底盘长的一半(mm)
+#define LENGTH_B 170 //底盘宽的一半(mm)
 
 /******** 底盘电机使用3508 *******/
 /* 3508底盘电机减速比 */

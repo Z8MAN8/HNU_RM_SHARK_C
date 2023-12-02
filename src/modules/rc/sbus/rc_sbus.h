@@ -10,7 +10,6 @@
 #define _RC_SBUS_H
 
 #include <rtthread.h>
-#include "rm_config.h"
 
 #define SBUS_RX_BUF_NUM 36u
 #define SBUS_FRAME_SIZE 25u
@@ -19,9 +18,9 @@
   * @brief 遥控器拨杆值
   */
 enum {
-    RC_UP = RC_UP_VALUE  ,
-    RC_MI = RC_MID_VALUE ,
-    RC_DN = RC_DN_VALUE  ,
+    RC_UP = 240,
+    RC_MI = 0,
+    RC_DN = 15,
 };
 
 typedef struct

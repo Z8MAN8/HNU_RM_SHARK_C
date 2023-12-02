@@ -114,6 +114,7 @@ void gimbal_thread_entry(void *argument)
             yaw_ramp->reset(yaw_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
             pit_ramp->reset(pit_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
 
+
             break;
         case GIMBAL_INIT:
             // TODO：加入斜坡算法，可以控制归中时间
@@ -125,7 +126,7 @@ void gimbal_thread_entry(void *argument)
                && (abs(gim_motor[YAW]->measure.ecd - CENTER_ECD_YAW) <= 20))
             {
                 gim_fdb.back_mode = BACK_IS_OK;
-                gim_fdb.yaw_offset_angle = ins_data.yaw;
+                gim_fdb.yaw_offset_angle = ins_data.yaw_total_angle;/*云台抽风的原因，期望应该为总角度。抽风原因：不应该用ins_data.yaw*/
                 gim_fdb.pit_offset_angle = ins_data.pitch;
             }
             else
@@ -140,7 +141,7 @@ void gimbal_thread_entry(void *argument)
             gim_fdb.yaw_relative_angle = -yaw_motor_relive;
             break;
         // TODO: add auto mode
-        default:
+        default: 
             for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
             {
                 dji_motor_relax(gim_motor[i]);
@@ -323,7 +324,7 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
         default:
             break;
     }
-    /* 切换模式需要清空控制器历史状态 */
+    /* 切换模式需要清空  控制器历史状态 */
     if(gim_cmd.ctrl_mode != gim_cmd.last_mode)
     {
         pid_clear(pid_angle);

@@ -89,6 +89,7 @@
 #define RT_SERIAL_USING_DMA
 #define RT_SERIAL_RB_BUFSZ 64
 #define RT_USING_CAN
+#define RT_USING_HWTIMER
 #define RT_USING_I2C
 #define RT_USING_I2C_BITOPS
 #define RT_USING_PIN
@@ -135,6 +136,15 @@
 
 
 /* Wiced WiFi */
+
+
+/* CYW43012 WiFi */
+
+
+/* BL808 WiFi */
+
+
+/* CYW43439 WiFi */
 
 
 /* IoT Cloud */
@@ -255,6 +265,8 @@
 #define BSP_USING_CAN
 #define BSP_USING_CAN1
 #define BSP_USING_CAN2
+#define BSP_USING_TIM
+#define BSP_USING_TIM4
 #define BSP_USING_PWM
 #define BSP_USING_PWM1
 #define BSP_USING_PWM1_CH2
@@ -280,6 +292,7 @@
 #define BSP_USING_IMU
 #define BSP_USING_BMI088
 #define BSP_USING_RC_SBUS
+#define BSP_USING_REFEREE
 
 /* RoboMaster Algorithms */
 
