@@ -340,6 +340,7 @@ rt_ssize_t rt_device_read(rt_device_t dev,
     }
 
     /* call device_read interface */
+
     if (device_read != RT_NULL)
     {
         return device_read(dev, pos, buffer, size);
