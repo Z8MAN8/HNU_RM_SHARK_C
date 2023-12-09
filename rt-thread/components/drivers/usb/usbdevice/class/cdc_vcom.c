@@ -467,7 +467,7 @@ static rt_err_t _interface_handler(ufunction_t func, ureq_t setup)
         _cdc_get_line_coding(func->device, setup);
         break;
     case CDC_SET_CONTROL_LINE_STATE:
-        data->connected = (setup->wValue & 0x01) > 0?RT_TRUE:RT_FALSE;
+        data->connected = 1; /*(setup->wValue & 0x01) > 0?RT_TRUE:RT_FALSE;*/
         LOG_D("vcom state:%d ", data->connected);
         dcd_ep0_send_status(func->device->dcd);
         break;
