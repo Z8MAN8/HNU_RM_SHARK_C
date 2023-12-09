@@ -32,6 +32,8 @@ static void cmd_sub_pull(void);
 
 /*发射停止标志位*/
 static int trigger_flag=0;
+/*堵转电流反转记次*/
+static int reverse_cnt;
 
 /* ------------------------------- 遥控数据转换为控制指令 ------------------------------ */
 static void remote_to_cmd(void);
@@ -146,6 +148,11 @@ static void remote_to_cmd(void)
     /*-------------------------------------------------底盘_云台状态机--------------------------------------------------------------*/
     // 左拨杆sw2为上时，底盘和云台均RELAX；为中时，云台为GYRO；为下时，云台为AUTO。
     // 右拨杆sw1为上时，底盘为FOLLOW；为中时，底盘为OPEN；为下时，底盘为SPIN。
+    if (gim_cmd.ctrl_mode==GIMBAL_INIT||gim_cmd.ctrl_mode==GIMBAL_RELAX)
+    {
+        gim_cmd.pitch=0;
+        gim_cmd.yaw=0;
+    }
     switch (rc_now->sw2)
     {
     case RC_UP:
@@ -184,6 +191,7 @@ static void remote_to_cmd(void)
         gim_cmd.ctrl_mode = GIMBAL_RELAX;
         chassis_cmd.ctrl_mode = CHASSIS_RELAX;
         shoot_cmd.ctrl_mode=SHOOT_STOP;
+        /*放开状态下，gim不接收值*/
         gim_cmd.pitch=0;
         gim_cmd.yaw=0;
         break;
@@ -216,34 +224,51 @@ static void remote_to_cmd(void)
     }
 
     /*--------------------------------------------------发射模块状态机--------------------------------------------------------------*/
-     switch (rc_now->sw1)
+
+    if(rc_now->sw3!=RC_UP)
     {
-    /*判断是否处于可发射状态*/
-    //TODO:由于遥控器拨杆档位限制,目前连发模式还未写进状态机。两档拨杆具体值由遥控器确定，现在待定。
-    case RC_DN:
-        if (rc_now->ch6<=775)
-            trigger_flag=1;
-        if (rc_now->ch6>=775&&trigger_flag)
-        {//判断是否要开火
-            shoot_cmd.trigger_status = TRIGGER_ON;
-            trigger_flag=0;
+        switch (rc_now->sw1)
+        {
+            /*判断是否处于可发射状态*/
+            //TODO:由于遥控器拨杆档位限制,目前连发模式还未写进状态机。两档拨杆具体值由遥控器确定，现在待定。
+            case RC_DN:
+                if (rc_now->ch6 <= 775)
+                    trigger_flag = 1;
+                if (rc_now->ch6 >= 775 && trigger_flag)
+                {//判断是否要开火
+                    shoot_cmd.trigger_status = TRIGGER_ON;
+                    trigger_flag = 0;
+                }
+                else shoot_cmd.trigger_status = TRIGGER_OFF;
+                /*判断发射模式是三连发还是全自动*/
+                switch (rc_now->sw4)
+                {
+                    case RC_UP:
+                        shoot_cmd.ctrl_mode = SHOOT_ONE;
+                        break;
+                    case RC_DN:
+                        shoot_cmd.ctrl_mode = SHOOT_COUNTINUE;
+                        break;
+                }
+                break;
+            case RC_UP:
+                shoot_cmd.ctrl_mode = SHOOT_STOP;
+                shoot_cmd.trigger_status = TRIGGER_OFF;
+                break;
         }
-        else shoot_cmd.trigger_status = TRIGGER_OFF;
-        /*判断发射模式是三连发还是全自动*/
-    switch (rc_now->sw4)
-    {
-    case RC_UP:
-        shoot_cmd.ctrl_mode=SHOOT_ONE;
-        break;
-    case RC_DN:
-        shoot_cmd.ctrl_mode=SHOOT_COUNTINUE;
-        break;
     }
-    break;
-    case RC_UP:
-            shoot_cmd.ctrl_mode=SHOOT_STOP;
-            shoot_cmd.trigger_status=TRIGGER_OFF;
-            break;
+    else
+    {
+        shoot_cmd.ctrl_mode==SHOOT_STOP;
+    }
+    /*堵弹反转检测*/
+    if (shoot_fdb.trigger_motor_current>=9500||reverse_cnt!=0)
+    {
+        shoot_cmd.ctrl_mode=SHOOT_REVERSE;
+        if (reverse_cnt<100)
+            reverse_cnt++;
+        else
+            reverse_cnt=0;
     }
 
     // TODO: 添加弹频和弹速控制

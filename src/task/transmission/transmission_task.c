@@ -5,7 +5,7 @@
 */
 
 #include "transmission_task.h"
-
+#include <stm32f4xx.h>
 #define DBG_TAG   "rm.task"
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
@@ -13,6 +13,9 @@
 /* -------------------------------- 线程间通讯话题相关 ------------------------------- */
 static void trans_sub_pull(void);
 static void trans_sub_init(void);
+
+ DMA_HandleTypeDef hdma_usart6_rx;
+ DMA_HandleTypeDef hdma_usart6_tx;
 /**
  * @brief trans 线程中所有订阅者初始化（如有其它数据需求可在其中添加）
  */

@@ -114,5 +114,6 @@ struct gimbal_fdb_msg
 struct shoot_fdb_msg
 {
     shoot_back_e shoot_mode;  // shoot状态反馈
+    int16_t trigger_motor_current //拨弹电机电流，传给cmd控制反转
 };
 #endif /* _RM_TASK_H */

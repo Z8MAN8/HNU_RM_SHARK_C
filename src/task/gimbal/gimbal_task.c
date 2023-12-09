@@ -2,6 +2,7 @@
 * Change Logs:
 * Date            Author          Notes
 * 2023-09-25      ChuShicheng     first version
+* 2023-12-2       ChenSihan       优化
 */
 #include "gimbal_task.h"
 #include "rm_config.h"
@@ -141,6 +142,12 @@ void gimbal_thread_entry(void *argument)
             gim_fdb.yaw_relative_angle = -yaw_motor_relive;
             break;
         // TODO: add auto mode
+            case GIMBAL_AUTO:
+                gim_motor_ref[YAW] = gim_cmd.yaw;
+                gim_motor_ref[PITCH] = gim_cmd.pitch;
+                // 底盘相对于云台归中值的角度，取负
+                gim_fdb.yaw_relative_angle = -yaw_motor_relive;
+                break;
         default: 
             for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
             {

@@ -292,7 +292,6 @@
 #define BSP_USING_IMU
 #define BSP_USING_BMI088
 #define BSP_USING_RC_SBUS
-#define BSP_USING_REFEREE
 
 /* RoboMaster Algorithms */
 
