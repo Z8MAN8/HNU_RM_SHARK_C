@@ -270,6 +270,9 @@ menu "On-chip Peripheral Drivers"
                 default 41
         endif
 
+    menuconfig BSP_USING_USBD
+		bool "Enable USB"
+		default y
 
     source "libraries/HAL_Drivers/Kconfig"
 

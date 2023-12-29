@@ -137,8 +137,8 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_ONE:
-            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -5000;
+            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -3500;
             /*从自动连发模式切换三连发及单发模式时，要继承总转子角度*/
             if(total_angle_flag == 0)
             {
@@ -154,8 +154,8 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_THREE:
-            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -5000;
+            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -3500;
             /*从自动连发模式切换三连发及单发模式时，要继承总转子角度*/
             if(total_angle_flag == 0)
             {
@@ -171,16 +171,20 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_COUNTINUE:
-            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -5000;
+            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -3500;
             shoot_motor_ref[TRIGGER_MOTOR] = shoot_cmd.shoot_freq;//自动模式的时候，只用速度环控制拨弹电机
-            if (shoot_cmd.shoot_freq>=1500&&shoot_cmd.shoot_freq<=2500)
+            if (shoot_cmd.shoot_freq>=3&&shoot_cmd.shoot_freq<=5)
             {
-                shoot_motor_ref[TRIGGER_MOTOR] = 2500;//自动模式的时候，只用速度环控制拨弹电机
+                shoot_motor_ref[TRIGGER_MOTOR] = 3500;//自动模式的时候，只用速度环控制拨弹电机
             }
-            else if(shoot_cmd.shoot_freq>2500)
+            else if(shoot_cmd.shoot_freq>=5&&shoot_cmd.shoot_freq<8)
             {
                 shoot_motor_ref[TRIGGER_MOTOR] = 5000;
+            }
+            else if(shoot_cmd.shoot_freq>=8&&shoot_cmd.shoot_freq<10)
+            {
+                shoot_motor_ref[TRIGGER_MOTOR] = 7000;
             }
              else
              {
@@ -191,8 +195,15 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_REVERSE:
-            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -5000;
+            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -3500;
+            shoot_motor_ref[TRIGGER_MOTOR]=  -2500;
+            total_angle_flag = 0;
+            break;
+
+        case SHOOT_AUTO:
+            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -3500;
             shoot_motor_ref[TRIGGER_MOTOR]=  -2500;
             total_angle_flag = 0;
             break;

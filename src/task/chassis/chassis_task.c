@@ -344,7 +344,7 @@ int TIM_Init(void)
     }
 }
 
- static struct chassis_real_speed_t omni_get_speed(dji_motor_object_t *chassis_motor[4])
+ static struct chassis_real_speed_t omni_get_speed(dji_motor_object_t *chassis_motor[4])//里程计计算函数。
 {
      //float rotate_ratio_f = ((LENGTH_A+LENGTH_B)/2.0f -chassis_cmd.offset_angle)/RADIAN_COEF;
      //float rotate_ratio_b = ((LENGTH_A+LENGTH_B)/2.0f + chassis_cmd.offset_angle)/RADIAN_COEF;

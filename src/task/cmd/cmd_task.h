@@ -7,7 +7,11 @@
 #define _CMD_TASK_H
 
 #include <rtthread.h>
-
+typedef struct
+{
+    float num[3];
+    float error[2];
+}gim_auto_judge;
 void cmd_thread_entry(void *argument);
 
 #endif /* _CMD_TASK_H */

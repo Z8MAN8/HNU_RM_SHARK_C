@@ -15,7 +15,6 @@
 #include <rtdbg.h>
 
 #define GIM_MOTOR_NUM 2
-
 /* -------------------------------- 线程间通讯话题相关 ------------------------------- */
 static struct gimbal_cmd_msg gim_cmd;
 static struct ins_msg ins_data;
@@ -121,13 +120,15 @@ void gimbal_thread_entry(void *argument)
             // TODO：加入斜坡算法，可以控制归中时间
             // TODO: 将编码器值转化为角度值
             // TODO: 优化归中逻辑，yaw轴选取最近的方向
+
             gim_motor_ref[YAW] = yaw_motor_relive * ( 1 - yaw_ramp->calc(yaw_ramp));
             gim_motor_ref[PITCH] = pitch_motor_relive* ( 1 - pit_ramp->calc(pit_ramp));
             if((abs(gim_motor[PITCH]->measure.ecd - CENTER_ECD_PITCH) <= 20)
-               && (abs(gim_motor[YAW]->measure.ecd - CENTER_ECD_YAW) <= 20))
+               && (abs(gim_motor[YAW]->measure.ecd - CENTER_ECD_YAW) <= 80))
             {
                 gim_fdb.back_mode = BACK_IS_OK;
-                gim_fdb.yaw_offset_angle = ins_data.yaw_total_angle;/*云台抽风的原因，期望应该为总角度。抽风原因：不应该用ins_data.yaw*/
+                gim_fdb.yaw_offset_angle_total = ins_data.yaw_total_angle;/*云台抽风的原因，期望应该为总角度。抽风原因：不应该用ins_data.yaw*/
+                gim_fdb.yaw_offset_angle=ins_data.yaw;
                 gim_fdb.pit_offset_angle = ins_data.pitch;
             }
             else
@@ -135,19 +136,22 @@ void gimbal_thread_entry(void *argument)
                 gim_fdb.back_mode = BACK_STEP;
             }
             break;
-        case GIMBAL_GYRO:
+            case GIMBAL_GYRO:
             gim_motor_ref[YAW] = gim_cmd.yaw;
             gim_motor_ref[PITCH] = gim_cmd.pitch;
             // 底盘相对于云台归中值的角度，取负
             gim_fdb.yaw_relative_angle = -yaw_motor_relive;
             break;
+
         // TODO: add auto mode
             case GIMBAL_AUTO:
-                gim_motor_ref[YAW] = gim_cmd.yaw;
-                gim_motor_ref[PITCH] = gim_cmd.pitch;
+                /*gim_motor_ref[YAW] = gim_cmd.yaw_auto;*/
+                gim_motor_ref[YAW] =gim_cmd.yaw;
+                gim_motor_ref[PITCH] =gim_cmd.pitch;
                 // 底盘相对于云台归中值的角度，取负
                 gim_fdb.yaw_relative_angle = -yaw_motor_relive;
                 break;
+
         default: 
             for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
             {
@@ -265,13 +269,13 @@ static rt_int16_t motor_control_yaw(dji_motor_measure_t measure){
             pid_speed = gim_controller[YAW].pid_speed_imu;
             pid_angle = gim_controller[YAW].pid_angle_imu;
             get_speed = ins_data.gyro[Z];
-            get_angle = ins_data.yaw_total_angle - gim_fdb.yaw_offset_angle;
+            get_angle = ins_data.yaw_total_angle - gim_fdb.yaw_offset_angle_total;
             break;
         case GIMBAL_AUTO:
             pid_speed = gim_controller[YAW].pid_speed_auto;
             pid_angle = gim_controller[YAW].pid_angle_auto;
             get_speed = ins_data.gyro[Z];
-            get_angle = ins_data.yaw;
+            get_angle = ins_data.yaw_total_angle - gim_fdb.yaw_offset_angle_total;
             break;
         default:
             break;

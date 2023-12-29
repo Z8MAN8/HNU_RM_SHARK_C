@@ -102,6 +102,7 @@ struct gimbal_fdb_msg
 {
     gimbal_back_e back_mode;  // 云台归中情况
 
+    float yaw_offset_angle_total;    //云台初始 yaw 轴角度 （由imu得）
     float yaw_offset_angle;    //云台初始 yaw 轴角度 （由imu得）
     float pit_offset_angle;    //云台初始 pit 轴角度 （由imu得）
     float yaw_relative_angle;  //云台相对于初始位置的yaw轴角度
@@ -114,6 +115,17 @@ struct gimbal_fdb_msg
 struct shoot_fdb_msg
 {
     shoot_back_e shoot_mode;  // shoot状态反馈
-    int16_t trigger_motor_current //拨弹电机电流，传给cmd控制反转
+    int16_t trigger_motor_current; //拨弹电机电流，传给cmd控制反转
 };
+
+/* ------------------------------ transmission反馈状态数据 ------------------------------ */
+/**
+ * @brief 上位机反馈状态数据,由transmission发布
+ */
+ struct trans_fdb_msg
+ { // 云台自瞄角度控制
+     float yaw;
+     float pitch;
+ };
+
 #endif /* _RM_TASK_H */

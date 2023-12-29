@@ -23,6 +23,7 @@ typedef enum
   SHOOT_THREE=2       ,     //三连发模式
   SHOOT_COUNTINUE=3   ,     //自动射击
   SHOOT_REVERSE=4     ,     //堵弹反转
+  SHOOT_AUTO=5        ,     //自动发射模式
 
 } shoot_mode_e;
 /**
