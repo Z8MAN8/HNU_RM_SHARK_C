@@ -217,8 +217,12 @@ static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
         switch (rpy_rx_data.ID) {
             case GIMBAL:{
                 if (rpy_rx_data.DATA[0]) {//相对角度控制
-                    trans_fdb.yaw = (*(int32_t*)&rpy_rx_data.DATA[1] / 1000.0);
-                    trans_fdb.pitch = (*(int32_t*)&rpy_rx_data.DATA[5] / 1000.0);
+                    trans_fdb.yaw = (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.pitch = (*(int32_t *) &rpy_rx_data.DATA[5] / 1000.0);
+                }
+                else{//绝对角度控制
+                    trans_fdb.yaw = (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.pitch = (*(int32_t *) &rpy_rx_data.DATA[5] / 1000.0);
                 }
             }break;
         }
