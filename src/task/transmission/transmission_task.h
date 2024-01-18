@@ -187,7 +187,7 @@ void Check_Rpy(RpyTypeDef *frame);
 /**
   * @brief 执行发送动作
   */
-void SendData(RpyTypeDef data_r);
+void Send_to_pc(RpyTypeDef data_r);
 
 /**
   * @brief 执行接收解析动作

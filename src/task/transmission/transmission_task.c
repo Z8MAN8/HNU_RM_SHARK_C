@@ -124,7 +124,7 @@ void transmission_task_entry(void* argument)
         /* 发布数据更新 */
         trans_pub_push();
 /*--------------------------------------------------具体需要发送的数据--------------------------------- */
-        SendData(rpy_tx_data);
+        Send_to_pc(rpy_tx_data);
         //Getdata();
 /*--------------------------------------------------具体需要发送的数据---------------------------------*/
         /* 用于调试监测线程调度使用 */
@@ -135,7 +135,7 @@ void transmission_task_entry(void* argument)
     }
 }
 
-void SendData(RpyTypeDef data_r)
+void Send_to_pc(RpyTypeDef data_r)
 {
     /*填充数据*/
     //pack_Rpy(&data_r, (ins_data.yaw - gim_fdb.yaw_offset_angle), (ins_data.pitch - gim_fdb.pit_offset_angle), ins_data.roll);
