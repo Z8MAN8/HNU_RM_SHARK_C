@@ -56,10 +56,11 @@ static void InitQuaternion(float *init_q4);
 
 static struct ins_msg ins_msg_p;
 /* ---------------------------- Attitude_Solving ---------------------------- */
+static float ins_dt;
+
 void ins_thread_entry(void *argument)
 {
     static publisher_t *ins_pub;
-    static float ins_dt;
     static float ins_start;
     static uint32_t ins_dwt = 0;
     static float dt = 0;

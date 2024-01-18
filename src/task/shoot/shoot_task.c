@@ -78,12 +78,14 @@ static rt_int16_t motor_control_right(dji_motor_measure_t measure);
 static rt_int16_t motor_control_left(dji_motor_measure_t measure);
 static rt_int16_t motor_control_trigger(dji_motor_measure_t measure);
 
+/* --------------------------------- 射击线程入口 --------------------------------- */
+static float sht_dt;
+
 /**
  * @brief shoot线程入口函数
  */
 void shoot_task_entry(void* argument)
 {
-    static float sht_dt;
     static float sht_start;
     static int total_angle_flag=0;//转子角度标志位，防止切换设计模式时拨弹电机反转
     static int servo_cvt_num;

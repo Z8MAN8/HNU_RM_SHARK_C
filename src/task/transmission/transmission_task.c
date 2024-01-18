@@ -85,9 +85,11 @@ static void trans_pub_push(void)
     pub_push_msg(pub_trans,&trans_fdb);
 }
 
+/* --------------------------------- 通讯线程入口 --------------------------------- */
+static float trans_dt;
+
 void transmission_task_entry(void* argument)
 {
-    static float trans_dt;
     static float trans_start;
 
     /*订阅数据初始化*/

@@ -49,9 +49,10 @@ static void remote_to_cmd(void);
 //TODO: 添加图传链路的自定义控制器控制方式和键鼠控制方式
 
 /* --------------------------------- cmd线程入口 -------------------------------- */
+static float cmd_dt;
+
 void cmd_thread_entry(void *argument)
 {
-    static float cmd_dt;
     static float cmd_start;
 
     cmd_pub_init();

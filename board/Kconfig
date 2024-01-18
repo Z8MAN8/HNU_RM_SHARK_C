@@ -286,6 +286,14 @@ menu "RoboMaster Modules"
             config BSP_USING_DJI_MOTOR
                 bool "Using DJI Motors"
                 default y
+
+            config BSP_USING_HT_MOTOR
+                bool "Using HT Motors"
+                default n
+
+            config BSP_USING_LK_MOTOR
+                bool "Using LK Motors"
+                default n
         endif
 
     config BSP_USING_DWT
@@ -323,9 +331,14 @@ menu "RoboMaster Modules"
         bool "Enable RC SBUS"
         default y
 
+
     config BSP_USING_REFEREE
         bool "Enable REFEREE"
         default y
+
+    config BSP_USING_LEG
+        bool "Enable Leg Solve"
+        default n
 
 endmenu
 
@@ -390,6 +403,20 @@ menu "RoboMaster Tasks"
         default y
 endmenu
 
+menu "RoboMaster Robot Types"
+    config WHEEL_LEG_INFANTRY
+        bool "Select Wheel Leg Infantry"
+        default n
+        select BSP_USING_LEG
+        select BSP_USING_MOTOR
+        select BSP_USING_RC_SBUS
+        select BSP_USING_PID
+        select BSP_USING_KALMAN_FILTER
+        select BSP_USING_INS_TASK
+        select BSP_USING_MOTOR_TASK
+        select BSP_USING_CMD_TASK
+
+endmenu
 
 menu "Board extended module Drivers"
 
