@@ -115,6 +115,22 @@ menu "On-chip Peripheral Drivers"
                 default n
         endif
 
+    menuconfig BSP_USING_TIM
+            bool "Enable timer"
+            default n
+            select RT_USING_HWTIMER
+            if BSP_USING_TIM
+                config BSP_USING_TIM0
+                    bool "Enable TIM0"
+                    default n
+                config BSP_USING_TIM1
+                    bool "Enable TIM1"
+                    default n
+                config BSP_USING_TIM4
+                    bool "Enable TIM4"
+                    default n
+            endif
+
     menuconfig BSP_USING_PWM
         bool "Enable PWM"
         default n
@@ -254,6 +270,9 @@ menu "On-chip Peripheral Drivers"
                 default 41
         endif
 
+    menuconfig BSP_USING_USBD
+		bool "Enable USB"
+		default y
 
     source "libraries/HAL_Drivers/Kconfig"
 
@@ -312,9 +331,15 @@ menu "RoboMaster Modules"
         bool "Enable RC SBUS"
         default y
 
+
+    config BSP_USING_REFEREE
+        bool "Enable REFEREE"
+        default y
+
     config BSP_USING_LEG
         bool "Enable Leg Solve"
         default n
+
 endmenu
 
 menu "RoboMaster Algorithms"
