@@ -45,7 +45,7 @@ static rt_err_t sbus_rc_decode(uint8_t *buff){
         rc_obj[NOW].ch3 = (buff[3] >> 6 | buff[4] << 2 | buff[5] << 10) & 0x07FF;
         rc_obj[NOW].ch3 -= 1024;
         rc_obj[NOW].ch4 = (buff[5] >> 1 | buff[6] << 7) & 0x07FF;
-        rc_obj[NOW].ch4 -= 1024-19;//摇杆零漂
+        rc_obj[NOW].ch4 -= 1024;
     /* 旋钮值获取 */
        rc_obj[NOW].ch5 =((buff[6] >> 4 | buff[7] << 4) & 0x07FF);
        rc_obj[NOW].ch5 -= 1024;

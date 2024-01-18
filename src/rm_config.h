@@ -124,13 +124,13 @@
 #define YAW_INTEGRAL_A_IMU       5
 #define YAW_MAX_A_IMU            25
 /* auto速度环 */
-#define YAW_KP_V_AUTO            5000
-#define YAW_KI_V_AUTO            200
+#define YAW_KP_V_AUTO            5200+400  //5000
+#define YAW_KI_V_AUTO            200   // 200 300
 #define YAW_KD_V_AUTO            10
 #define YAW_INTEGRAL_V_AUTO      1000
 #define YAW_MAX_V_AUTO           30000
 /* auto角度环 */
-#define YAW_KP_A_AUTO            0.35f
+#define YAW_KP_A_AUTO            0.39f //0.35f
 #define YAW_KI_A_AUTO            0
 #define YAW_KD_A_AUTO            0.001f
 #define YAW_INTEGRAL_A_AUTO      5
@@ -158,13 +158,13 @@
 #define PITCH_INTEGRAL_A_IMU     0.2f
 #define PITCH_MAX_A_IMU          20
 /* auto速度环 */
-#define PITCH_KP_V_AUTO          4250
-#define PITCH_KI_V_AUTO          1000
+#define PITCH_KP_V_AUTO          5200+400+150  // 4250
+#define PITCH_KI_V_AUTO          200  //1000 300
 #define PITCH_KD_V_AUTO          3
 #define PITCH_INTEGRAL_V_AUTO    1500
 #define PITCH_MAX_V_AUTO         20000
 /* auto角度环 */
-#define PITCH_KP_A_AUTO          0.5f
+#define PITCH_KP_A_AUTO          0.39f  // 0.5f 0.38f 0.39
 #define PITCH_KI_A_AUTO          0.0f
 #define PITCH_KD_A_AUTO          0.005f
 #define PITCH_INTEGRAL_A_AUTO    0.2f

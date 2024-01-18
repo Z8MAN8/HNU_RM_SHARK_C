@@ -215,7 +215,7 @@ static void remote_to_cmd(void)
     if (gim_cmd.ctrl_mode==GIMBAL_AUTO) {
 
         gim_cmd.yaw = trans_fdb.yaw + gyro_yaw_inherit + 150 * rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW;//上位机自瞄
-        gim_cmd.pitch = trans_fdb.pitch + ins_data.pitch + 100* rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT;//上位机自瞄
+        gim_cmd.pitch = trans_fdb.pitch + 100* rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT;//上位机自瞄
 
     }
     /* 限制云台角度 */

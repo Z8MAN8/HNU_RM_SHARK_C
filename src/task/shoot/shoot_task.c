@@ -137,8 +137,8 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_ONE:
-            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -3500;
+            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -5000;
             /*从自动连发模式切换三连发及单发模式时，要继承总转子角度*/
             if(total_angle_flag == 0)
             {
@@ -154,8 +154,8 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_THREE:
-            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -3500;
+            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -5000;
             /*从自动连发模式切换三连发及单发模式时，要继承总转子角度*/
             if(total_angle_flag == 0)
             {
@@ -171,8 +171,8 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_COUNTINUE:
-            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -3500;
+            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -5000;
             shoot_motor_ref[TRIGGER_MOTOR] = shoot_cmd.shoot_freq;//自动模式的时候，只用速度环控制拨弹电机
             if (shoot_cmd.shoot_freq>=3&&shoot_cmd.shoot_freq<=5)
             {
@@ -195,15 +195,15 @@ void shoot_task_entry(void* argument)
             break;
 
         case SHOOT_REVERSE:
-            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -3500;
+            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -5000;
             shoot_motor_ref[TRIGGER_MOTOR]=  -2500;
             total_angle_flag = 0;
             break;
 
         case SHOOT_AUTO:
-            shoot_motor_ref[RIGHT_FRICTION] = 3500;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -3500;
+            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = -5000;
             shoot_motor_ref[TRIGGER_MOTOR]=  -2500;
             total_angle_flag = 0;
             break;
@@ -275,14 +275,30 @@ static void shoot_motor_init(){
 /*右摩擦轮电机控制算法*/
 static rt_int16_t motor_control_right(dji_motor_measure_t measure){
     static rt_int16_t set = 0;
-    set =(int16_t) pid_calculate(sht_controller[RIGHT_FRICTION].pid_speed, measure.speed_rpm, shoot_motor_ref[RIGHT_FRICTION]);
+    static int16_t feed;
+    if(shoot_cmd.ctrl_mode != SHOOT_STOP)
+    {
+        feed=800;
+    }
+    else
+        feed = 0;
+
+    set = feed + (int16_t) pid_calculate(sht_controller[RIGHT_FRICTION].pid_speed, measure.speed_rpm, shoot_motor_ref[RIGHT_FRICTION]);
     return set;
 }
 
+static float left_speed;
 /*右摩擦轮电机控制算法*/
 static rt_int16_t motor_control_left(dji_motor_measure_t measure){
     static rt_int16_t set = 0;
-    set =(int16_t) pid_calculate(sht_controller[LEFT_FRICTION].pid_speed, measure.speed_rpm, shoot_motor_ref[LEFT_FRICTION]);
+    static int16_t feed;
+    if(shoot_cmd.ctrl_mode != SHOOT_STOP)
+    {
+        feed=800;
+    }
+    else
+        feed = 0;
+    set = feed + (int16_t) pid_calculate(sht_controller[LEFT_FRICTION].pid_speed, measure.speed_rpm, shoot_motor_ref[LEFT_FRICTION]/*left_speed*/);
     return set;
 }
 

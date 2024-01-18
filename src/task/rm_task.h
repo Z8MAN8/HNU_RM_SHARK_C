@@ -79,7 +79,7 @@ struct gimbal_cmd_msg
     gimbal_mode_e ctrl_mode;  // 当前云台控制模式
     gimbal_mode_e last_mode;  // 上一次云台控制模式
 };
-
+ 
 /**
  * @brief cmd发布的云台控制数据,由shoot订阅
  */

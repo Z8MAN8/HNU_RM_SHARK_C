@@ -138,8 +138,10 @@ void transmission_task_entry(void* argument)
 void SendData(RpyTypeDef data_r)
 {
     /*填充数据*/
-    pack_Rpy(&data_r, (ins_data.yaw - gim_fdb.yaw_offset_angle), (ins_data.pitch - gim_fdb.pit_offset_angle), ins_data.roll);
+    //pack_Rpy(&data_r, (ins_data.yaw - gim_fdb.yaw_offset_angle), (ins_data.pitch - gim_fdb.pit_offset_angle), ins_data.roll);
+    pack_Rpy(&data_r, (gim_fdb.yaw_offset_angle - ins_data.yaw), (ins_data.pitch - gim_fdb.pit_offset_angle), ins_data.roll);
     Check_Rpy(&data_r);
+
 
     rt_device_write(vs_port, 0, (uint8_t*)&data_r, sizeof(data_r));
 }
@@ -217,11 +219,11 @@ static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
         switch (rpy_rx_data.ID) {
             case GIMBAL:{
                 if (rpy_rx_data.DATA[0]) {//相对角度控制
-                    trans_fdb.yaw = (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.yaw = - (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
                     trans_fdb.pitch = (*(int32_t *) &rpy_rx_data.DATA[5] / 1000.0);
                 }
                 else{//绝对角度控制
-                    trans_fdb.yaw = (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.yaw = - (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
                     trans_fdb.pitch = (*(int32_t *) &rpy_rx_data.DATA[5] / 1000.0);
                 }
             }break;

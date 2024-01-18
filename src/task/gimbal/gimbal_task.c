@@ -123,7 +123,7 @@ void gimbal_thread_entry(void *argument)
 
             gim_motor_ref[YAW] = yaw_motor_relive * ( 1 - yaw_ramp->calc(yaw_ramp));
             gim_motor_ref[PITCH] = pitch_motor_relive* ( 1 - pit_ramp->calc(pit_ramp));
-            if((abs(gim_motor[PITCH]->measure.ecd - CENTER_ECD_PITCH) <= 20)
+            if((abs(gim_motor[PITCH]->measure.ecd - CENTER_ECD_PITCH) <= 10)
                && (abs(gim_motor[YAW]->measure.ecd - CENTER_ECD_YAW) <= 80))
             {
                 gim_fdb.back_mode = BACK_IS_OK;
