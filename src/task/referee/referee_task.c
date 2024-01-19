@@ -4,7 +4,6 @@
 
 #include "referee_task.h"
 #include "drv_gpio.h"
-
 #define DBG_TAG   "rm.task"
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
@@ -15,9 +14,27 @@ DMA_HandleTypeDef hdma_usart6_tx;
 /*裁判系统线程入口*/
 void referee_thread_entry(void *argument){
 
+    /*用户3pin串口初始化*/
+    /* DMA controller clock enable */
+    __HAL_RCC_DMA2_CLK_ENABLE();
+    /* DMA2_Stream1_IRQn interrupt configuration */
+    HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
+    /* DMA2_Stream6_IRQn interrupt configuration */
+   /* HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);*/
+    huart6.Instance=USART6;
+    huart6.Init.BaudRate=115200;
+    huart6.Init.WordLength=UART_WORDLENGTH_8B;
+    huart6.Init.Parity=UART_PARITY_NONE;
+    huart6.Init.Mode=UART_MODE_TX_RX;
+    huart6.Init.HwFlowCtl=UART_HWCONTROL_NONE;
+    huart6.Init.OverSampling=UART_OVERSAMPLING_16;
+    HAL_UART_Init(&huart6);
+
     /*裁判系统初始化*/
     Referee_system_Init(RX_AgreementData_Buffer0,RX_AgreementData_Buffer1,Agreement_RX_BUF_NUM);
-    graphic_data_struct_t TEST_data;
+
     /*裁判系统数据解包*/
     for(;;) {
         if ((hdma_usart6_rx.Instance->CR & DMA_SxCR_CT) == RESET) //如果当前缓冲区是0，解包0缓冲区，否则解包1缓冲区
