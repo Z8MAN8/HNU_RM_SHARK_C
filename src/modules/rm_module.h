@@ -39,7 +39,7 @@
 #include "imu.h"
 #endif /* BSP_USING_RC_SBUS */
 #ifdef BSP_USING_RC_SBUS
-#include "rc_sbus.h"
+#include "rc_sdbus.h"
 #endif /* BSP_USING_RC_SBUS */
 #ifdef BSP_USING_REFEREE
 #include "BSP_CRC.h"

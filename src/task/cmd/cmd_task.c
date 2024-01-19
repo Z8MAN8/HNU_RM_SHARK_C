@@ -26,7 +26,7 @@ static struct trans_fdb_msg  trans_fdb;
 static struct ins_msg ins_data;
 
 static rc_obj_t *rc_now, *rc_last;
-
+static rc_dbus_obj_t *rc_dbus_now, *rc_dbus_last;
 static void cmd_pub_init(void);
 static void cmd_pub_push(void);
 static void cmd_sub_init(void);
@@ -58,8 +58,12 @@ void cmd_thread_entry(void *argument)
     cmd_pub_init();
     cmd_sub_init();
 
+    /* SBUS链路 */
     rc_now = sbus_rc_init();
     rc_last = (rc_now + 1);   // rc_obj[0]:当前数据NOW,[1]:上一次的数据LAST
+    /* DBUS链路 */
+    //rc_dbus_now = dbus_rc_init();
+    //rc_dbus_last = (rc_dbus_now + 1);
     /* 初始化拨杆为上位 */
     rc_now->sw1 = RC_UP;
     rc_now->sw2 = RC_UP;
@@ -148,9 +152,9 @@ static void remote_to_cmd(void)
 // TODO: 目前状态机转换较为简单，有很多优化和改进空间
 //遥控器的控制信息转化为标准单位，平移为(mm/s)旋转为(degree/s)
     /*底盘命令*/
-    chassis_cmd.vx = rc_now->ch1 * CHASSIS_RC_MOVE_RATIO_X / RC_MAX_VALUE * MAX_CHASSIS_VX_SPEED;
-    chassis_cmd.vy = rc_now->ch2 * CHASSIS_RC_MOVE_RATIO_Y / RC_MAX_VALUE * MAX_CHASSIS_VY_SPEED;
-    chassis_cmd.vw = rc_now->ch4 * CHASSIS_RC_MOVE_RATIO_R / RC_MAX_VALUE * MAX_CHASSIS_VR_SPEED;
+    chassis_cmd.vx = rc_now->ch1 * CHASSIS_RC_MOVE_RATIO_X / RC_SBUS_MAX_VALUE * MAX_CHASSIS_VX_SPEED;
+    chassis_cmd.vy = rc_now->ch2 * CHASSIS_RC_MOVE_RATIO_Y / RC_SBUS_MAX_VALUE * MAX_CHASSIS_VY_SPEED;
+    chassis_cmd.vw = rc_now->ch4 * CHASSIS_RC_MOVE_RATIO_R / RC_SBUS_MAX_VALUE * MAX_CHASSIS_VR_SPEED;
     chassis_cmd.offset_angle = gim_fdb.yaw_relative_angle;
     /*上下位机通讯接收缓存区清空标志位*/
 /*    if(gim_cmd.last_mode == GIMBAL_AUTO)
@@ -371,7 +375,7 @@ static void remote_to_cmd(void)
     // TODO: 添加弹频和弹速控制
     if (rc_now->ch6>0)
     {
-        shoot_cmd.shoot_freq = rc_now->ch6 / RC_MAX_VALUE*10;//连发模式拨弹电机转速
+        shoot_cmd.shoot_freq = rc_now->ch6 / RC_SBUS_MAX_VALUE * 10;//连发模式拨弹电机转速
     }
     else if(rc_now->ch6<=-775)
     {

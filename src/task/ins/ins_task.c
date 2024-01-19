@@ -93,7 +93,7 @@ void ins_thread_entry(void *argument)
         // ins.atanyz = atan2f(ins.accel[Y], ins.accel[Z]) * 180 / PI;
 
         // 核心函数,EKF更新四元数
-        IMU_QuaternionEKF_Update(ins.gyro[X], ins.gyro[Y], ins.gyro[Z], ins.accel[X], ins.accel[Y], ins.accel[Z], dt);
+        IMU_QuaternionEKF_Update(ins.gyro[INS_X], ins.gyro[INS_Y], ins.gyro[INS_Z], ins.accel[INS_X], ins.accel[INS_Y], ins.accel[INS_Z], dt);
 
         memcpy(ins.q, QEKF_INS.q, sizeof(QEKF_INS.q));
 
@@ -172,9 +172,9 @@ static rt_err_t temp_pwm_init(rt_uint32_t period, rt_uint32_t pulse)
  */
 static void ins_init(void)
 {
-    imu_param.scale[X] = 1;
-    imu_param.scale[Y] = 1;
-    imu_param.scale[Z] = 1;
+    imu_param.scale[INS_X] = 1;
+    imu_param.scale[INS_Y] = 1;
+    imu_param.scale[INS_Z] = 1;
     imu_param.yaw = 0;
     imu_param.pitch = 0;
     imu_param.roll = 0;
@@ -295,29 +295,29 @@ static void IMU_Param_Correction(imu_param_t *param, float gyro[3], float accel[
     for (uint8_t i = 0; i < 3; ++i)
         gyro_temp[i] = gyro[i] * param->scale[i];
 
-    gyro[X] = c_11 * gyro_temp[X] +
-              c_12 * gyro_temp[Y] +
-              c_13 * gyro_temp[Z];
-    gyro[Y] = c_21 * gyro_temp[X] +
-              c_22 * gyro_temp[Y] +
-              c_23 * gyro_temp[Z];
-    gyro[Z] = c_31 * gyro_temp[X] +
-              c_32 * gyro_temp[Y] +
-              c_33 * gyro_temp[Z];
+    gyro[INS_X] = c_11 * gyro_temp[INS_X] +
+              c_12 * gyro_temp[INS_Y] +
+              c_13 * gyro_temp[INS_Z];
+    gyro[INS_Y] = c_21 * gyro_temp[INS_X] +
+              c_22 * gyro_temp[INS_Y] +
+              c_23 * gyro_temp[INS_Z];
+    gyro[INS_Z] = c_31 * gyro_temp[INS_X] +
+              c_32 * gyro_temp[INS_Y] +
+              c_33 * gyro_temp[INS_Z];
 
     float accel_temp[3];
     for (uint8_t i = 0; i < 3; ++i)
         accel_temp[i] = accel[i];
 
-    accel[X] = c_11 * accel_temp[X] +
-               c_12 * accel_temp[Y] +
-               c_13 * accel_temp[Z];
-    accel[Y] = c_21 * accel_temp[X] +
-               c_22 * accel_temp[Y] +
-               c_23 * accel_temp[Z];
-    accel[Z] = c_31 * accel_temp[X] +
-               c_32 * accel_temp[Y] +
-               c_33 * accel_temp[Z];
+    accel[INS_X] = c_11 * accel_temp[INS_X] +
+               c_12 * accel_temp[INS_Y] +
+               c_13 * accel_temp[INS_Z];
+    accel[INS_Y] = c_21 * accel_temp[INS_X] +
+               c_22 * accel_temp[INS_Y] +
+               c_23 * accel_temp[INS_Z];
+    accel[INS_Z] = c_31 * accel_temp[INS_X] +
+               c_32 * accel_temp[INS_Y] +
+               c_33 * accel_temp[INS_Z];
 
     lastYawOffset = param->yaw;
     lastPitchOffset = param->pitch;

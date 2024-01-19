@@ -30,7 +30,11 @@
 #define USART_RC       "uart3"
 
 /* ---------------------------------- 遥控器相关 --------------------------------- */
-#define RC_MAX_VALUE      784.0f  /* 遥控器通道最大值 */
+#define RC_SBUS_MAX_VALUE      784.0f  /* SBUS遥控器通道最大值 */
+#define RC_DBUS_MAX_VALUE      660.0f  /* DBUS遥控器通道最大值 */
+#define SBUS_FRAME_SIZE        25u     /* SBUS数据帧帧长 */
+#define DBUS_FRAME_SIZE        18u     /* DBUS数据帧帧长 */
+#define RX_BUF_NUM             36u     /* 遥控器数据接收缓存区长度 */
 
 #define RC_RATIO          0.0009f
 

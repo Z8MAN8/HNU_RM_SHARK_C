@@ -10,9 +10,9 @@
 #include <rtthread.h>
 #include "rm_algorithm.h"
 
-#define X 0
-#define Y 1
-#define Z 2
+#define INS_X 0
+#define INS_Y 1
+#define INS_Z 2
 
 #define INS_TASK_PERIOD 1
 
