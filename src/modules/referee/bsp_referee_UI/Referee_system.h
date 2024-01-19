@@ -1,6 +1,11 @@
-//
-// Created by 16933 on 2022/3/14.
-//
+/*
+* Change Logs:
+* Date            Author          Notes
+* 2024-01-9      ChenSihan     first version
+*/
+#ifndef REFEREE_SYSTEM_H
+#define REFEREE_SYSTEM_H
+
 #pragma once
 #define HEADER_SOF 0xA5
 #define Agreement_RX_BUF_NUM 512        //DMA要传输的数据项数目NDTR寄存器填充值 200，即收200字节后自动填充并转换缓冲数组
@@ -487,11 +492,17 @@ typedef  struct
     uint8_t *data;                                  /*! 内容数据段 */
 } __attribute__((__packed__)) ext_student_interactive_header_data_t;
 
-
-
+/**
+ * @brief 裁判系统接收初始化
+ */
 void Referee_system_Init(uint8_t *  rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_num);
+/**
+ * @brief 裁判系统接收数据帧解包
+ */
 void Referee_Data_Unpack();
-
+/**
+ * @brief 裁判系统数据更新并保存
+ */
 void Referee_Data_Solve(uint8_t* referee_data_frame);
 
-extern ext_game_robot_status_t                 robot_status;
+#endif //REFEREE_SYSTEM_H

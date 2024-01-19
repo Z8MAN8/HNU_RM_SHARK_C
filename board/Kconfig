@@ -401,6 +401,11 @@ menu "RoboMaster Tasks"
     config BSP_USING_SHOOT_TASK
         bool "Select USING Shoot Task"
         default y
+
+    config BSP_USING_REFEREE_TASK
+            bool "Select USING Referee Task"
+            default y
+
 endmenu
 
 menu "RoboMaster Robot Types"

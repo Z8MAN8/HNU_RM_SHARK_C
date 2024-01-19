@@ -3,8 +3,6 @@
 //
 
 #include "Referee.h"
-#include "rm_task.h"
-
 
 //#define normal 15;
 //#define normal 18;
@@ -12,7 +10,7 @@
 ext_power_heat_data_t ext_power_heat_data;
 ext_game_robot_status_t ext_game_robot_status;
 
-void referee_task(void *argument)
+__weak void referee_task(void *argument)
 {
     /*int num=359;
     int supcolour;
@@ -202,7 +200,7 @@ void referee_task(void *argument)
 
     }
 }
-void USART6_IRQHandler(void)
+__weak void USART6_IRQHandler(void)
 {
     if(__HAL_UART_GET_FLAG(&huart6,UART_FLAG_IDLE)!=RESET)//如果串口中断开启
     {

@@ -1,6 +1,8 @@
-//
-// Created by 16933 on 2022/3/14.
-//
+/*
+* Change Logs:
+* Date            Author          Notes
+* 2024-01-9      ChenSihan     first version
+*/
 
 #include "Referee_system.h"
 #include "string.h"

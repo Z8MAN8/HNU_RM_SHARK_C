@@ -40,6 +40,9 @@
 #ifdef BSP_USING_SHOOT_TASK
 #include "shoot_task.h"
 #endif /* BSP_USING_SHOOT_TASK */
+#ifdef BSP_USING_REFEREE_TASK
+#include "referee_task.h"
+#endif /* BSP_USING_REFEREE_TASK */
 
 
 /* --------------------------------- 话题的数据格式 -------------------------------- */
