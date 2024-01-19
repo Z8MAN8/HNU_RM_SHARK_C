@@ -37,10 +37,10 @@
 #endif /* BSP_USING_IST8310 */
 #ifdef BSP_USING_IMU
 #include "imu.h"
-#endif /* BSP_USING_RC_SBUS */
-#ifdef BSP_USING_RC_SBUS
-#include "rc_sdbus.h"
-#endif /* BSP_USING_RC_SBUS */
+#endif /* BSP_USING_IMU */
+#ifdef BSP_USING_RC_DBUS
+#include "rc_dbus.h"
+#endif /* BSP_USING_RC_DBUS */
 #ifdef BSP_USING_REFEREE
 #include "BSP_CRC.h"
 #include "fifo.h"
