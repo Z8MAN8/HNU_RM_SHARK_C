@@ -1,11 +1,11 @@
- /*
- * Change Logs:
- * Date            Author          Notes
- * 2023-09-24      ChuShicheng     first version
- *                 ZhengWanshun
- *                 Yangshuo
- *                 ChenSihan
- */
+/*
+* Change Logs:
+* Date            Author          Notes
+* 2023-09-24      ChuShicheng     first version
+*                 ZhengWanshun
+*                 Yangshuo
+*                 ChenSihan
+*/
 #ifndef _RC_SBUS_H
 #define _RC_SBUS_H
 

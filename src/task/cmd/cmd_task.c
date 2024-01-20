@@ -25,8 +25,8 @@ static struct chassis_cmd_msg chassis_cmd;
 static struct trans_fdb_msg  trans_fdb;
 static struct ins_msg ins_data;
 
-static rc_obj_t *rc_now, *rc_last;
-
+//static rc_obj_t *rc_now, *rc_last;
+static rc_dbus_obj_t *rc_now, *rc_last;
 static void cmd_pub_init(void);
 static void cmd_pub_push(void);
 static void cmd_sub_init(void);
@@ -58,13 +58,14 @@ void cmd_thread_entry(void *argument)
     cmd_pub_init();
     cmd_sub_init();
 
-    rc_now = sbus_rc_init();
-    rc_last = (rc_now + 1);   // rc_obj[0]:当前数据NOW,[1]:上一次的数据LAST
+    /* DBUS链路 */
+    rc_now = dbus_rc_init();
+    rc_last = (rc_now + 1);
     /* 初始化拨杆为上位 */
     rc_now->sw1 = RC_UP;
     rc_now->sw2 = RC_UP;
-    rc_now->sw3 = RC_UP;
-    rc_now->sw4 = RC_UP;
+    //rc_now->sw3 = RC_UP;
+    //rc_now->sw4 = RC_UP;
 
     LOG_I("Cmd Task Start");
     for (;;)
@@ -148,9 +149,9 @@ static void remote_to_cmd(void)
 // TODO: 目前状态机转换较为简单，有很多优化和改进空间
 //遥控器的控制信息转化为标准单位，平移为(mm/s)旋转为(degree/s)
     /*底盘命令*/
-    chassis_cmd.vx = rc_now->ch1 * CHASSIS_RC_MOVE_RATIO_X / RC_MAX_VALUE * MAX_CHASSIS_VX_SPEED;
-    chassis_cmd.vy = rc_now->ch2 * CHASSIS_RC_MOVE_RATIO_Y / RC_MAX_VALUE * MAX_CHASSIS_VY_SPEED;
-    chassis_cmd.vw = rc_now->ch4 * CHASSIS_RC_MOVE_RATIO_R / RC_MAX_VALUE * MAX_CHASSIS_VR_SPEED;
+    chassis_cmd.vx = rc_now->ch1 * CHASSIS_RC_MOVE_RATIO_X / RC_SBUS_MAX_VALUE * MAX_CHASSIS_VX_SPEED;
+    chassis_cmd.vy = rc_now->ch2 * CHASSIS_RC_MOVE_RATIO_Y / RC_SBUS_MAX_VALUE * MAX_CHASSIS_VY_SPEED;
+    chassis_cmd.vw = rc_now->ch4 * CHASSIS_RC_MOVE_RATIO_R / RC_SBUS_MAX_VALUE * MAX_CHASSIS_VR_SPEED;
     chassis_cmd.offset_angle = gim_fdb.yaw_relative_angle;
     /*上下位机通讯接收缓存区清空标志位*/
 /*    if(gim_cmd.last_mode == GIMBAL_AUTO)
@@ -252,7 +253,7 @@ static void remote_to_cmd(void)
 /*    case RC_MI:
         chassis_cmd.ctrl_mode = CHASSIS_OPEN_LOOP;
         break;*/
-    case RC_DN:
+    /*case RC_DN:
         if(gim_cmd.ctrl_mode != GIMBAL_INIT && gim_cmd.ctrl_mode != GIMBAL_RELAX)
         {
             chassis_cmd.ctrl_mode = CHASSIS_SPIN;
@@ -275,7 +276,7 @@ static void remote_to_cmd(void)
         }
         break;
     }
-    /* 因为左拨杆值会影响到底盘RELAX状态，所以后判断 */
+    *//* 因为左拨杆值会影响到底盘RELAX状态，所以后判断 *//*
 
     switch(rc_now->sw3)
     {
@@ -283,13 +284,13 @@ static void remote_to_cmd(void)
         gim_cmd.ctrl_mode = GIMBAL_RELAX;
         chassis_cmd.ctrl_mode = CHASSIS_RELAX;
         shoot_cmd.ctrl_mode=SHOOT_STOP;
-        /*放开状态下，gim不接收值*/
+        *//*放开状态下，gim不接收值*//*
         gim_cmd.pitch=0;
         gim_cmd.yaw=0;
         break;
     case RC_MI:
         if(gim_cmd.last_mode == GIMBAL_RELAX)
-        {/* 判断上次状态是否为RELAX，是则先归中 */
+        {*//* 判断上次状态是否为RELAX，是则先归中 *//*
             gim_cmd.ctrl_mode = GIMBAL_INIT;
         }
         else
@@ -302,13 +303,13 @@ static void remote_to_cmd(void)
         break;
     case RC_DN:
         if(gim_cmd.last_mode == GIMBAL_RELAX)
-        {/* 判断上次状态是否为RELAX，是则先归中 */
+        {*//* 判断上次状态是否为RELAX，是则先归中 *//*
             gim_cmd.ctrl_mode = GIMBAL_INIT;
         }
         else
         {
             if(gim_fdb.back_mode == BACK_IS_OK)
-            {/* 判断归中是否完成 */
+            {*//* 判断归中是否完成 *//*
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode=CHASSIS_RELAX;
             }
@@ -316,13 +317,13 @@ static void remote_to_cmd(void)
         break;
     }
 
-    /*--------------------------------------------------发射模块状态机--------------------------------------------------------------*/
+    *//*--------------------------------------------------发射模块状态机--------------------------------------------------------------*//*
 
     if(rc_now->sw3!=RC_UP&&gim_cmd.ctrl_mode!=GIMBAL_AUTO)//判断总开关是否停止发射
     {
         switch (rc_now->sw1)
         {
-            /*判断是否处于可发射状态*/
+            *//*判断是否处于可发射状态*//*
             //TODO:由于遥控器拨杆档位限制,目前连发模式还未写进状态机。两档拨杆具体值由遥控器确定，现在待定。
             case RC_DN:
                 if (rc_now->ch6 <= 775)
@@ -333,7 +334,7 @@ static void remote_to_cmd(void)
                     trigger_flag = 0;
                 }
                 else shoot_cmd.trigger_status = TRIGGER_OFF;
-                /*判断发射模式是三连发还是全自动*/
+                *//*判断发射模式是三连发还是全自动*//*
                 switch (rc_now->sw4)
                 {
                     case RC_UP:
@@ -358,7 +359,7 @@ static void remote_to_cmd(void)
     {
         shoot_cmd.ctrl_mode==SHOOT_STOP;
     }
-    /*堵弹反转检测*/
+    *//*堵弹反转检测*//*
     if (shoot_fdb.trigger_motor_current>=9500||reverse_cnt!=0)
     {
         shoot_cmd.ctrl_mode=SHOOT_REVERSE;
@@ -371,7 +372,7 @@ static void remote_to_cmd(void)
     // TODO: 添加弹频和弹速控制
     if (rc_now->ch6>0)
     {
-        shoot_cmd.shoot_freq = rc_now->ch6 / RC_MAX_VALUE*10;//连发模式拨弹电机转速
+        shoot_cmd.shoot_freq = rc_now->ch6 / RC_SBUS_MAX_VALUE * 10;//连发模式拨弹电机转速
     }
     else if(rc_now->ch6<=-775)
     {
@@ -379,6 +380,6 @@ static void remote_to_cmd(void)
     }
     else
     {
-         shoot_cmd.cover_open=0;
+         shoot_cmd.cover_open=0;*/
     }
 }

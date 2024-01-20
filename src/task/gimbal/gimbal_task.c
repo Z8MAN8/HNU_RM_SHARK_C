@@ -263,19 +263,19 @@ static rt_int16_t motor_control_yaw(dji_motor_measure_t measure){
         case GIMBAL_INIT:
             pid_speed = gim_controller[YAW].pid_speed_imu;
             pid_angle = gim_controller[YAW].pid_angle_imu;
-            get_speed = ins_data.gyro[Z];
+            get_speed = ins_data.gyro[INS_Z];
             get_angle = yaw_motor_relive;
             break;
         case GIMBAL_GYRO:
             pid_speed = gim_controller[YAW].pid_speed_imu;
             pid_angle = gim_controller[YAW].pid_angle_imu;
-            get_speed = ins_data.gyro[Z];
+            get_speed = ins_data.gyro[INS_Z];
             get_angle = ins_data.yaw_total_angle - gim_fdb.yaw_offset_angle_total;
             break;
         case GIMBAL_AUTO:
             pid_speed = gim_controller[YAW].pid_speed_auto;
             pid_angle = gim_controller[YAW].pid_angle_auto;
-            get_speed = ins_data.gyro[Z];
+            get_speed = ins_data.gyro[INS_Z];
             get_angle = ins_data.yaw_total_angle - gim_fdb.yaw_offset_angle_total;
             break;
         default:
@@ -318,19 +318,19 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
         case GIMBAL_INIT:// TODO: 云台初始化模式加入斜坡算法，可以控制归中时间
             pid_speed = gim_controller[PITCH].pid_speed_imu;
             pid_angle = gim_controller[PITCH].pid_angle_imu;
-            get_speed = ins_data.gyro[Y];
+            get_speed = ins_data.gyro[INS_Y];
             get_angle = pitch_motor_relive;
             break;
         case GIMBAL_GYRO:
             pid_speed = gim_controller[PITCH].pid_speed_imu;
             pid_angle = gim_controller[PITCH].pid_angle_imu;
-            get_speed = ins_data.gyro[Y];
+            get_speed = ins_data.gyro[INS_Y];
             get_angle = ins_data.pitch;
             break;
         case GIMBAL_AUTO:
             pid_speed = gim_controller[PITCH].pid_speed_auto;
             pid_angle = gim_controller[PITCH].pid_angle_auto;
-            get_speed = ins_data.gyro[Y];
+            get_speed = ins_data.gyro[INS_Y];
             get_angle = ins_data.pitch;
             break;
         default:
