@@ -327,8 +327,8 @@ menu "RoboMaster Modules"
                 endif
         endif
     
-    config BSP_USING_RC_SBUS
-        bool "Enable RC SBUS"
+    config BSP_USING_RC_DBUS
+        bool "Enable RC DBUS"
         default y
 
 
