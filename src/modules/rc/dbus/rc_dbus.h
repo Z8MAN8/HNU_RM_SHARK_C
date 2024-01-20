@@ -12,6 +12,8 @@
 #include <rtthread.h>
 #include "rm_config.h"
 
+#define DBUS_FRAME_SIZE        18u     /* DBUS数据帧帧长 */
+
 /**
   * @brief dbus遥控器拨杆值
   */
