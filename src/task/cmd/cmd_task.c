@@ -25,7 +25,7 @@ static struct chassis_cmd_msg chassis_cmd;
 static struct trans_fdb_msg  trans_fdb;
 static struct ins_msg ins_data;
 
-static rc_obj_t *rc_now, *rc_last;
+static rc_dbus_obj_t *rc_now, *rc_last;
 
 static void cmd_pub_init(void);
 static void cmd_pub_push(void);
@@ -58,13 +58,15 @@ void cmd_thread_entry(void *argument)
     cmd_pub_init();
     cmd_sub_init();
 
-    rc_now = sbus_rc_init();
+    rc_now = dbus_rc_init();
     rc_last = (rc_now + 1);   // rc_obj[0]:当前数据NOW,[1]:上一次的数据LAST
     /* 初始化拨杆为上位 */
     rc_now->sw1 = RC_UP;
     rc_now->sw2 = RC_UP;
-    rc_now->sw3 = RC_UP;
-    rc_now->sw4 = RC_UP;
+    //rc_now->sw3 = RC_UP;
+    //rc_now->sw4 = RC_UP;
+    /*处理PC端键鼠控制*/
+    PC_Handle_kb();
 
     LOG_I("Cmd Task Start");
     for (;;)
@@ -229,7 +231,7 @@ static void remote_to_cmd(void)
     /*-------------------------------------------------底盘_云台状态机--------------------------------------------------------------*/
     // 左拨杆sw2为上时，底盘和云台均RELAX；为中时，云台为GYRO；为下时，云台为AUTO。
     // 右拨杆sw1为上时，底盘为FOLLOW；为中时，底盘为OPEN；为下时，底盘为SPIN。
-    if (gim_cmd.ctrl_mode==GIMBAL_INIT||gim_cmd.ctrl_mode==GIMBAL_RELAX)
+    /*if (gim_cmd.ctrl_mode==GIMBAL_INIT||gim_cmd.ctrl_mode==GIMBAL_RELAX)
     {
         gim_cmd.pitch=0;
         gim_cmd.yaw=0;
@@ -249,9 +251,9 @@ static void remote_to_cmd(void)
             chassis_cmd.ctrl_mode = CHASSIS_RELAX;
         }
         break;
-/*    case RC_MI:
+*//*    case RC_MI:
         chassis_cmd.ctrl_mode = CHASSIS_OPEN_LOOP;
-        break;*/
+        break;*//*
     case RC_DN:
         if(gim_cmd.ctrl_mode != GIMBAL_INIT && gim_cmd.ctrl_mode != GIMBAL_RELAX)
         {
@@ -275,7 +277,7 @@ static void remote_to_cmd(void)
         }
         break;
     }
-    /* 因为左拨杆值会影响到底盘RELAX状态，所以后判断 */
+    *//* 因为左拨杆值会影响到底盘RELAX状态，所以后判断 *//*
 
     switch(rc_now->sw3)
     {
@@ -283,13 +285,13 @@ static void remote_to_cmd(void)
         gim_cmd.ctrl_mode = GIMBAL_RELAX;
         chassis_cmd.ctrl_mode = CHASSIS_RELAX;
         shoot_cmd.ctrl_mode=SHOOT_STOP;
-        /*放开状态下，gim不接收值*/
+        *//*放开状态下，gim不接收值*//*
         gim_cmd.pitch=0;
         gim_cmd.yaw=0;
         break;
     case RC_MI:
         if(gim_cmd.last_mode == GIMBAL_RELAX)
-        {/* 判断上次状态是否为RELAX，是则先归中 */
+        {*//* 判断上次状态是否为RELAX，是则先归中 *//*
             gim_cmd.ctrl_mode = GIMBAL_INIT;
         }
         else
@@ -302,27 +304,27 @@ static void remote_to_cmd(void)
         break;
     case RC_DN:
         if(gim_cmd.last_mode == GIMBAL_RELAX)
-        {/* 判断上次状态是否为RELAX，是则先归中 */
+        {*//* 判断上次状态是否为RELAX，是则先归中 *//*
             gim_cmd.ctrl_mode = GIMBAL_INIT;
         }
         else
         {
             if(gim_fdb.back_mode == BACK_IS_OK)
-            {/* 判断归中是否完成 */
+            {*//* 判断归中是否完成 *//*
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode=CHASSIS_RELAX;
             }
         }
         break;
     }
-
+*/
     /*--------------------------------------------------发射模块状态机--------------------------------------------------------------*/
 
-    if(rc_now->sw3!=RC_UP&&gim_cmd.ctrl_mode!=GIMBAL_AUTO)//判断总开关是否停止发射
+    /*if(rc_now->sw3!=RC_UP&&gim_cmd.ctrl_mode!=GIMBAL_AUTO)//判断总开关是否停止发射
     {
         switch (rc_now->sw1)
         {
-            /*判断是否处于可发射状态*/
+            *//*判断是否处于可发射状态*//*
             //TODO:由于遥控器拨杆档位限制,目前连发模式还未写进状态机。两档拨杆具体值由遥控器确定，现在待定。
             case RC_DN:
                 if (rc_now->ch6 <= 775)
@@ -333,7 +335,7 @@ static void remote_to_cmd(void)
                     trigger_flag = 0;
                 }
                 else shoot_cmd.trigger_status = TRIGGER_OFF;
-                /*判断发射模式是三连发还是全自动*/
+                *//*判断发射模式是三连发还是全自动*//*
                 switch (rc_now->sw4)
                 {
                     case RC_UP:
@@ -358,7 +360,7 @@ static void remote_to_cmd(void)
     {
         shoot_cmd.ctrl_mode==SHOOT_STOP;
     }
-    /*堵弹反转检测*/
+    *//*堵弹反转检测*//*
     if (shoot_fdb.trigger_motor_current>=9500||reverse_cnt!=0)
     {
         shoot_cmd.ctrl_mode=SHOOT_REVERSE;
@@ -380,5 +382,5 @@ static void remote_to_cmd(void)
     else
     {
          shoot_cmd.cover_open=0;
-    }
+    }*/
 }

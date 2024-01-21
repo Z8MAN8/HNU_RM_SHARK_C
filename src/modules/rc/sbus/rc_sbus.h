@@ -9,7 +9,7 @@
 #ifndef _RC_SBUS_H
 #define _RC_SBUS_H
 
-#include <rtthread.h>
+#include "rt-thread/include/rtthread.h"
 
 #define SBUS_RX_BUF_NUM 36u
 #define SBUS_FRAME_SIZE 25u
