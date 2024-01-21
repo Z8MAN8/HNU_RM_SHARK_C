@@ -8,11 +8,11 @@
  */
 #include "rc_sbus.h"
 #include "rm_config.h"
-#include <stm32f4xx.h>
+#include "libraries/STM32F4xx_HAL/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
 
 #define DBG_TAG           "rc.sbus"
 #define DBG_LVL DBG_INFO
-#include <rtdbg.h>
+#include "rt-thread/include/rtdbg.h"
 
 #define NOW 0
 #define LAST 1
@@ -22,7 +22,7 @@
 UART_HandleTypeDef huart3;
 DMA_HandleTypeDef hdma_usart3_rx;
 
-//接收原始数据，为18个字节，给了36个字节长度，防止DMA传输越界
+//接收原始数据，为25个字节，给了36个字节长度，防止DMA传输越界
 static uint8_t sbus_rx_buf[2][SBUS_RX_BUF_NUM];
 static rc_obj_t rc_obj[2];   // [0]:当前数据NOW,[1]:上一次的数据LAST
 // TODO: 目前遥控器发送端关闭并不会检测为丢失，只有接收端异常才会判断为离线，
