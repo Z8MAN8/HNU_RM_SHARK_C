@@ -329,8 +329,11 @@ menu "RoboMaster Modules"
     
     config BSP_USING_RC_SBUS
         bool "Enable RC SBUS"
-        default y
+        default n
 
+    config BSP_USING_RC_DBUS
+        bool "Enable RC DBUS"
+        default y
 
     config BSP_USING_REFEREE
         bool "Enable REFEREE"

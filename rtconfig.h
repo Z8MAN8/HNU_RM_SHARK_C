@@ -305,7 +305,7 @@
 #define BSP_USING_IST8310
 #define BSP_USING_IMU
 #define BSP_USING_BMI088
-#define BSP_USING_RC_SBUS
+#define BSP_USING_RC_DBUS
 
 /* RoboMaster Algorithms */
 
@@ -324,6 +324,9 @@
 #define BSP_USING_GIMBAL_TASK
 #define BSP_USING_TRANSMISSION_TASK
 #define BSP_USING_SHOOT_TASK
+
+/* RoboMaster Robot Types */
+
 
 /* Board extended module Drivers */
 

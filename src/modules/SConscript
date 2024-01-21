@@ -42,9 +42,9 @@ if GetDepend(['BSP_USING_BMI088']):
     src += [cwd + '/imu/bmi088/bmi088.c']
     path += [cwd + '/imu/bmi088']
     
-if GetDepend(['BSP_USING_RC_SBUS']):
-    src += Glob(cwd + '/rc/sbus/*.c')
-    path += [cwd + '/rc/sbus']
+if GetDepend(['BSP_USING_RC_DBUS']):
+    src += Glob(cwd + '/rc/dbus/*.c')
+    path += [cwd + '/rc/dbus']
 
 
 if GetDepend(['BSP_USING_REFEREE']):
