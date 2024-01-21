@@ -87,4 +87,7 @@ typedef struct
  */
 rc_dbus_obj_t *dbus_rc_init(void);
 
+/* 解析后的遥控器数据传递给keyboard */
+extern rc_dbus_obj_t rc_dbus_obj[2];
+
 #endif /* _RC_DBUS_H */

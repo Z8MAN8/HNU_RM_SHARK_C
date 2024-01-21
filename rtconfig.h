@@ -306,6 +306,7 @@
 #define BSP_USING_IMU
 #define BSP_USING_BMI088
 #define BSP_USING_RC_DBUS
+#define BSP_USING_RC_KEYBOARD
 
 /* RoboMaster Algorithms */
 

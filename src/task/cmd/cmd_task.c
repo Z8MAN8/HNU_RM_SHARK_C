@@ -65,6 +65,8 @@ void cmd_thread_entry(void *argument)
     rc_now->sw2 = RC_UP;
     //rc_now->sw3 = RC_UP;
     //rc_now->sw4 = RC_UP;
+    /*处理PC端键鼠控制*/
+    PC_Handle_kb();
 
     LOG_I("Cmd Task Start");
     for (;;)

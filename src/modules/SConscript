@@ -46,6 +46,9 @@ if GetDepend(['BSP_USING_RC_DBUS']):
     src += Glob(cwd + '/rc/dbus/*.c')
     path += [cwd + '/rc/dbus']
 
+if GetDepend(['BSP_USING_RC_KEYBOARD']):
+    src += Glob(cwd + '/rc/keyboard/*.c')
+    path += [cwd + '/rc/keyboard']
 
 if GetDepend(['BSP_USING_REFEREE']):
     src += Glob(cwd + '/referee/*.c')
