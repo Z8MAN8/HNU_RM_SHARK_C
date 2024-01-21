@@ -24,10 +24,6 @@
 /* kservice optimization */
 
 #define RT_KSERVICE_USING_STDLIB
-#define RT_USING_DEBUG
-#define RT_DEBUGING_COLOR
-#define RT_DEBUGING_CONTEXT
-#define RT_DEBUGING_INIT
 
 /* Inter-Thread communication */
 
@@ -305,6 +301,7 @@
 #define BSP_USING_IST8310
 #define BSP_USING_IMU
 #define BSP_USING_BMI088
+#define BSP_USING_REFEREE
 #define BSP_USING_RC_DBUS
 #define BSP_USING_RC_KEYBOARD
 
@@ -325,6 +322,10 @@
 #define BSP_USING_GIMBAL_TASK
 #define BSP_USING_TRANSMISSION_TASK
 #define BSP_USING_SHOOT_TASK
+#define BSP_USING_REFEREE_TASK
+
+/* RoboMaster Robot Types */
+
 
 /* RoboMaster Robot Types */
 

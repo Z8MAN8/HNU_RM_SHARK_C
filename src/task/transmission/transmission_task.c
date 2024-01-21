@@ -11,10 +11,7 @@
 #define DBG_TAG   "rm.task"
 #define DBG_LVL DBG_INFO
 #include <rtdbg.h>
-/* -------------------------------- 线程间通讯话题相关 ------------------------------- */
-UART_HandleTypeDef huart6;
-DMA_HandleTypeDef hdma_usart6_rx;
-DMA_HandleTypeDef hdma_usart6_tx;
+
 /* -------------------------------- 线程间通讯话题相关 ------------------------------- */
 static struct gimbal_cmd_msg gim_cmd;
 static struct ins_msg ins_data;

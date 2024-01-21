@@ -39,6 +39,10 @@ if GetDepend(['BSP_USING_SHOOT_TASK']):
     src += Glob(cwd + '/shoot/*.c')
     path += [cwd + '/shoot']
 
+if GetDepend(['BSP_USING_REFEREE_TASK']):
+    src += Glob(cwd + '/referee/*.c')
+    path += [cwd + '/referee']
+
 group = DefineGroup('RM_Task', src, depend = [''], CPPPATH = path)
 
 Return('group')
