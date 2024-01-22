@@ -33,7 +33,7 @@
 #define RC_MAX_VALUE      784.0f  /* 遥控器通道最大值 */
 #define RC_DBUS_MAX_VALUE      660.0f  /* DBUS遥控器通道最大值 */
 #define RC_RATIO          0.0009f
-
+#define KB_RATIO          0.010f
 /* 遥控器模式下的底盘最大速度限制 */
 /* 底盘平移速度 */
 #define CHASSIS_RC_MOVE_RATIO_X 1.0f
@@ -42,11 +42,25 @@
 /* 底盘旋转速度，只在底盘开环模式下使用 */
 #define CHASSIS_RC_MOVE_RATIO_R 1.0f
 
+/* 鼠标键盘模式下的底盘最大速度限制 */
+/* 底盘平移速度 */
+#define CHASSIS_PC_MOVE_RATIO_X 0.5f
+/* 底盘前进速度 */
+#define CHASSIS_PC_MOVE_RATIO_Y 1.0f
+/* 底盘旋转速度，只在底盘开环模式下使用 */
+#define CHASSIS_PC_MOVE_RATIO_R 5.0f
+
 /* 遥控器模式下的云台速度限制 */
 /* 云台pitch轴速度 */
 #define GIMBAL_RC_MOVE_RATIO_PIT 0.5f
 /* 云台yaw轴速度 */
 #define GIMBAL_RC_MOVE_RATIO_YAW 0.5f
+
+/* 鼠标键盘模式下的云台速度限制 */
+/* 云台pitch轴速度 */
+#define GIMBAL_PC_MOVE_RATIO_PIT 0.3f
+/* 云台yaw轴速度 */
+#define GIMBAL_PC_MOVE_RATIO_YAW 0.5f
 
 /* 遥控器拨杆对应档位值 */
 #define RC_UP_VALUE 240
