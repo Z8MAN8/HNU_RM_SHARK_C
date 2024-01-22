@@ -23,6 +23,9 @@
 #ifdef BSP_USING_QUATERNIONESF
 #include "QuaternionEKF.h"
 #endif /* BSP_USING_QUATERNIONESF */
+#ifdef BSP_USING_FILTER
+#include "filter32.h"
+#endif /* BSP_USING_FILTER */
 #ifdef BSP_USING_KALMAN_FILTER
 #include "kalman_filter.h"
 #endif /* BSP_USING_KALMAN_FILTER */
