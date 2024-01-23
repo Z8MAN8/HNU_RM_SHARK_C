@@ -24,7 +24,6 @@ typedef enum
   SHOOT_COUNTINUE=3   ,     //自动射击
   SHOOT_REVERSE=4     ,     //堵弹反转
   SHOOT_AUTO=5        ,     //自动发射模式
-
 } shoot_mode_e;
 /**
  * @brief 扳机模式

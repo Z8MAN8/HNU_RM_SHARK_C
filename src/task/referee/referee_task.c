@@ -1,7 +1,9 @@
-//
-// Created by Administrator on 2024/1/19.
-//
-
+/*
+* Change Logs:
+* Date            Author          Notes
+* 2024-01-19     ChenSihan    first version
+*
+*/
 #include "referee_task.h"
 #include "drv_gpio.h"
 #define DBG_TAG   "rm.task"
@@ -11,9 +13,9 @@
 UART_HandleTypeDef huart6;
 DMA_HandleTypeDef hdma_usart6_rx;
 DMA_HandleTypeDef hdma_usart6_tx;
+
 /*裁判系统线程入口*/
 void referee_thread_entry(void *argument){
-
     /*用户3pin串口初始化*/
     /* DMA controller clock enable */
     __HAL_RCC_DMA2_CLK_ENABLE();
