@@ -226,8 +226,8 @@ void shoot_task_entry(void* argument)
         /*开关摩擦轮*/
         if (shoot_cmd.friction_status==1)
         {
-            shoot_motor_ref[RIGHT_FRICTION] = 5000;//摩擦轮常转
-            shoot_motor_ref[LEFT_FRICTION] = -5000;
+            shoot_motor_ref[RIGHT_FRICTION] =-5000;//摩擦轮常转
+            shoot_motor_ref[LEFT_FRICTION] = 5000;
             /*从自动连发模式切换三连发及单发模式时，要继承总转子角度*/
         }
         else
@@ -355,7 +355,7 @@ static rt_int16_t motor_control_right(dji_motor_measure_t measure){
     static int16_t feed;
     if(shoot_cmd.ctrl_mode != SHOOT_STOP)
     {
-        feed=800;
+        feed=0;//800;
     }
     else
         feed = 0;
@@ -371,7 +371,7 @@ static rt_int16_t motor_control_left(dji_motor_measure_t measure){
     static int16_t feed;
     if(shoot_cmd.ctrl_mode != SHOOT_STOP)
     {
-        feed=800;
+        feed=0;//800;
     }
     else
         feed = 0;
