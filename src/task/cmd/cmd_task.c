@@ -151,12 +151,13 @@ static void cmd_sub_pull(void)
  * @brief 将遥控器数据转换为控制指令
  */
 #ifdef BSP_USING_RC_DBUS
-struct dbus_mode_cnt_t
+struct dbus_mode_flag_t
 {
-    uint8_t chassis_cnt;
-    uint8_t shoot_cnt;
+    uint8_t chassis_flag;
+    uint8_t shoot_flag;
 };
-static struct dbus_mode_cnt_t dbus_mode_cnt;
+static int cnt_patrol;
+static struct dbus_mode_flag_t dbus_mode_flag;
 static void remote_to_cmd_dbus(void)
 {
     /* 保存上一次数据 */
@@ -171,15 +172,15 @@ static void remote_to_cmd_dbus(void)
 // TODO: 目前状态机转换较为简单，有很多优化和改进空间
 //遥控器的控制信息转化为标准单位，平移为(mm/s)旋转为(degree/s)
     /*底盘命令*/
-    chassis_cmd.vx += rc_now->ch1 * CHASSIS_RC_MOVE_RATIO_X / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VX_SPEED + km.vx * CHASSIS_PC_MOVE_RATIO_X;
-    chassis_cmd.vy += rc_now->ch2 * CHASSIS_RC_MOVE_RATIO_Y / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VY_SPEED + km.vy * CHASSIS_PC_MOVE_RATIO_Y;
-    chassis_cmd.vw += rc_now->ch4 * CHASSIS_RC_MOVE_RATIO_R / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VR_SPEED + rc_now->mouse.x * CHASSIS_PC_MOVE_RATIO_R;
+    chassis_cmd.vx = rc_now->ch1 * CHASSIS_RC_MOVE_RATIO_X / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VX_SPEED + km.vx * CHASSIS_PC_MOVE_RATIO_X;
+    chassis_cmd.vy = rc_now->ch2 * CHASSIS_RC_MOVE_RATIO_Y / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VY_SPEED + km.vy * CHASSIS_PC_MOVE_RATIO_Y;
+    chassis_cmd.vw = rc_now->ch3 * CHASSIS_RC_MOVE_RATIO_R / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VR_SPEED + rc_now->mouse.x * CHASSIS_PC_MOVE_RATIO_R;
     chassis_cmd.offset_angle = gim_fdb.yaw_relative_angle;
     /*云台命令*/
     if (gim_cmd.ctrl_mode==GIMBAL_GYRO)
     {
-        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW -fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW;
-        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT - fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;
+        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW /*-fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW*/;
+        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT /*- fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT*/;
         gyro_yaw_inherit =gim_cmd.yaw;
         gyro_pitch_inherit =ins_data.pitch;
 
@@ -187,7 +188,7 @@ static void remote_to_cmd_dbus(void)
     if (gim_cmd.ctrl_mode==GIMBAL_AUTO) {
 
         gim_cmd.yaw = trans_fdb.yaw + gyro_yaw_inherit + 150 * rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW;//上位机自瞄
-        gim_cmd.pitch = trans_fdb.pitch + 100* rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT - Ballistic * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;//上位机自瞄
+        gim_cmd.pitch = trans_fdb.pitch + 100* rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT /*- Ballistic * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT*/;//上位机自瞄
 
     }
     /* 限制云台角度 */
@@ -204,37 +205,8 @@ static void remote_to_cmd_dbus(void)
     // 左拨杆sw2为上时，底盘和云台均RELAX；为中时，云台为GYRO；为下时，云台为AUTO。
     // 右拨杆sw1为上时，底盘为FOLLOW；为中时，底盘为OPEN；为下时，底盘为SPIN。
 
-    /*左拨杆计数器*/
-    if (rc_now->sw1==RC_UP&&rc_last->sw1==RC_MI)
-    {
-        dbus_mode_cnt.shoot_cnt++;
-    }
-    else if(rc_now->sw1==RC_DN&&rc_last->sw1==RC_MI)
-    {
-        dbus_mode_cnt.chassis_cnt++;
-    }
-    /*摩擦轮开关*/
-    if (dbus_mode_cnt.shoot_cnt == 2 && shoot_cmd.friction_status == 0)
-    {
-        shoot_cmd.friction_status=1;
-        dbus_mode_cnt.shoot_cnt=0;
-    }
-    else if(dbus_mode_cnt.shoot_cnt == 1 && shoot_cmd.friction_status== 1)
-    {
-        shoot_cmd.friction_status=0;
-        dbus_mode_cnt.shoot_cnt=0;
-    }
-   /*跟随模式和小陀螺模式切换*/
-    if (dbus_mode_cnt.chassis_cnt == 2 && chassis_cmd.ctrl_mode == CHASSIS_FOLLOW_GIMBAL)
-    {
-        chassis_cmd.ctrl_mode=CHASSIS_SPIN;
-        dbus_mode_cnt.shoot_cnt=0;
-    }
-    else if(dbus_mode_cnt.shoot_cnt == 1 && chassis_cmd.ctrl_mode ==CHASSIS_SPIN)
-    {
-        chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
-        dbus_mode_cnt.shoot_cnt=0;
-    }
+
+
 
 
    /* switch (rc_now->sw1)
@@ -297,8 +269,11 @@ static void remote_to_cmd_dbus(void)
             if(gim_fdb.back_mode == BACK_IS_OK)
             {
                 gim_cmd.ctrl_mode = GIMBAL_GYRO;
+                chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
             }
+            else chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
         }
+
         break;
     case RC_DN:
         if(gim_cmd.last_mode == GIMBAL_RELAX)
@@ -310,13 +285,62 @@ static void remote_to_cmd_dbus(void)
             if(gim_fdb.back_mode == BACK_IS_OK)
             {/* 判断归中是否完成 */
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
-                chassis_cmd.ctrl_mode=CHASSIS_RELAX;
+                chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
             }
         }
+           /* chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
+            chassis_cmd.vx=trans_fdb.line_x*1000;
+            chassis_cmd.vy=trans_fdb.line_y*1000;
+            chassis_cmd.vw=-trans_fdb.angle_z;*/
         break;
     }
 
+//    /*左拨杆计数器*/
+//    /*摩擦轮开关*/
+//    if (rc_now->sw1==RC_UP&&rc_now->wheel<-10&&dbus_mode_flag.shoot_flag==0)
+//    {
+//        dbus_mode_flag.shoot_flag++;
+//        shoot_cmd.friction_status=1;
+//    }
+//    else if(rc_now->sw1==RC_DN&&rc_now->wheel<-10&&dbus_mode_flag.chassis_flag==0)/*跟随模式和小陀螺模式切换*/
+//    {
+//        dbus_mode_flag.chassis_flag++;
+//        chassis_cmd.ctrl_mode=CHASSIS_SPIN;
+//        chassis_cmd.vw=3;
+//    }
+//    if (rc_now->sw1==RC_MI&&rc_now->wheel<-200)
+//    {
+//        dbus_mode_flag.shoot_flag=0;
+//        dbus_mode_flag.chassis_flag=0;
+//        chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
+//        shoot_cmd.friction_status=0;
+//    }
+//
+//    if (chassis_cmd.ctrl_mode==CHASSIS_SPIN)
+//    {
+//        chassis_cmd.vw=3;
+//    }
 
+    /*左拨杆计数器*/
+    /*摩擦轮开关*/
+    if (rc_now->sw1==RC_UP)
+    {
+        shoot_cmd.friction_status=0;
+    }
+    else if(rc_now->sw1==RC_MI)/*跟随模式和小陀螺模式切换*/
+    {
+        shoot_cmd.friction_status=1;
+    }
+    if (rc_now->sw1==RC_DN)
+    {
+        chassis_cmd.ctrl_mode=CHASSIS_SPIN;
+        shoot_cmd.friction_status=1;
+    }
+
+    if (chassis_cmd.ctrl_mode==CHASSIS_SPIN)
+    {
+        chassis_cmd.vw=3;
+    }
     /*--------------------------------------------------发射模块状态机--------------------------------------------------------------*/
     /*单发/三联模式发射判断*/
     if (rc_now->wheel>=-640)
@@ -325,7 +349,7 @@ static void remote_to_cmd_dbus(void)
         {//判断是否要开火
                     shoot_cmd.trigger_status = TRIGGER_ON;
                     trigger_flag = 0;
-                    shoot_cmd.ctrl_mode=SHOOT_THREE;
+                    shoot_cmd.ctrl_mode=SHOOT_ONE;
         }
     else
     {
@@ -335,7 +359,7 @@ static void remote_to_cmd_dbus(void)
     if(rc_now->wheel>=50)
     {
         shoot_cmd.ctrl_mode=SHOOT_COUNTINUE;
-         shoot_cmd.shoot_freq=(int16_t)(1000+rc_now->wheel*5);
+         shoot_cmd.shoot_freq=(int16_t)(50+rc_now->wheel*5);
     }
     /*堵弹反转检测*/
     if (shoot_fdb.trigger_motor_current>=9500||reverse_cnt!=0)
@@ -347,12 +371,12 @@ static void remote_to_cmd_dbus(void)
             reverse_cnt=0;
     }
     /*舵机开盖关盖*/
-    if(rc_now->sw1==RC_MI&&rc_now->wheel<=-640)
+    if(rc_now->sw1==RC_UP&&rc_now->wheel<=-640)
     {
          shoot_cmd.cover_open=1;
     }
     else
-    {
+{
          shoot_cmd.cover_open=0;
     }
 }
