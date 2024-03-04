@@ -80,7 +80,7 @@ int robot_task_init(void)
                                           1024,15, 10);
     /* 如果获得线程控制块，启动这个线程 */
     if (cmd_thread_handle != RT_NULL)
-        //rt_thread_startup(cmd_thread_handle);
+        rt_thread_startup(cmd_thread_handle);
 #endif /* BSP_USING_CMD_TASK */
 
 #ifdef BSP_USING_CHASSIS_TASK

@@ -110,13 +110,13 @@
 #define YAW_MOTOR_ID     0x207
 #define PITCH_MOTOR_ID   0x208
 
-#define CENTER_ECD_YAW   7837         //云台yaw轴编码器归中值
-#define CENTER_ECD_PITCH 1353         //云台pitch轴编码器归中值
+#define CENTER_ECD_YAW   7790         //云台yaw轴编码器归中值
+#define CENTER_ECD_PITCH 159         //云台pitch轴编码器归中值
 
 /* pitch轴最大仰角 */
 #define PIT_ANGLE_MAX        31.0f
 /* pitch轴最大俯角 */
-#define PIT_ANGLE_MIN        -32.0f
+#define PIT_ANGLE_MIN        -15.0f
 
 /* 云台控制周期 (ms) */
 #define GIMBAL_PERIOD 1

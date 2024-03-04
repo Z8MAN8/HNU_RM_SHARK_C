@@ -347,8 +347,8 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
     {
         /*串级pid的使用，角度环套在速度环上面*/
         /* 注意负号 */
-        pid_out_angle = -pid_calculate(pid_angle, get_angle, gim_motor_ref[PITCH]);  // 编码器增长方向与imu相反
-        send_data = -pid_calculate(pid_speed, get_speed, pid_out_angle);     // 电机转动正方向与imu相反
+        pid_out_angle = pid_calculate(pid_angle, get_angle, gim_motor_ref[PITCH]);  // 编码器增长方向与imu相反
+        send_data = pid_calculate(pid_speed, get_speed, pid_out_angle);     // 电机转动正方向与imu相反
     }
     else /* imu闭环 */
     {
@@ -356,7 +356,7 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
         VAL_LIMIT(gim_motor_ref[PITCH], PIT_ANGLE_MIN, PIT_ANGLE_MAX);
         /* 注意负号 */
         pid_out_angle = pid_calculate(pid_angle, get_angle, gim_motor_ref[PITCH]);
-        send_data = -pid_calculate(pid_speed, get_speed, pid_out_angle);      // 电机转动正方向与imu相反
+        send_data = pid_calculate(pid_speed, get_speed, pid_out_angle);      // 电机转动正方向与imu相反
     }
 
     return send_data;
