@@ -18,7 +18,7 @@ static struct ins_msg ins_data;
 static struct gimbal_fdb_msg gim_fdb;
 static struct trans_fdb_msg trans_fdb;
 /*------------------------------传输数据相关 --------------------------------- */
-#define RECV_BUFFER_SIZE 32  // 接收环形缓冲区大小
+#define RECV_BUFFER_SIZE 64  // 接收环形缓冲区大小
 rt_uint8_t r_buffer[RECV_BUFFER_SIZE];  // 接收环形缓冲区
 struct rt_ringbuffer receive_buffer ; // 环形缓冲区对象控制块指针
 rt_uint8_t buf[31] = {0};
@@ -33,10 +33,7 @@ RpyTypeDef rpy_tx_data={
 };
 RpyTypeDef rpy_rx_data; //接收解析结构体
 /* ---------------------------------usb虚拟串口数据相关 --------------------------------- */
-int USB_DP_PIN = GET_PIN(A,12);//USB PD引脚
 static rt_device_t vs_port = RT_NULL;
-struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置参数 */
-static struct rt_semaphore rx_sem;    /* 用于接收消息的信号量 */
 /* -------------------------------- 线程间通讯话题相关 ------------------------------- */
 static publisher_t *pub_trans;
 static subscriber_t *sub_cmd,*sub_ins,*sub_gim;
@@ -93,25 +90,13 @@ void transmission_task_entry(void* argument)
     trans_sub_init();
     /*发布数据初始化*/
     trans_pub_init();
-    /*软件模拟USB插拔*/
-    rt_pin_write(USB_DP_PIN,PIN_LOW);
     /* step1：查找名为 "vcom" 的虚拟串口设备*/
     vs_port = rt_device_find("vcom");
-    /* step2：修改串口配置参数 */
-    config.baud_rate = BAUD_RATE_921600;        //修改波特率为 921600
-    config.data_bits = DATA_BITS_8;           //数据位 8
-    config.stop_bits = STOP_BITS_1;           //停止位 1
-    config.bufsz     = 1024;                   //修改接收缓冲区 buff size 为 1024
-    config.parity    = PARITY_NONE;           //无奇偶校验位
-    /* step3：控制串口设备。通过控制接口传入命令控制字，与控制参数 */
-    rt_device_control(vs_port, RT_DEVICE_CTRL_CONFIG,&config);
     /* step4：打开串口设备。以中断接收及轮询发送模式打开串口设备*/
     if (vs_port)
         rt_device_open(vs_port, RT_DEVICE_FLAG_INT_RX);
     /*环形缓冲区初始化*/
     rt_ringbuffer_init(&receive_buffer, r_buffer, RECV_BUFFER_SIZE);
-    /*信号量初始化*/
-    rt_sem_init(&rx_sem, "rx_sem", 0, RT_IPC_FLAG_FIFO);
     /* 设置接收回调函数 */
     rt_device_set_rx_indicate(vs_port, usb_input);
     LOG_I("Transmission Task Start");
@@ -137,18 +122,14 @@ void transmission_task_entry(void* argument)
 void Send_to_pc(RpyTypeDef data_r)
 {
     /*填充数据*/
-    //pack_Rpy(&data_r, (ins_data.yaw - gim_fdb.yaw_offset_angle), (ins_data.pitch - gim_fdb.pit_offset_angle), ins_data.roll);
     pack_Rpy(&data_r, (gim_fdb.yaw_offset_angle - ins_data.yaw), (ins_data.pitch - gim_fdb.pit_offset_angle), ins_data.roll);
     Check_Rpy(&data_r);
-
 
     rt_device_write(vs_port, 0, (uint8_t*)&data_r, sizeof(data_r));
 }
 
 void pack_Rpy(RpyTypeDef *frame, float yaw, float pitch,float roll)
 {
-
-
     int8_t rpy_tx_buffer[FRAME_RPY_LEN] = {0} ;
     int32_t rpy_data = 0;
     uint32_t *gimbal_rpy = (uint32_t *)&rpy_data;
@@ -200,8 +181,6 @@ void Check_Rpy(RpyTypeDef *frame)
 static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
 {
     memset(buf, 0, sizeof(buf));
-    // 串口接收到数据后产生中断，调用此回调函数，然后发送接收信号量
-    rt_sem_release(&rx_sem);
 
     // 从串口读取数据并保存到环形接收缓冲区
     rt_uint32_t rx_length;
@@ -230,7 +209,7 @@ static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
         memset(&rpy_rx_data, 0, sizeof(rpy_rx_data));
     }
     return RT_EOK;
-}
+}/*
 void Getdata()
 {
     rt_uint8_t frame_rx[sizeof(RpyTypeDef)]={0};
@@ -249,4 +228,4 @@ void Getdata()
         memset(&rpy_rx_data, 0, sizeof(rpy_rx_data));
     }
 
-}
+}*/
