@@ -22,6 +22,7 @@ static struct trans_fdb_msg trans_fdb;
 rt_uint8_t r_buffer[RECV_BUFFER_SIZE];  // 接收环形缓冲区
 struct rt_ringbuffer receive_buffer ; // 环形缓冲区对象控制块指针
 rt_uint8_t buf[31] = {0};
+rt_uint8_t buf_s[30] = {0};
 RpyTypeDef rpy_tx_data={
         .HEAD = 0XFF,
         .D_ADDR = MAINFLOD,
@@ -32,8 +33,10 @@ RpyTypeDef rpy_tx_data={
         .AC = 0,
 };
 RpyTypeDef rpy_rx_data; //接收解析结构体
+CtrlTypeDef ctrl_rx_data; //接收解析结构体
 /* ---------------------------------usb虚拟串口数据相关 --------------------------------- */
 static rt_device_t vs_port = RT_NULL;
+struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置参数 */
 /* -------------------------------- 线程间通讯话题相关 ------------------------------- */
 static publisher_t *pub_trans;
 static subscriber_t *sub_cmd,*sub_ins,*sub_gim;
@@ -92,7 +95,7 @@ void transmission_task_entry(void* argument)
     trans_pub_init();
     /* step1：查找名为 "vcom" 的虚拟串口设备*/
     vs_port = rt_device_find("vcom");
-    /* step4：打开串口设备。以中断接收及轮询发送模式打开串口设备*/
+    /* step2：打开串口设备。以中断接收及轮询发送模式打开串口设备*/
     if (vs_port)
         rt_device_open(vs_port, RT_DEVICE_FLAG_INT_RX);
     /*环形缓冲区初始化*/
@@ -114,7 +117,7 @@ void transmission_task_entry(void* argument)
         /* 用于调试监测线程调度使用 */
         trans_dt = dwt_get_time_ms() - trans_start;
         if (trans_dt > 1)
-            LOG_E("Transmission Task is being DELAY! dt = [%f]", &trans_dt);
+                LOG_E("Transmission Task is being DELAY! dt = [%f]", &trans_dt);
         rt_thread_mdelay(1);
     }
 }
@@ -130,6 +133,8 @@ void Send_to_pc(RpyTypeDef data_r)
 
 void pack_Rpy(RpyTypeDef *frame, float yaw, float pitch,float roll)
 {
+
+
     int8_t rpy_tx_buffer[FRAME_RPY_LEN] = {0} ;
     int32_t rpy_data = 0;
     uint32_t *gimbal_rpy = (uint32_t *)&rpy_data;
@@ -177,8 +182,39 @@ void Check_Rpy(RpyTypeDef *frame)
     frame->AC = add & 0xFF;
 }
 
-// 接收数据回调函数
+// 串口接收到数据后产生中断，调用此回调函数
 static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
+{
+    memset(buf_s, 0, sizeof(buf_s));
+
+    // 从串口读取数据并保存到环形接收缓冲区
+    rt_uint32_t rx_length;
+    while ((rx_length = rt_device_read(vs_port, 0, buf_s, sizeof(buf_s))) > 0)
+    {
+        // 将接收到的数据放入环形缓冲区
+        rt_ringbuffer_put_force(&receive_buffer, buf_s, rx_length);
+    }
+    rt_uint8_t frame_rx[sizeof(CtrlTypeDef)]={0};
+    rt_ringbuffer_get(&receive_buffer, frame_rx, sizeof(frame_rx));
+    if(*(uint8_t*)frame_rx==0xFF)
+    {
+        memcpy(&ctrl_rx_data,&frame_rx,sizeof(ctrl_rx_data));
+        switch (ctrl_rx_data.ID) {
+            case CHASSIS_CTRL:{
+                trans_fdb.liner_x = (*(int32_t *) &ctrl_rx_data.DATA[0] / 1000.0);
+                trans_fdb.liner_y = (*(int32_t *) &ctrl_rx_data.DATA[4] / 1000.0);
+                trans_fdb.liner_z = (*(int32_t *) &ctrl_rx_data.DATA[8] / 1000.0);
+                trans_fdb.angler_x = (*(int32_t *) &ctrl_rx_data.DATA[12] / 1000.0);
+                trans_fdb.angler_y = (*(int32_t *) &ctrl_rx_data.DATA[16] / 1000.0);
+                trans_fdb.angler_z = (*(int32_t *) &ctrl_rx_data.DATA[20] / 1000.0);
+            }break;
+        }
+        memset(&ctrl_rx_data, 0, sizeof(ctrl_rx_data));
+    }
+    return RT_EOK;
+}
+// 接收数据回调函数
+/*static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
 {
     memset(buf, 0, sizeof(buf));
 
@@ -209,7 +245,8 @@ static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
         memset(&rpy_rx_data, 0, sizeof(rpy_rx_data));
     }
     return RT_EOK;
-}/*
+}*/
+/*
 void Getdata()
 {
     rt_uint8_t frame_rx[sizeof(RpyTypeDef)]={0};

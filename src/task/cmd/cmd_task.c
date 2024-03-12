@@ -63,6 +63,8 @@ void cmd_thread_entry(void *argument)
 
     rc_now = dbus_rc_init();
     rc_last = (rc_now + 1);   // rc_obj[0]:当前数据NOW,[1]:上一次的数据LAST
+    First_Order_Filter_Init(&mouse_x_lpf,0.014,0.1);
+    First_Order_Filter_Init(&mouse_y_lpf,0.014,0.1);
     /* 初始化拨杆为上位 */
     rc_now->sw1 = RC_UP;
     rc_now->sw2 = RC_UP;
@@ -175,6 +177,9 @@ static void remote_to_cmd_dbus(void)
     chassis_cmd.vx = rc_now->ch1 * CHASSIS_RC_MOVE_RATIO_X / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VX_SPEED + km.vx * CHASSIS_PC_MOVE_RATIO_X;
     chassis_cmd.vy = rc_now->ch2 * CHASSIS_RC_MOVE_RATIO_Y / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VY_SPEED + km.vy * CHASSIS_PC_MOVE_RATIO_Y;
     chassis_cmd.vw = rc_now->ch3 * CHASSIS_RC_MOVE_RATIO_R / RC_DBUS_MAX_VALUE * MAX_CHASSIS_VR_SPEED + rc_now->mouse.x * CHASSIS_PC_MOVE_RATIO_R;
+    /*chassis_cmd.vx=trans_fdb.line_x*1000;
+    chassis_cmd.vy=trans_fdb.line_y*1000;
+    chassis_cmd.vw=-trans_fdb.angle_z;*/
     chassis_cmd.offset_angle = gim_fdb.yaw_relative_angle;
     /*云台命令*/
     if (gim_cmd.ctrl_mode==GIMBAL_GYRO)
@@ -270,6 +275,8 @@ static void remote_to_cmd_dbus(void)
             {
                 gim_cmd.ctrl_mode = GIMBAL_GYRO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
+                //TODO:手动、自动模式下自瞄所需角度值的刷新
+                //gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
             else chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
         }
@@ -286,6 +293,8 @@ static void remote_to_cmd_dbus(void)
             {/* 判断归中是否完成 */
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
+                //TODO:手动、自动模式下自瞄所需角度值的刷新
+                //gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
         }
            /* chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
