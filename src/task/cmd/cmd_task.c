@@ -63,6 +63,9 @@ void cmd_thread_entry(void *argument)
 
     rc_now = dbus_rc_init();
     rc_last = (rc_now + 1);   // rc_obj[0]:当前数据NOW,[1]:上一次的数据LAST
+    /* 鼠标一阶滤波初始化 */
+    First_Order_Filter_Init(&mouse_x_lpf,0.014,0.1);
+    First_Order_Filter_Init(&mouse_y_lpf,0.014,0.1);
     /* 初始化拨杆为上位 */
     rc_now->sw1 = RC_UP;
     rc_now->sw2 = RC_UP;
@@ -179,8 +182,8 @@ static void remote_to_cmd_dbus(void)
     /*云台命令*/
     if (gim_cmd.ctrl_mode==GIMBAL_GYRO)
     {
-        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW /*-fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW*/;
-        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT /*- fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT*/;
+        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW + fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW;
+        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT - fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;
         gyro_yaw_inherit =gim_cmd.yaw;
         gyro_pitch_inherit =ins_data.pitch;
 
@@ -251,7 +254,7 @@ static void remote_to_cmd_dbus(void)
     /*右拨杆三种模式：停止 手动 自动*/
     switch(rc_now->sw2)
     {
-    case RC_UP:
+    case RC_UP://if(rc.sw2==RC_UP)
         gim_cmd.ctrl_mode = GIMBAL_RELAX;
         chassis_cmd.ctrl_mode = CHASSIS_RELAX;
         shoot_cmd.ctrl_mode=SHOOT_STOP;
@@ -259,7 +262,7 @@ static void remote_to_cmd_dbus(void)
         gim_cmd.pitch=0;
         gim_cmd.yaw=0;
         break;
-    case RC_MI:
+    case RC_MI://if(rc.sw2==RC_MI && rc.mouse.r!=1)
         if(gim_cmd.last_mode == GIMBAL_RELAX)
         {/* 判断上次状态是否为RELAX，是则先归中 */
             gim_cmd.ctrl_mode = GIMBAL_INIT;
@@ -270,12 +273,14 @@ static void remote_to_cmd_dbus(void)
             {
                 gim_cmd.ctrl_mode = GIMBAL_GYRO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
+                //TODO:手动、自动模式下自瞄所需角度值的刷新
+                //gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
             else chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
         }
 
         break;
-    case RC_DN:
+    case RC_DN://if(rc_now->sw2==RC_DN || rc_now->mouse.r==1)
         if(gim_cmd.last_mode == GIMBAL_RELAX)
         {/* 判断上次状态是否为RELAX，是则先归中 */
             gim_cmd.ctrl_mode = GIMBAL_INIT;
@@ -286,6 +291,8 @@ static void remote_to_cmd_dbus(void)
             {/* 判断归中是否完成 */
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
+                //TODO:手动、自动模式下自瞄所需角度值的刷新
+                //gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
         }
            /* chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
