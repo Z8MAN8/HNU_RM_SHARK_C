@@ -125,7 +125,7 @@ typedef  struct
     rt_int8_t DATA[FRAME_CTRL_LEN];    /*! 数据内容 */
     rt_uint8_t SC;                     /*! 和校验 */
     rt_uint8_t AC;                     /*! 附加校验 */
-}__attribute__((packed)) XyzTypeDef;
+}__attribute__((packed)) CtrlTypeDef;
 
 /**
   * @brief  里程计方式控制通讯帧结构体
