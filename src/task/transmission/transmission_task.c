@@ -208,6 +208,17 @@ static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
                 trans_fdb.angler_y = (*(int32_t *) &ctrl_rx_data.DATA[16] / 1000.0);
                 trans_fdb.angler_z = (*(int32_t *) &ctrl_rx_data.DATA[20] / 1000.0);
             }break;
+
+            case GIMBAL:{
+                if (ctrl_rx_data.DATA[0]) {//相对角度控制
+                    trans_fdb.yaw = - (*(int32_t *) &ctrl_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.pitch = (*(int32_t *) &ctrl_rx_data.DATA[5] / 1000.0);
+                }
+                else{//绝对角度控制
+                    trans_fdb.yaw = - (*(int32_t *) &ctrl_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.pitch = (*(int32_t *) &ctrl_rx_data.DATA[5] / 1000.0);
+                }
+            }break;
         }
         memset(&ctrl_rx_data, 0, sizeof(ctrl_rx_data));
     }

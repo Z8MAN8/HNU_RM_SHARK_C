@@ -184,8 +184,8 @@ static void remote_to_cmd_dbus(void)
     /*云台命令*/
     if (gim_cmd.ctrl_mode==GIMBAL_GYRO)
     {
-        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW /*-fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW*/;
-        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT /*- fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT*/;
+        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW + fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW;
+        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT - fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;
         gyro_yaw_inherit =gim_cmd.yaw;
         gyro_pitch_inherit =ins_data.pitch;
 
@@ -276,7 +276,7 @@ static void remote_to_cmd_dbus(void)
                 gim_cmd.ctrl_mode = GIMBAL_GYRO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
                 //TODO:手动、自动模式下自瞄所需角度值的刷新
-                //gim_fdb.yaw_offset_angle=ins_data.yaw;
+                gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
             else chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
         }
@@ -294,7 +294,7 @@ static void remote_to_cmd_dbus(void)
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
                 //TODO:手动、自动模式下自瞄所需角度值的刷新
-                //gim_fdb.yaw_offset_angle=ins_data.yaw;
+                gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
         }
            /* chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
