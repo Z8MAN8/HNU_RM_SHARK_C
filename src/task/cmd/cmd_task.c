@@ -173,8 +173,6 @@ static void cmd_sub_pull(void)
  */
 #ifdef BSP_USING_RC_DBUS
 
-
-
 #endif
 
 
