@@ -73,7 +73,7 @@ static rt_int16_t motor_control_yaw(dji_motor_measure_t measure);
 static rt_int16_t motor_control_pitch(dji_motor_measure_t measure);
 static rt_int16_t get_relative_pos(rt_int16_t raw_ecd, rt_int16_t center_offset);
 
-
+static int auto_staus=1;
 /* --------------------------------- 云台线程入口 --------------------------------- */
 static float gim_dt;
 
@@ -96,8 +96,8 @@ void gimbal_thread_entry(void *argument)
         gimbal_sub_pull();
 
         // 云台本身相对于归中值的角度，加负号
-        yaw_motor_relive = -get_relative_pos(gim_motor[YAW]->measure.ecd, CENTER_ECD_YAW) / 22.75f;
-        pitch_motor_relive = get_relative_pos(gim_motor[PITCH]->measure.ecd, CENTER_ECD_PITCH) / 22.75f;
+        yaw_motor_relive = -(rt_int16_t)get_relative_pos((rt_int16_t)gim_motor[YAW]->measure.ecd, CENTER_ECD_YAW) / 22.75f;
+        pitch_motor_relive = (rt_int16_t )get_relative_pos((rt_int16_t)gim_motor[PITCH]->measure.ecd, CENTER_ECD_PITCH) / 22.75f;
 
         for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
         {
@@ -124,13 +124,14 @@ void gimbal_thread_entry(void *argument)
 
             gim_motor_ref[YAW] = yaw_motor_relive * ( 1 - yaw_ramp->calc(yaw_ramp));
             gim_motor_ref[PITCH] = pitch_motor_relive* ( 1 - pit_ramp->calc(pit_ramp));
-            if((abs(gim_motor[PITCH]->measure.ecd - CENTER_ECD_PITCH) <= 10)
+            if((abs(gim_motor[PITCH]->measure.ecd - CENTER_ECD_PITCH) <= 20)
                && (abs(gim_motor[YAW]->measure.ecd - CENTER_ECD_YAW) <= 80))
             {
                 gim_fdb.back_mode = BACK_IS_OK;
                 gim_fdb.yaw_offset_angle_total = ins_data.yaw_total_angle;/*云台抽风的原因，期望应该为总角度。抽风原因：不应该用ins_data.yaw*/
                 gim_fdb.yaw_offset_angle=ins_data.yaw;
                 gim_fdb.pit_offset_angle = ins_data.pitch;
+                auto_staus=1;
             }
             else
             {
@@ -142,11 +143,18 @@ void gimbal_thread_entry(void *argument)
             gim_motor_ref[PITCH] = gim_cmd.pitch;
             // 底盘相对于云台归中值的角度，取负
             gim_fdb.yaw_relative_angle = -yaw_motor_relive;
+            auto_staus=1;
+
             break;
 
         // TODO: add auto mode
             case GIMBAL_AUTO:
                 /*gim_motor_ref[YAW] = gim_cmd.yaw_auto;*/
+                if(auto_staus==1)
+                {
+                    gim_fdb.yaw_offset_angle=ins_data.yaw;
+                    auto_staus=0;
+                }
                 gim_motor_ref[YAW] =gim_cmd.yaw;
                 gim_motor_ref[PITCH] =gim_cmd.pitch;
                 // 底盘相对于云台归中值的角度，取负

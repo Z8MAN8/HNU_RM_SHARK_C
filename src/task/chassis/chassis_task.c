@@ -26,6 +26,9 @@ static void chassis_sub_init(void);
 static void chassis_pub_push(void);
 static void chassis_sub_pull(void);
 
+/* -------------------------------- 裁判系统底盘功率相关 ------------------------------- */
+extern robot_status_t robot_status;
+extern ext_power_heat_data_t power_heat_data_t;
 /* --------------------------------- 电机控制相关 --------------------------------- */
 static pid_obj_t *follow_pid; // 用于底盘跟随云台计算vw
 static pid_config_t chassis_follow_config = INIT_PID_CONFIG(CHASSIS_KP_V_FOLLOW, CHASSIS_KI_V_FOLLOW, CHASSIS_KD_V_FOLLOW, CHASSIS_INTEGRAL_V_FOLLOW, CHASSIS_MAX_V_FOLLOW,
@@ -171,31 +174,73 @@ static void chassis_sub_pull(void)
     sub_get_msg(sub_cmd, &chassis_cmd);
 }
 
+#define CURRENT_POWER_LIMIT_RATE 60
 static rt_int16_t motor_control_0(dji_motor_measure_t measure)
 {
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[0].speed_pid, measure.speed_rpm, motor_ref[0]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+    chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[0].speed_pid, measure.speed_rpm, motor_ref[0]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 
 static rt_int16_t motor_control_1(dji_motor_measure_t measure)
 {
+
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[1].speed_pid, measure.speed_rpm, motor_ref[1]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[1].speed_pid, measure.speed_rpm, motor_ref[1]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 
 static rt_int16_t motor_control_2(dji_motor_measure_t measure)
 {
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[2].speed_pid, measure.speed_rpm, motor_ref[2]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[2].speed_pid, measure.speed_rpm, motor_ref[2]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 
 static rt_int16_t motor_control_3(dji_motor_measure_t measure)
 {
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[3].speed_pid, measure.speed_rpm, motor_ref[3]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[3].speed_pid, measure.speed_rpm, motor_ref[3]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 

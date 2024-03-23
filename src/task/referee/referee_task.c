@@ -13,7 +13,6 @@
 UART_HandleTypeDef huart6;
 DMA_HandleTypeDef hdma_usart6_rx;
 DMA_HandleTypeDef hdma_usart6_tx;
-
 /*裁判系统线程入口*/
 void referee_thread_entry(void *argument){
     /*用户3pin串口初始化*/

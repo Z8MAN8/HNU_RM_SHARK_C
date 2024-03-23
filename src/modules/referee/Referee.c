@@ -8,19 +8,19 @@
 ////#define normal 18;
 ////#define normal 30;
 //ext_power_heat_data_t ext_power_heat_data;
-//ext_game_robot_status_t ext_game_robot_status;
+//robot_status_t ext_game_robot_status;
 //
 //__weak void referee_task(void *argument)
 //{
 //    /*int num=359;
 //    int supcolour;
-//    int spin_colour;//ÍÓÂÝ
-//    int fric_colour;//Ä¦²ÁÂÖ
-//    int cap_open_colour;//µ¯²Ö
-//    int Refresh_flag15=1;//×¼ÐÄ¸üÐÂ±êÖ¾Î»
-//    int Refresh_flag18=0;//×¼ÐÄ¸üÐÂ±êÖ¾Î»
-//    int Refresh_flag30=0;//×¼ÐÄ¸üÐÂ±êÖ¾Î»*/
-////»æÖÆÊµÀý²Î¿¼
+//    int spin_colour;//ï¿½ï¿½ï¿½ï¿½
+//    int fric_colour;//Ä¦ï¿½ï¿½ï¿½ï¿½
+//    int cap_open_colour;//ï¿½ï¿½ï¿½ï¿½
+//    int Refresh_flag15=1;//×¼ï¿½Ä¸ï¿½ï¿½Â±ï¿½Ö¾Î»
+//    int Refresh_flag18=0;//×¼ï¿½Ä¸ï¿½ï¿½Â±ï¿½Ö¾Î»
+//    int Refresh_flag30=0;//×¼ï¿½Ä¸ï¿½ï¿½Â±ï¿½Ö¾Î»*/
+////ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½Î¿ï¿½
 ////    UI_TCB * myfloat = uiDrawFloatDataSeq("005",1,2,3,10,3,1,700,750,5124,10);
 ////    UI_TCB * mygraph = uiDrawGraphicsSeq(ARC,"003",1,2,3,5,10,50,400,800,100,100,NONE,10);
 ////    UI_TCB * mygraph2 = uiDrawGraphicsSeq(LINE,"004",1,2,3,5,10,50,800,500,100,100,NONE,10);
@@ -34,7 +34,7 @@
 //    graphic_data_struct_t TEST_data;
 //
 //
-//        //×¼ÐÄ15m/s
+//        //×¼ï¿½ï¿½15m/s
 //
 ////            UI_TCB * l1 = uiDrawGraphicsSeq(LINE,"3m",1,2,3,2,NONE,NONE,933,470,987,470,NONE,100);
 ////            UI_TCB * l2 = uiDrawGraphicsSeq(LINE,"4m",1,2,3,2,NONE,NONE,936,440,984,440,NONE,150);
@@ -49,7 +49,7 @@
 //            UI_TCB * e = uiDrawGraphicsSeq(LINE,"2m",1,2,3,2,NONE,NONE,920,486,1000,486,NONE,170);
 //            UI_TCB * f = uiDrawGraphicsSeq(LINE,"2mv",1,2,3,2,NONE,NONE,972,482,972,500,NONE,200);
 //            UI_TCB * g = uiDrawGraphicsSeq(LINE,"ver",1,2,3,2,NONE,NONE,972,400,972,550,NONE,200);
-//        //×¼ÐÄ18m/s*/
+//        //×¼ï¿½ï¿½18m/s*/
 //
 ////            UI_TCB * a = uiDrawGraphicsSeq(LINE,"4m",1,2,3,2,NONE,NONE,951,475,996,475,NONE,100);
 ////            UI_TCB * b= uiDrawGraphicsSeq(LINE,"4mv",1,2,3,2,NONE,NONE,973,471,973,479,NONE,100);
@@ -60,74 +60,74 @@
 ////            UI_TCB * g = uiDrawGraphicsSeq(LINE,"ver",1,2,3,2,NONE,NONE,972,400,972,550,NONE,100);
 //
 //
-//          //×¼ÐÄ30m/s
+//          //×¼ï¿½ï¿½30m/s
 //
 //
 //
 //
 //
-////×Ö·û
+////ï¿½Ö·ï¿½
 //   /* UI_TCB * sspin = uiDrawStringDataSeq("sspin",1,2,3,15,2,155,815,"spin",100);
 //    UI_TCB * sfric = uiDrawStringDataSeq("sfric",1,2,3,15,2,155,755,"fric",200);
 //    UI_TCB * scapopen = uiDrawStringDataSeq("scapopen",1,2,3,15,2,155,695,"cap_open",200);
 ////    UI_TCB * s4 = uiDrawStringDataSeq("04",1,2,3,15,2,155,635,"s4",300);
 ////    UI_TCB * s5 = uiDrawStringDataSeq("05",1,2,3,15,2,155,575,"s5",300);
 ////    UI_TCB * s6 = uiDrawStringDataSeq("s6",1,2,3,14,2,1658,545,"supcap",300);
-////ÏÔÊ¾Ô²
+////ï¿½ï¿½Ê¾Ô²
 //    UI_TCB * cspin = uiDrawGraphicsSeq(CIRCLE,"cspin",1,2,3,5,10,50,100,810,NONE,NONE,16,100);
 //    UI_TCB * cfric = uiDrawGraphicsSeq(CIRCLE,"cfric",1,2,3,5,10,50,100,750,NONE,NONE,16,200);
 //    UI_TCB * ccapopen = uiDrawGraphicsSeq(CIRCLE,"ccapopen",1,2,3,5,10,50,100,690,NONE,NONE,16,200);
 //    UI_TCB * c4 = uiDrawGraphicsSeq(CIRCLE,"004",1,2,3,5,10,50,100,630,NONE,NONE,16,300);
 //    UI_TCB * c5 = uiDrawGraphicsSeq(CIRCLE,"005",1,2,3,5,10,50,100,570,NONE,NONE,16,310);
-////³¬¼¶µçÈÝ
+////ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //    UI_TCB * supercap = uiDrawGraphicsSeq(ARC,"supercap",1,2,3,5,0,360,1700,540,65,65,NONE,10);
 //    *//* Infinite loop */
 //    for(;;) {
-//        if ((hdma_usart6_rx.Instance->CR & DMA_SxCR_CT) == RESET) //Èç¹ûµ±Ç°»º³åÇøÊÇ0£¬½â°ü0»º³åÇø£¬·ñÔò½â°ü1»º³åÇø
+//        if ((hdma_usart6_rx.Instance->CR & DMA_SxCR_CT) == RESET) //ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //        {
 //            Referee_Data_Unpack(RX_AgreementData_Buffer0, &Referee_Data_header, &Referee_Data);
 //        } else {
 //            Referee_Data_Unpack(RX_AgreementData_Buffer1, &Referee_Data_header, &Referee_Data);
 //        }
 //       /* for (int i = 0; i < UI_TCBNum; i++) {
-//            UI_SendTCBSequence[i]->frequency_cnt -= 1; // ±éÀúÃ¿Ò»¸öUI»æÖÆÈÎÎñ£¬²¢½«Ã¿¸öµÄÆµÂÊµ¹Êý¼ÆÊýÆ÷¼ü1
-//            if (UI_SendTCBSequence[i]->frequency_cnt == 0)  //Èç¹ûÄ³¸öUI»æÖÆÈÎÎñµÄµ¹ÊýÆ÷µ½0£¬¼´¸ÃÖ´ÐÐ(draw)Õâ¸öUI»æÖÆÈÎÎñ
+//            UI_SendTCBSequence[i]->frequency_cnt -= 1; // ï¿½ï¿½ï¿½ï¿½Ã¿Ò»ï¿½ï¿½UIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ñ£¬²ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½ï¿½Æµï¿½Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
+//            if (UI_SendTCBSequence[i]->frequency_cnt == 0)  //ï¿½ï¿½ï¿½Ä³ï¿½ï¿½UIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½(draw)ï¿½ï¿½ï¿½UIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //            {
-//                UI_Draw(UI_SendTCBSequence[i]->senddata, UI_SendTCBSequence[i]->size);   //¸ø²ÃÅÐÏµÍ³·¢ËÍ¸ÃÈÎÎñ¶ÔÓ¦µÄ»æÍ¼Êý¾Ý°ü
+//                UI_Draw(UI_SendTCBSequence[i]->senddata, UI_SendTCBSequence[i]->size);   //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Ä»ï¿½Í¼ï¿½ï¿½ï¿½Ý°ï¿½
 //
 //                //UI_Drawnew(UI_SendTCBSequence[i]);
-//                UI_SendTCBSequence[i]->frequency_cnt = UI_SendTCBSequence[i]->frequency;    //·¢ËÍ¹ýºó½«¼ÆÊýÆ÷ÔÙÖÃ»ØÔ­À´µÄ×´Ì¬
+//                UI_SendTCBSequence[i]->frequency_cnt = UI_SendTCBSequence[i]->frequency;    //ï¿½ï¿½ï¿½Í¹ï¿½ï¿½ó½«¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½Ô­ï¿½ï¿½ï¿½ï¿½×´Ì¬
 //
-//                //ÒÔÏÂÊÇÓÃÀ´ÅÐ¶ÏÊÇ¸ÃÖ´ÐÐÐÂÔö×÷»­»¹ÊÇÐÞ¸Ä×÷»­²Ù×÷µÄÂß¼­  Ä¿µÄ£º·¢5´ÎÖÐ4´ÎÎªÐÞ¸ÄÒ»´ÎÎªÐÂÔö
+//                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½Ç¸ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½  Ä¿ï¿½Ä£ï¿½ï¿½ï¿½5ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½Îªï¿½Þ¸ï¿½Ò»ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
 //                if ((UI_SendTCBSequence[i]->fresh_count) % 5 ==
-//                    0)      //Èç¹ûÓà5Îª0ÔòÓÐÁ½ÖÖ¿ÉÄÜ£¬µÚÒ»´Î·¢»òÕßµÚÎå´Î·¢ ÎªÁË±£Ö¤µÚÒ»´Î·¢Ê±ÊÇÐÂÔö£¬ÕâÑù²ÅÄÜÊ¹ºóÐøµÄÐÞ¸Ä²Ù×÷ÓÐÐ§
+//                    0)      //ï¿½ï¿½ï¿½ï¿½ï¿½5Îª0ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¿ï¿½ï¿½Ü£ï¿½ï¿½ï¿½Ò»ï¿½Î·ï¿½ï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½Î·ï¿½ Îªï¿½Ë±ï¿½Ö¤ï¿½ï¿½Ò»ï¿½Î·ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸Ä²ï¿½ï¿½ï¿½ï¿½ï¿½Ð§
 //                {
-//                    if (UI_SendTCBSequence[i]->fresh_count == 0)      //±£Ö¤×îºóÒ»´Î»¹ÊÇ·¢µÄÐÞ¸Ä²Ù×÷
+//                    if (UI_SendTCBSequence[i]->fresh_count == 0)      //ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½Ò»ï¿½Î»ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Þ¸Ä²ï¿½ï¿½ï¿½
 //                    {
 //                        UI_SendTCBSequence[i]->FOA = 2;
 //                        UI_SendTCBSequence[i]->fresh_count =
-//                                5 + 1;     //ÖØÐÂ¿ªÊ¼ÊýÊý,ÒòÎªÅÐ¶Ï½áÊøºó»áÕÕ³£-1£¬Èç¹ûÊÇ5µÄ»°ÅÐ¶ÏÒ»½áÊø¾Í»á±»¼õ³É4£¬ÕâÑùÓÀÔ¶¶¼²»´æÔÚ5£¬Ò²¾Í²»»áÔÙÐÂÔö
+//                                5 + 1;     //ï¿½ï¿½ï¿½Â¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½Îªï¿½Ð¶Ï½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ³ï¿½-1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½5ï¿½Ä»ï¿½ï¿½Ð¶ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Í»á±»ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½5ï¿½ï¿½Ò²ï¿½Í²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //                    } else {
-//                        UI_SendTCBSequence[i]->FOA = 1;             //Èç¹ûÊÇµÚÒ»´Î·¢ ÔòÒª±£Ö¤ÊÇÐÂÔö²Ù×÷
+//                        UI_SendTCBSequence[i]->FOA = 1;             //ï¿½ï¿½ï¿½ï¿½Çµï¿½Ò»ï¿½Î·ï¿½ ï¿½ï¿½Òªï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //                    }
 //
-//                } else          //ÆäÓà×´Ì¬¶¼ÊÇ·¢µÄÐÞ¸Ä²Ù×÷
+//                } else          //ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Þ¸Ä²ï¿½ï¿½ï¿½
 //                {
 //                    UI_SendTCBSequence[i]->FOA = 2;
 //                }
 //
-//                UI_SendTCBSequence[i]->fresh_count -= 1;  //¸üÐÂ¼ÆÊýÆ÷µÝ¼õ
+//                UI_SendTCBSequence[i]->fresh_count -= 1;  //ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý¼ï¿½
 //            }
-//            //ÐèÒª¸üÐÂµÄ»æÍ¼ÈÎÎñÐ´ÔÚ´Ë´¦
+//            //ï¿½ï¿½Òªï¿½ï¿½ï¿½ÂµÄ»ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ð´ï¿½Ú´Ë´ï¿½
 //            //uiRefreshStringDataSeq(mystring,UI_SendTCBSequence[i],2,3,25,2,1200,500,"li",200);
 ////            uiRefreshGraphicsSeq(mygraph, UI_SendTCBSequence[i],2,3,5,10,num,800,600,100,100,NONE,10);
 //            uiRefreshGraphicsSeq(supercap, UI_SendTCBSequence[i],2,supcolour,5,0,num,1700,540,60,60,NONE,10);
 //            uiRefreshGraphicsSeq(cspin, UI_SendTCBSequence[i],2,spin_colour,5,10,50,100,810,NONE,NONE,16,10);
 //            uiRefreshGraphicsSeq(cfric, UI_SendTCBSequence[i],2,fric_colour,5,10,50,100,750,NONE,NONE,16,10);
 //            uiRefreshGraphicsSeq(ccapopen, UI_SendTCBSequence[i],2,cap_open_colour,5,10,50,100,690,NONE,NONE,16,10);
-//            if(fric_flag==1)//µ¯ËÙÎª15
+//            if(fric_flag==1)//ï¿½ï¿½ï¿½ï¿½Îª15
 //            {
-//             if(Refresh_flag15==0)//Èç¹ûÃ»ÓÐ¸üÐÂ¹ý
+//             if(Refresh_flag15==0)//ï¿½ï¿½ï¿½Ã»ï¿½Ð¸ï¿½ï¿½Â¹ï¿½
 //             {
 //                 uiRefreshGraphicsSeq(a, UI_SendTCBSequence[i],2,3,2,NONE,NONE,936,440,984,440,NONE,150);
 //                 uiRefreshGraphicsSeq(b, UI_SendTCBSequence[i],2,3,2,NONE,NONE,973,436,973,444,NONE,100);
@@ -141,7 +141,7 @@
 //                 Refresh_flag30=0;
 //             }
 //            }
-//            else if(fric_flag==2)//µ¯ËÙÎª18
+//            else if(fric_flag==2)//ï¿½ï¿½ï¿½ï¿½Îª18
 //            {
 //              if(Refresh_flag18==0)
 //              {
@@ -170,7 +170,7 @@
 ////            uiRefreshIntDataSeq(myint,UI_SendTCBSequence[i],2,5,25,1,650,700,num,20);
 ////            uiRefreshIntDataSeq(myint2,UI_SendTCBSequence[i],2,5,25,1,650,800,num,10);
 //        }
-//        //ÅÐ¶Ïµ×ÅÌÊÇ·ñÎªÍÓÂÝ×´Ì¬£¬´ò¿ªÎª³ÈÉ«£¬Ã»´ò¿ªÎªÂÌÉ«
+//        //ï¿½Ð¶Ïµï¿½ï¿½ï¿½ï¿½Ç·ï¿½Îªï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½É«ï¿½ï¿½Ã»ï¿½ï¿½Îªï¿½ï¿½É«
 //        if(spin_flag==0)
 //            fric_colour=3;
 //        else
@@ -185,13 +185,13 @@
 //                supcolour=3;
 //        }
 //
-//        //ÅÐ¶ÏÄ¦²ÁÂÖÊÇ·ñ´ò¿ª£¬´ò¿ªÎª³ÈÉ«£¬Ã»´ò¿ªÎªÂÌÉ«
+//        //ï¿½Ð¶ï¿½Ä¦ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ò¿ª£ï¿½ï¿½ï¿½Îªï¿½ï¿½É«ï¿½ï¿½Ã»ï¿½ï¿½Îªï¿½ï¿½É«
 //        if(fric_wheel_run==0)
 //            fric_colour=3;
 //        else
 //            fric_colour=2;
 //
-//        // ÅÐ¶Ïµ¯²Ö¸ÇÊÇ·ñ´ò¿ª£¬´ò¿ªÎª³ÈÉ«£¬Ã»´ò¿ªÎªÂÌÉ«
+//        // ï¿½Ð¶Ïµï¿½ï¿½Ö¸ï¿½ï¿½Ç·ï¿½ò¿ª£ï¿½ï¿½ï¿½Îªï¿½ï¿½É«ï¿½ï¿½Ã»ï¿½ï¿½Îªï¿½ï¿½É«
 //        if(cap_open_flag==0)
 //            cap_open_colour=3;
 //        else if(cap_open_flag==1)
@@ -202,32 +202,32 @@
 //}
 //__weak void USART6_IRQHandler(void)
 //{
-//    if(__HAL_UART_GET_FLAG(&huart6,UART_FLAG_IDLE)!=RESET)//Èç¹û´®¿ÚÖÐ¶Ï¿ªÆô
+//    if(__HAL_UART_GET_FLAG(&huart6,UART_FLAG_IDLE)!=RESET)//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶Ï¿ï¿½ï¿½ï¿½
 //    {
 //        static uint16_t this_time_rx_len = 0;
-//        __HAL_UART_CLEAR_IDLEFLAG(&huart6);      //Çå³ý¿ÕÏÐÖÐ¶Ï
-//        if((hdma_usart6_rx.Instance->CR & DMA_SxCR_CT) == RESET) //Èç¹ûµ±Ç°µÄ»º³åÇøÊÇ»º³åÇø0
+//        __HAL_UART_CLEAR_IDLEFLAG(&huart6);      //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
+//        if((hdma_usart6_rx.Instance->CR & DMA_SxCR_CT) == RESET) //ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½ï¿½ï¿½ï¿½0
 //        {
-//            //¼ÆËãÕâÒ»Ö¡½ÓÊÕµÄÊý¾ÝµÄ³¤¶È
+//            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ö¡ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½ÝµÄ³ï¿½ï¿½ï¿½
 //            __HAL_DMA_DISABLE(&hdma_usart6_rx);
 //            this_time_rx_len = Agreement_RX_BUF_NUM - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
-//            //ÖØÐÂÉè¶¨Êý¾Ý³¤¶È
+//            //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½
 //            hdma_usart6_rx.Instance->NDTR = Agreement_RX_BUF_NUM;
-//            //°Ñ»º³åÇøÉèÖÃ³É»º³åÇø1
+//            //ï¿½Ñ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã³É»ï¿½ï¿½ï¿½ï¿½ï¿½1
 //            hdma_usart6_rx.Instance->CR |= DMA_SxCR_CT;
 //            __HAL_DMA_ENABLE(&hdma_usart6_rx);
-//            //½«Õâ1Ö¡Êý¾Ý·ÅÈëfifo0
+//            //ï¿½ï¿½ï¿½ï¿½1Ö¡ï¿½ï¿½ï¿½Ý·ï¿½ï¿½ï¿½fifo0
 //            fifo_s_puts(&RX_AgreementData_FIFO,(char *)RX_AgreementData_Buffer0,this_time_rx_len);
 //        }
-//        else //Èç¹ûµ±Ç°µÄ»º³åÇøÊÇ»º³åÇø1
+//        else //ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½ï¿½ï¿½ï¿½1
 //        {
-//            //¼ÆËãÕâÒ»Ö¡½ÓÊÕµÄÊý¾ÝµÄ³¤¶È
+//            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ö¡ï¿½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½ÝµÄ³ï¿½ï¿½ï¿½
 //            __HAL_DMA_DISABLE(&hdma_usart6_rx);
 //            this_time_rx_len = Agreement_RX_BUF_NUM - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
-//            //osSemaphoreRelease(RefereeRxOKHandle);  //ÊÍ·ÅÐÅºÅÁ¿
-//            //ÖØÐÂÉè¶¨Êý¾Ý³¤¶È
+//            //osSemaphoreRelease(RefereeRxOKHandle);  //ï¿½Í·ï¿½ï¿½Åºï¿½ï¿½ï¿½
+//            //ï¿½ï¿½ï¿½ï¿½ï¿½è¶¨ï¿½ï¿½ï¿½Ý³ï¿½ï¿½ï¿½
 //            hdma_usart6_rx.Instance->NDTR = Agreement_RX_BUF_NUM;
-//            //°Ñ»º³åÇøÉèÖÃ³É»º³åÇø0
+//            //ï¿½Ñ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã³É»ï¿½ï¿½ï¿½ï¿½ï¿½0
 //            hdma_usart6_rx.Instance->CR &= ~DMA_SxCR_CT;
 //            __HAL_DMA_ENABLE(&hdma_usart6_rx);
 //            fifo_s_puts(&RX_AgreementData_FIFO,(char *)RX_AgreementData_Buffer1,this_time_rx_len);

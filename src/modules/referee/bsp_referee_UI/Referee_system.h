@@ -294,22 +294,15 @@ typedef struct
 {
     uint8_t robot_id;                               /*! 本机器人 ID */
     uint8_t robot_level;                            /*! 机器人等级 */
-    uint16_t remain_HP;                             /*! 机器人剩余血量 */
-    uint16_t max_HP;                                /*! 机器人上限血量 */
-    uint16_t shooter_id1_17mm_cooling_rate;         /*! 机器人 1 号 17mm 枪口每秒冷却值 */
-    uint16_t shooter_id1_17mm_cooling_limit;        /*! 机器人 1 号 17mm 枪口热量上限 */
-    uint16_t shooter_id1_17mm_speed_limit;          /*! 机器人 1 号 17mm 枪口上限速度 单位 m/s */
-    uint16_t shooter_id2_17mm_cooling_rate;         /*! 机器人 2 号 17mm 枪口每秒冷却值 */
-    uint16_t shooter_id2_17mm_cooling_limit;        /*! 机器人 2 号 17mm 枪口热量上限 */
-    uint16_t shooter_id2_17mm_speed_limit;          /*! 机器人 2 号 17mm 枪口上限速度 单位 m/s */
-    uint16_t shooter_id1_42mm_cooling_rate;         /*! 本机器人 42mm 枪口每秒冷却值 */
-    uint16_t shooter_id1_42mm_cooling_limit;        /*! 机器人 42mm 枪口热量上限 */
-    uint16_t shooter_id1_42mm_speed_limit;          /*! 机器人 42mm 枪口上限速度 单位 m/s */
+    uint16_t current_HP;                             /*! 机器人剩余血量 */
+    uint16_t maximum_HP;                                /*! 机器人上限血量 */
+    uint16_t shooter_barrel_cooling_value;             /*!机器人枪口热量每秒冷却值*/
+    uint16_t shooter_barrel_heat_limit;                /*!机器人枪口热量上限*/
     uint16_t chassis_power_limit;                   /*! 机器人底盘功率限制上限 */
     uint8_t mains_power_gimbal_output : 1;          /*! 主控电源输出情况：gimbal 口输出 */
     uint8_t mains_power_chassis_output : 1;         /*! 主控电源输出情况：chassis 口输出 */
     uint8_t mains_power_shooter_output : 1;         /*! 主控电源输出情况：shooter 口输出 */
-} __attribute__((__packed__)) ext_game_robot_status_t;
+} __attribute__((__packed__)) robot_status_t;
 #endif //SETINGS_REFEREE_SYSTEM_H
 
 
