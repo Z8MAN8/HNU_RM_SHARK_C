@@ -73,7 +73,7 @@ static rt_int16_t motor_control_yaw(dji_motor_measure_t measure);
 static rt_int16_t motor_control_pitch(dji_motor_measure_t measure);
 static rt_int16_t get_relative_pos(rt_int16_t raw_ecd, rt_int16_t center_offset);
 
-
+static int auto_staus=1;//自瞄刷新yaw标志位
 /* --------------------------------- 云台线程入口 --------------------------------- */
 static float gim_dt;
 
@@ -96,8 +96,8 @@ void gimbal_thread_entry(void *argument)
         gimbal_sub_pull();
 
         // 云台本身相对于归中值的角度，加负号
-        yaw_motor_relive = -get_relative_pos(gim_motor[YAW]->measure.ecd, CENTER_ECD_YAW) / 22.75f;
-        pitch_motor_relive = get_relative_pos(gim_motor[PITCH]->measure.ecd, CENTER_ECD_PITCH) / 22.75f;
+        yaw_motor_relive = -(rt_int16_t)get_relative_pos((rt_int16_t)gim_motor[YAW]->measure.ecd, CENTER_ECD_YAW) / 22.75f;
+        pitch_motor_relive = (rt_int16_t )get_relative_pos((rt_int16_t)gim_motor[PITCH]->measure.ecd, CENTER_ECD_PITCH) / 22.75f;
 
         for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
         {
@@ -106,59 +106,67 @@ void gimbal_thread_entry(void *argument)
 
         switch (gim_cmd.ctrl_mode)
         {
-        case GIMBAL_RELAX:
-            for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
-            {
-                dji_motor_relax(gim_motor[i]);
-            }
-            gim_fdb.back_mode = BACK_STEP;
-            yaw_ramp->reset(yaw_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
-            pit_ramp->reset(pit_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
-
-
-            break;
-        case GIMBAL_INIT:
-            // TODO：加入斜坡算法，可以控制归中时间
-            // TODO: 将编码器值转化为角度值
-            // TODO: 优化归中逻辑，yaw轴选取最近的方向
-
-            gim_motor_ref[YAW] = yaw_motor_relive * ( 1 - yaw_ramp->calc(yaw_ramp));
-            gim_motor_ref[PITCH] = pitch_motor_relive* ( 1 - pit_ramp->calc(pit_ramp));
-            if((abs(gim_motor[PITCH]->measure.ecd - CENTER_ECD_PITCH) <= 10)
-               && (abs(gim_motor[YAW]->measure.ecd - CENTER_ECD_YAW) <= 80))
-            {
-                gim_fdb.back_mode = BACK_IS_OK;
-                gim_fdb.yaw_offset_angle_total = ins_data.yaw_total_angle;/*云台抽风的原因，期望应该为总角度。抽风原因：不应该用ins_data.yaw*/
-                gim_fdb.yaw_offset_angle=ins_data.yaw;
-                gim_fdb.pit_offset_angle = ins_data.pitch;
-            }
-            else
-            {
+            case GIMBAL_RELAX:
+                for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
+                {
+                    dji_motor_relax(gim_motor[i]);
+                }
                 gim_fdb.back_mode = BACK_STEP;
-            }
-            break;
-            case GIMBAL_GYRO:
-            gim_motor_ref[YAW] = gim_cmd.yaw;
-            gim_motor_ref[PITCH] = gim_cmd.pitch;
-            // 底盘相对于云台归中值的角度，取负
-            gim_fdb.yaw_relative_angle = -yaw_motor_relive;
-            break;
+                yaw_ramp->reset(yaw_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
+                pit_ramp->reset(pit_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
 
-        // TODO: add auto mode
+
+                break;
+            case GIMBAL_INIT:
+                // TODO：加入斜坡算法，可以控制归中时间
+                // TODO: 将编码器值转化为角度值
+                // TODO: 优化归中逻辑，yaw轴选取最近的方向
+
+                gim_motor_ref[YAW] = yaw_motor_relive * ( 1 - yaw_ramp->calc(yaw_ramp));
+                gim_motor_ref[PITCH] = pitch_motor_relive* ( 1 - pit_ramp->calc(pit_ramp));
+                if((abs(gim_motor[PITCH]->measure.ecd - CENTER_ECD_PITCH) <= 20)
+                   && (abs(gim_motor[YAW]->measure.ecd - CENTER_ECD_YAW) <= 80))
+                {
+                    gim_fdb.back_mode = BACK_IS_OK;
+                    gim_fdb.yaw_offset_angle_total = ins_data.yaw_total_angle;/*云台抽风的原因，期望应该为总角度。抽风原因：不应该用ins_data.yaw*/
+                    gim_fdb.yaw_offset_angle=ins_data.yaw;
+                    gim_fdb.pit_offset_angle = ins_data.pitch;
+                    auto_staus=1;
+                }
+                else
+                {
+                    gim_fdb.back_mode = BACK_STEP;
+                }
+                break;
+            case GIMBAL_GYRO:
+                gim_motor_ref[YAW] = gim_cmd.yaw;
+                gim_motor_ref[PITCH] = gim_cmd.pitch;
+                // 底盘相对于云台归中值的角度，取负
+                gim_fdb.yaw_relative_angle = -yaw_motor_relive;
+                auto_staus=1;
+
+                break;
+
+                // TODO: add auto mode
             case GIMBAL_AUTO:
                 /*gim_motor_ref[YAW] = gim_cmd.yaw_auto;*/
+                if(auto_staus==1)
+                {
+                    gim_fdb.yaw_offset_angle=ins_data.yaw;
+                    auto_staus=0;
+                }
                 gim_motor_ref[YAW] =gim_cmd.yaw;
                 gim_motor_ref[PITCH] =gim_cmd.pitch;
                 // 底盘相对于云台归中值的角度，取负
                 gim_fdb.yaw_relative_angle = -yaw_motor_relive;
                 break;
 
-        default: 
-            for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
-            {
-                dji_motor_relax(gim_motor[i]);
-            }
-            break;
+            default:
+                for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
+                {
+                    dji_motor_relax(gim_motor[i]);
+                }
+                break;
         }
 
         /* 更新发布该线程的msg */
@@ -167,7 +175,7 @@ void gimbal_thread_entry(void *argument)
         /* 用于调试监测线程调度使用 */
         gim_dt = dwt_get_time_ms() - gim_start;
         if (gim_dt > 1)
-            LOG_E("Gimbal Task is being DELAY! dt = [%f]", &gim_dt);
+                LOG_E("Gimbal Task is being DELAY! dt = [%f]", &gim_dt);
 
         rt_thread_delay(1);
     }
@@ -347,8 +355,8 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
     {
         /*串级pid的使用，角度环套在速度环上面*/
         /* 注意负号 */
-        pid_out_angle = -pid_calculate(pid_angle, get_angle, gim_motor_ref[PITCH]);  // 编码器增长方向与imu相反
-        send_data = -pid_calculate(pid_speed, get_speed, pid_out_angle);     // 电机转动正方向与imu相反
+        pid_out_angle = pid_calculate(pid_angle, get_angle, gim_motor_ref[PITCH]);  // 编码器增长方向与imu相反
+        send_data = pid_calculate(pid_speed, get_speed, pid_out_angle);     // 电机转动正方向与imu相反
     }
     else /* imu闭环 */
     {
@@ -356,7 +364,7 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
         VAL_LIMIT(gim_motor_ref[PITCH], PIT_ANGLE_MIN, PIT_ANGLE_MAX);
         /* 注意负号 */
         pid_out_angle = pid_calculate(pid_angle, get_angle, gim_motor_ref[PITCH]);
-        send_data = -pid_calculate(pid_speed, get_speed, pid_out_angle);      // 电机转动正方向与imu相反
+        send_data = pid_calculate(pid_speed, get_speed, pid_out_angle);      // 电机转动正方向与imu相反
     }
 
     return send_data;
