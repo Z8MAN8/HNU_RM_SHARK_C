@@ -48,6 +48,9 @@ static gim_auto_judge pitch_auto;
 static void remote_to_cmd_dbus(void);
 static void remote_to_cmd_sbus(void);
 //TODO: 添加图传链路的自定义控制器控制方式和键鼠控制方式
+/*键盘加速度的斜坡*/
+ramp_obj_t *km_vx_ramp;//x轴控制斜坡
+ramp_obj_t *km_vy_ramp;//y周控制斜坡
 /*储存鼠标坐标数据*/
 First_Order_Filter_t mouse_y_lpf,mouse_x_lpf;
 float Ballistic;  //对自瞄数据进行手动鼠标弹道补偿
@@ -70,7 +73,8 @@ void cmd_thread_entry(void *argument)
     rc_now->sw2 = RC_UP;
     //rc_now->sw3 = RC_UP;
     //rc_now->sw4 = RC_UP;
-
+    km_vx_ramp = ramp_register(100, 2500000);
+    km_vy_ramp = ramp_register(100, 2500000);
     LOG_I("Cmd Task Start");
     for (;;)
     {
@@ -275,8 +279,6 @@ static void remote_to_cmd_dbus(void)
             {
                 gim_cmd.ctrl_mode = GIMBAL_GYRO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
-                //TODO:手动、自动模式下自瞄所需角度值的刷新
-                gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
             else chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
         }
@@ -293,8 +295,6 @@ static void remote_to_cmd_dbus(void)
             {/* 判断归中是否完成 */
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
-                //TODO:手动、自动模式下自瞄所需角度值的刷新
-                gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
         }
            /* chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
