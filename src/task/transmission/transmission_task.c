@@ -22,7 +22,6 @@ static struct trans_fdb_msg trans_fdb;
 rt_uint8_t r_buffer[RECV_BUFFER_SIZE];  // 接收环形缓冲区
 struct rt_ringbuffer receive_buffer ; // 环形缓冲区对象控制块指针
 rt_uint8_t buf[31] = {0};
-rt_uint8_t buf_s[30] = {0};
 RpyTypeDef rpy_tx_data={
         .HEAD = 0XFF,
         .D_ADDR = MAINFLOD,
@@ -33,7 +32,6 @@ RpyTypeDef rpy_tx_data={
         .AC = 0,
 };
 RpyTypeDef rpy_rx_data; //接收解析结构体
-CtrlTypeDef ctrl_rx_data; //接收解析结构体
 /* ---------------------------------usb虚拟串口数据相关 --------------------------------- */
 static rt_device_t vs_port = RT_NULL;
 struct serial_configure config = RT_SERIAL_CONFIG_DEFAULT;  /* 初始化配置参数 */
@@ -185,48 +183,6 @@ void Check_Rpy(RpyTypeDef *frame)
 // 串口接收到数据后产生中断，调用此回调函数
 static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
 {
-    memset(buf_s, 0, sizeof(buf_s));
-
-    // 从串口读取数据并保存到环形接收缓冲区
-    rt_uint32_t rx_length;
-    while ((rx_length = rt_device_read(vs_port, 0, buf_s, sizeof(buf_s))) > 0)
-    {
-        // 将接收到的数据放入环形缓冲区
-        rt_ringbuffer_put_force(&receive_buffer, buf_s, rx_length);
-    }
-    rt_uint8_t frame_rx[sizeof(CtrlTypeDef)]={0};
-    rt_ringbuffer_get(&receive_buffer, frame_rx, sizeof(frame_rx));
-    if(*(uint8_t*)frame_rx==0xFF)
-    {
-        memcpy(&ctrl_rx_data,&frame_rx,sizeof(ctrl_rx_data));
-        switch (ctrl_rx_data.ID) {
-            case CHASSIS_CTRL:{
-                trans_fdb.liner_x = (*(int32_t *) &ctrl_rx_data.DATA[0] / 1000.0);
-                trans_fdb.liner_y = (*(int32_t *) &ctrl_rx_data.DATA[4] / 1000.0);
-                trans_fdb.liner_z = (*(int32_t *) &ctrl_rx_data.DATA[8] / 1000.0);
-                trans_fdb.angler_x = (*(int32_t *) &ctrl_rx_data.DATA[12] / 1000.0);
-                trans_fdb.angler_y = (*(int32_t *) &ctrl_rx_data.DATA[16] / 1000.0);
-                trans_fdb.angler_z = (*(int32_t *) &ctrl_rx_data.DATA[20] / 1000.0);
-            }break;
-
-            case GIMBAL:{
-                if (ctrl_rx_data.DATA[0]) {//相对角度控制
-                    trans_fdb.yaw = - (*(int32_t *) &ctrl_rx_data.DATA[1] / 1000.0);
-                    trans_fdb.pitch = (*(int32_t *) &ctrl_rx_data.DATA[5] / 1000.0);
-                }
-                else{//绝对角度控制
-                    trans_fdb.yaw = - (*(int32_t *) &ctrl_rx_data.DATA[1] / 1000.0);
-                    trans_fdb.pitch = (*(int32_t *) &ctrl_rx_data.DATA[5] / 1000.0);
-                }
-            }break;
-        }
-        memset(&ctrl_rx_data, 0, sizeof(ctrl_rx_data));
-    }
-    return RT_EOK;
-}
-// 接收数据回调函数
-/*static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
-{
     memset(buf, 0, sizeof(buf));
 
     // 从串口读取数据并保存到环形接收缓冲区
@@ -242,6 +198,14 @@ static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
     {
         memcpy(&rpy_rx_data,&frame_rx,sizeof(rpy_rx_data));
         switch (rpy_rx_data.ID) {
+            case CHASSIS_CTRL:{
+                trans_fdb.liner_x = (*(int32_t *) &rpy_rx_data.DATA[0] / 10000.0);
+                trans_fdb.liner_y = (*(int32_t *) &rpy_rx_data.DATA[4] / 10000.0);
+                trans_fdb.liner_z = (*(int32_t *) &rpy_rx_data.DATA[8] / 10000.0);
+                trans_fdb.angler_x = (*(int32_t *) &rpy_rx_data.DATA[12] / 10000.0);
+                trans_fdb.angler_y = (*(int32_t *) &rpy_rx_data.DATA[16] / 10000.0);
+                trans_fdb.angler_z = (*(int32_t *) &rpy_rx_data.DATA[20] / 10000.0);
+            }break;
             case GIMBAL:{
                 if (rpy_rx_data.DATA[0]) {//相对角度控制
                     trans_fdb.yaw = - (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
@@ -256,8 +220,9 @@ static rt_err_t usb_input(rt_device_t dev, rt_size_t size)
         memset(&rpy_rx_data, 0, sizeof(rpy_rx_data));
     }
     return RT_EOK;
-}*/
+}
 /*
+
 void Getdata()
 {
     rt_uint8_t frame_rx[sizeof(RpyTypeDef)]={0};
@@ -266,10 +231,23 @@ void Getdata()
     {
         memcpy(&rpy_rx_data,&frame_rx,sizeof(rpy_rx_data));
         switch (rpy_rx_data.ID) {
+            case CHASSIS_CTRL:{
+                trans_fdb.liner_x = (*(int32_t *) &rpy_rx_data.DATA[0] / 1000.0);
+                trans_fdb.liner_y = (*(int32_t *) &rpy_rx_data.DATA[4] / 1000.0);
+                trans_fdb.liner_z = (*(int32_t *) &rpy_rx_data.DATA[8] / 1000.0);
+                //trans_fdb.angler_x = (*(int32_t *) &rpy_rx_data.DATA[12] / 1000.0);
+                //trans_fdb.angler_y = (*(int32_t *) &rpy_rx_data.DATA[16] / 1000.0);
+                //trans_fdb.angler_z = (*(int32_t *) &rpy_rx_data.DATA[20] / 1000.0);
+            }break;
+
             case GIMBAL:{
                 if (rpy_rx_data.DATA[0]) {//相对角度控制
-                    trans_fdb.yaw = (*(int32_t*)&rpy_rx_data.DATA[1] / 1000.0);
-                    trans_fdb.pitch = (*(int32_t*)&rpy_rx_data.DATA[5] / 1000.0);
+                    trans_fdb.yaw = - (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.pitch = (*(int32_t *) &rpy_rx_data.DATA[5] / 1000.0);
+                }
+                else{//绝对角度控制
+                    trans_fdb.yaw = - (*(int32_t *) &rpy_rx_data.DATA[1] / 1000.0);
+                    trans_fdb.pitch = (*(int32_t *) &rpy_rx_data.DATA[5] / 1000.0);
                 }
             }break;
         }
