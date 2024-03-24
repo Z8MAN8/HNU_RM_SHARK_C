@@ -240,7 +240,7 @@ void shoot_task_entry(void* argument)
         switch (shoot_cmd.ctrl_mode)
         {
         case SHOOT_STOP:
-            shoot_motor_ref[LEFT_FRICTION] = 0;
+            shoot_motor_ref[TRIGGER_MOTOR] = 0;
             total_angle_flag=0;
             break;
 

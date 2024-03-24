@@ -43,11 +43,19 @@ static int pitch_cnt=0;
 /*判断上位机角度是否更新数值*/
 static gim_auto_judge yaw_auto;
 static gim_auto_judge pitch_auto;
-
+/*----------------------------------裁判系统数据接收/比赛状态-------------------------------------*/
+extern robot_status_t robot_status;
+extern ext_power_heat_data_t power_heat_data_t;
 /* ------------------------------- 遥控数据转换为控制指令 ------------------------------ */
 static void remote_to_cmd_dbus(void);
 static void remote_to_cmd_sbus(void);
 //TODO: 添加图传链路的自定义控制器控制方式和键鼠控制方式
+/*键盘加速度的斜坡*/
+ramp_obj_t *km_vx_ramp;//x轴控制斜坡
+ramp_obj_t *km_vy_ramp;//y周控制斜坡
+/*自瞄鼠标累计操作值*/
+static float mouse_accumulate_x=0;
+static float mouse_accumulate_y=0;
 /*储存鼠标坐标数据*/
 First_Order_Filter_t mouse_y_lpf,mouse_x_lpf;
 float Ballistic;  //对自瞄数据进行手动鼠标弹道补偿
@@ -70,7 +78,8 @@ void cmd_thread_entry(void *argument)
     rc_now->sw2 = RC_UP;
     //rc_now->sw3 = RC_UP;
     //rc_now->sw4 = RC_UP;
-
+    km_vx_ramp = ramp_register(100, 2500000);
+    km_vy_ramp = ramp_register(100, 2500000);
     LOG_I("Cmd Task Start");
     for (;;)
     {
@@ -184,16 +193,19 @@ static void remote_to_cmd_dbus(void)
     /*云台命令*/
     if (gim_cmd.ctrl_mode==GIMBAL_GYRO)
     {
-        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW /*-fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW*/;
-        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT /*- fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT*/;
+        gim_cmd.yaw += rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW + fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW;
+        gim_cmd.pitch += rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT - fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;
         gyro_yaw_inherit =gim_cmd.yaw;
-        gyro_pitch_inherit =ins_data.pitch;
+        mouse_accumulate_x=0;
+        mouse_accumulate_y=0;
 
     }
-    if (gim_cmd.ctrl_mode==GIMBAL_AUTO) {
-
-        gim_cmd.yaw = trans_fdb.yaw + gyro_yaw_inherit + 150 * rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW;//上位机自瞄
-        gim_cmd.pitch = trans_fdb.pitch + 100* rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT /*- Ballistic * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT*/;//上位机自瞄
+    if (gim_cmd.ctrl_mode==GIMBAL_AUTO)
+    {
+        mouse_accumulate_x+=fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW;
+        mouse_accumulate_y-=fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;
+        gim_cmd.yaw = trans_fdb.yaw + gyro_yaw_inherit + 150 * rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW + mouse_accumulate_x;
+        gim_cmd.pitch = trans_fdb.pitch + 100* rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT + mouse_accumulate_y;
 
     }
     /* 限制云台角度 */
@@ -209,49 +221,6 @@ static void remote_to_cmd_dbus(void)
     /*-------------------------------------------------底盘_云台状态机--------------------------------------------------------------*/
     // 左拨杆sw2为上时，底盘和云台均RELAX；为中时，云台为GYRO；为下时，云台为AUTO。
     // 右拨杆sw1为上时，底盘为FOLLOW；为中时，底盘为OPEN；为下时，底盘为SPIN。
-
-
-
-
-
-   /* switch (rc_now->sw1)
-    {
-    case RC_UP:
-        if(gim_cmd.ctrl_mode != GIMBAL_INIT && gim_cmd.ctrl_mode != GIMBAL_RELAX)
-        {
-            chassis_cmd.ctrl_mode = CHASSIS_FOLLOW_GIMBAL;
-        }
-        else
-        {
-            //TODO:把开环模式改成释放，让云台归中到底盘
-            chassis_cmd.ctrl_mode = CHASSIS_RELAX;
-        }
-        break;
-
-    case RC_DN:
-        if(gim_cmd.ctrl_mode != GIMBAL_INIT && gim_cmd.ctrl_mode != GIMBAL_RELAX)
-        {
-            chassis_cmd.ctrl_mode = CHASSIS_SPIN;
-            // TODO：考虑将陀螺转速改为变量，可以手动或自动调整转速
-            if (gim_cmd.ctrl_mode==GIMBAL_GYRO)
-            {
-                chassis_cmd.vw = (float) (rc_now->ch5) / 784.0 * 5.0; // 小陀螺转速
-            }
-            if (gim_cmd.ctrl_mode==GIMBAL_AUTO)
-            {
-                chassis_cmd.vw=(float)(rc_now->ch5) / 784.0 * 5.0; // 小陀螺转速
-                chassis_cmd.vx=2000*(float)(rc_now->ch5) / 784.0;
-                chassis_cmd.vy=2000*(float)(rc_now->ch5) / 784.0;
-            }
-
-        }
-        else
-        {
-            chassis_cmd.ctrl_mode = CHASSIS_RELAX;
-        }
-        break;
-    }*/
-
     /* 因为左拨杆值会影响到底盘RELAX状态，所以后判断 */
     /*右拨杆三种模式：停止 手动 自动*/
     switch(rc_now->sw2)
@@ -263,6 +232,7 @@ static void remote_to_cmd_dbus(void)
         /*放开状态下，gim不接收值*/
         gim_cmd.pitch=0;
         gim_cmd.yaw=0;
+        gyro_yaw_inherit=0;
         break;
     case RC_MI:
         if(gim_cmd.last_mode == GIMBAL_RELAX)
@@ -275,8 +245,6 @@ static void remote_to_cmd_dbus(void)
             {
                 gim_cmd.ctrl_mode = GIMBAL_GYRO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
-                //TODO:手动、自动模式下自瞄所需角度值的刷新
-                //gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
             else chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
         }
@@ -293,8 +261,6 @@ static void remote_to_cmd_dbus(void)
             {/* 判断归中是否完成 */
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
-                //TODO:手动、自动模式下自瞄所需角度值的刷新
-                //gim_fdb.yaw_offset_angle=ins_data.yaw;
             }
         }
            /* chassis_cmd.ctrl_mode=CHASSIS_OPEN_LOOP;
@@ -303,32 +269,6 @@ static void remote_to_cmd_dbus(void)
             chassis_cmd.vw=-trans_fdb.angle_z;*/
         break;
     }
-
-//    /*左拨杆计数器*/
-//    /*摩擦轮开关*/
-//    if (rc_now->sw1==RC_UP&&rc_now->wheel<-10&&dbus_mode_flag.shoot_flag==0)
-//    {
-//        dbus_mode_flag.shoot_flag++;
-//        shoot_cmd.friction_status=1;
-//    }
-//    else if(rc_now->sw1==RC_DN&&rc_now->wheel<-10&&dbus_mode_flag.chassis_flag==0)/*跟随模式和小陀螺模式切换*/
-//    {
-//        dbus_mode_flag.chassis_flag++;
-//        chassis_cmd.ctrl_mode=CHASSIS_SPIN;
-//        chassis_cmd.vw=3;
-//    }
-//    if (rc_now->sw1==RC_MI&&rc_now->wheel<-200)
-//    {
-//        dbus_mode_flag.shoot_flag=0;
-//        dbus_mode_flag.chassis_flag=0;
-//        chassis_cmd.ctrl_mode=CHASSIS_FOLLOW_GIMBAL;
-//        shoot_cmd.friction_status=0;
-//    }
-//
-//    if (chassis_cmd.ctrl_mode==CHASSIS_SPIN)
-//    {
-//        chassis_cmd.vw=3;
-//    }
 
     /*左拨杆计数器*/
     /*摩擦轮开关*/

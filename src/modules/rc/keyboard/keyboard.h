@@ -44,6 +44,10 @@ typedef struct
     kb_state_e lk_sta; //左侧按键状态
     kb_state_e rk_sta; //右侧按键状态
 
+    /* 键盘按键状态 */
+    kb_state_e e_sta; //E键按键状态
+    kb_state_e f_sta; //F键按键状态
+
     uint16_t lk_cnt;
     uint16_t rk_cnt;
 

@@ -26,10 +26,13 @@ static void chassis_sub_init(void);
 static void chassis_pub_push(void);
 static void chassis_sub_pull(void);
 
+/* -------------------------------- 裁判系统底盘功率相关 ------------------------------- */
+extern robot_status_t robot_status;
+extern ext_power_heat_data_t power_heat_data_t;
 /* --------------------------------- 电机控制相关 --------------------------------- */
 static pid_obj_t *follow_pid; // 用于底盘跟随云台计算vw
 static pid_config_t chassis_follow_config = INIT_PID_CONFIG(CHASSIS_KP_V_FOLLOW, CHASSIS_KI_V_FOLLOW, CHASSIS_KD_V_FOLLOW, CHASSIS_INTEGRAL_V_FOLLOW, CHASSIS_MAX_V_FOLLOW,
-                                                         (PID_Trapezoid_Intergral | PID_Integral_Limit | PID_Derivative_On_Measurement));
+                                                            (PID_Trapezoid_Intergral | PID_Integral_Limit | PID_Derivative_On_Measurement));
 static struct chassis_controller_t
 {
     pid_obj_t *speed_pid;
@@ -92,38 +95,38 @@ void chassis_thread_entry(void *argument)
 
         switch (chassis_cmd.ctrl_mode)
         {
-        case CHASSIS_RELAX:
-            for (uint8_t i = 0; i < 4; i++)
-            {
-                dji_motor_relax(chassis_motor[i]);
-            }
-            break;
-        case CHASSIS_FOLLOW_GIMBAL:
-            chassis_cmd.vw = pid_calculate(follow_pid, chassis_cmd.offset_angle, 0);
-            /* 底盘运动学解算 */
-            absolute_cal(&chassis_cmd, chassis_cmd.offset_angle);
-            chassis_calc_moto_speed(&chassis_cmd, motor_ref);
-            break;
-        case CHASSIS_SPIN:
-            absolute_cal(&chassis_cmd, chassis_cmd.offset_angle);
-            chassis_calc_moto_speed(&chassis_cmd, motor_ref);
-            break;
-        case CHASSIS_OPEN_LOOP:
-            chassis_calc_moto_speed(&chassis_cmd, motor_ref);
-            break;
-        case CHASSIS_STOP:
-            rt_memset(motor_ref, 0, sizeof(motor_ref));
-            break;
-        case CHASSIS_FLY:
-            break;
-        case CHASSIS_AUTO:
-            break;
-        default:
-            for (uint8_t i = 0; i < 4; i++)
-            {
-                dji_motor_relax(chassis_motor[i]);
-            }
-            break;
+            case CHASSIS_RELAX:
+                for (uint8_t i = 0; i < 4; i++)
+                {
+                    dji_motor_relax(chassis_motor[i]);
+                }
+                break;
+            case CHASSIS_FOLLOW_GIMBAL:
+                chassis_cmd.vw = pid_calculate(follow_pid, chassis_cmd.offset_angle, 0);
+                /* 底盘运动学解算 */
+                absolute_cal(&chassis_cmd, chassis_cmd.offset_angle);
+                chassis_calc_moto_speed(&chassis_cmd, motor_ref);
+                break;
+            case CHASSIS_SPIN:
+                absolute_cal(&chassis_cmd, chassis_cmd.offset_angle);
+                chassis_calc_moto_speed(&chassis_cmd, motor_ref);
+                break;
+            case CHASSIS_OPEN_LOOP:
+                chassis_calc_moto_speed(&chassis_cmd, motor_ref);
+                break;
+            case CHASSIS_STOP:
+                rt_memset(motor_ref, 0, sizeof(motor_ref));
+                break;
+            case CHASSIS_FLY:
+                break;
+            case CHASSIS_AUTO:
+                break;
+            default:
+                for (uint8_t i = 0; i < 4; i++)
+                {
+                    dji_motor_relax(chassis_motor[i]);
+                }
+                break;
         }
 
         /* 更新发布该线程的msg */
@@ -132,7 +135,7 @@ void chassis_thread_entry(void *argument)
         /* 用于调试监测线程调度使用 */
         cmd_dt = dwt_get_time_ms() - cmd_start;
         if (cmd_dt > 1)
-            LOG_E("Chassis Task is being DELAY! dt = [%f]", &cmd_dt);
+                LOG_E("Chassis Task is being DELAY! dt = [%f]", &cmd_dt);
 
         rt_thread_delay(1);
     }
@@ -171,31 +174,73 @@ static void chassis_sub_pull(void)
     sub_get_msg(sub_cmd, &chassis_cmd);
 }
 
+#define CURRENT_POWER_LIMIT_RATE 60
 static rt_int16_t motor_control_0(dji_motor_measure_t measure)
 {
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[0].speed_pid, measure.speed_rpm, motor_ref[0]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[0].speed_pid, measure.speed_rpm, motor_ref[0]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 
 static rt_int16_t motor_control_1(dji_motor_measure_t measure)
 {
+
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[1].speed_pid, measure.speed_rpm, motor_ref[1]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[1].speed_pid, measure.speed_rpm, motor_ref[1]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 
 static rt_int16_t motor_control_2(dji_motor_measure_t measure)
 {
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[2].speed_pid, measure.speed_rpm, motor_ref[2]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[2].speed_pid, measure.speed_rpm, motor_ref[2]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 
 static rt_int16_t motor_control_3(dji_motor_measure_t measure)
 {
     static rt_int16_t set = 0;
-    set = pid_calculate(chassis_controller[3].speed_pid, measure.speed_rpm, motor_ref[3]);
+    static int16_t chassis_max_current=0;
+    if(power_heat_data_t.chassis_power_buffer<20)
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    }
+    else
+    {
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE;
+    }
+    set =(rt_int16_t) pid_calculate(chassis_controller[3].speed_pid, measure.speed_rpm, motor_ref[3]);
+    VAL_LIMIT(set , -chassis_max_current, chassis_max_current);
     return set;
 }
 
@@ -345,13 +390,13 @@ int TIM_Init(void)
     }
 }
 
- static struct chassis_real_speed_t omni_get_speed(dji_motor_object_t *chassis_motor[4])//里程计计算函数。
+static struct chassis_real_speed_t omni_get_speed(dji_motor_object_t *chassis_motor[4])//里程计计算函数。
 {
-     //float rotate_ratio_f = ((LENGTH_A+LENGTH_B)/2.0f -chassis_cmd.offset_angle)/RADIAN_COEF;
-     //float rotate_ratio_b = ((LENGTH_A+LENGTH_B)/2.0f + chassis_cmd.offset_angle)/RADIAN_COEF;
+    //float rotate_ratio_f = ((LENGTH_A+LENGTH_B)/2.0f -chassis_cmd.offset_angle)/RADIAN_COEF;
+    //float rotate_ratio_b = ((LENGTH_A+LENGTH_B)/2.0f + chassis_cmd.offset_angle)/RADIAN_COEF;
     float angle_hd = -(chassis_cmd.offset_angle/RADIAN_COEF);
-     float wheel_rpm_ratio = 60.0f/(WHEEL_PERIMETER*CHASSIS_DECELE_RATIO);
-     int16_t wheel_rpm[4];
+    float wheel_rpm_ratio = 60.0f/(WHEEL_PERIMETER*CHASSIS_DECELE_RATIO);
+    int16_t wheel_rpm[4];
     for (int i = 0; i < 4; ++i)
     {
         wheel_rpm[i]=chassis_motor[i]->measure.speed_rpm;
@@ -370,7 +415,7 @@ int TIM_Init(void)
 //    real_speed.chassis_vy_gim=((real_speed.chassis_vx_ch+real_speed.chassis_vy_ch)-real_speed.chassis_vx_gim*(cos(chassis_cmd.offset_angle)-sin(chassis_cmd.offset_angle)))/
 //            (sin(chassis_cmd.offset_angle)+cos(chassis_cmd.offset_angle));
     return real_speed;
- }
+}
 #endif /* BSP_CHASSIS_OMNI_MODE */
 
 #ifdef BSP_CHASSIS_MECANUM_MODE
