@@ -96,8 +96,8 @@ void gimbal_thread_entry(void *argument)
         gimbal_sub_pull();
 
         // 云台本身相对于归中值的角度，加负号
-        yaw_motor_relive = -(rt_int16_t)get_relative_pos((rt_int16_t)gim_motor[YAW]->measure.ecd, CENTER_ECD_YAW) / 22.75f;
-        pitch_motor_relive = (rt_int16_t )get_relative_pos((rt_int16_t)gim_motor[PITCH]->measure.ecd, CENTER_ECD_PITCH) / 22.75f;
+        yaw_motor_relive = -(rt_int16_t)get_relative_pos(gim_motor[YAW]->measure.ecd, CENTER_ECD_YAW) / 22.75f;
+        pitch_motor_relive = (rt_int16_t )get_relative_pos(gim_motor[PITCH]->measure.ecd, CENTER_ECD_PITCH) / 22.75f;
 
         for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
         {
@@ -114,7 +114,6 @@ void gimbal_thread_entry(void *argument)
             gim_fdb.back_mode = BACK_STEP;
             yaw_ramp->reset(yaw_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
             pit_ramp->reset(pit_ramp, 0, BACK_CENTER_TIME/GIMBAL_PERIOD);
-
 
             break;
         case GIMBAL_INIT:
@@ -380,15 +379,15 @@ static rt_int16_t motor_control_pitch(dji_motor_measure_t measure){
 rt_int16_t get_relative_pos(rt_int16_t raw_ecd, rt_int16_t center_offset)
 {
     rt_int16_t tmp = 0;
-    if (center_offset >= 4096){
-        if (raw_ecd > center_offset - 4096)
+    if (center_offset >= 4095){
+        if (raw_ecd > center_offset - 4095)
             tmp = raw_ecd - center_offset;
         else
-            tmp = raw_ecd + 8192 - center_offset;
+            tmp = raw_ecd + 8191 - center_offset;
     }
     else{
-        if (raw_ecd > center_offset + 4096)
-            tmp = raw_ecd - 8192 - center_offset;
+        if (raw_ecd > center_offset + 4095)
+            tmp = raw_ecd - 8191 - center_offset;
         else
             tmp = raw_ecd - center_offset;
     }

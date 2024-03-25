@@ -100,7 +100,7 @@
 #define CHASSIS_MAX_V_MOTOR             16000
 // TODO: 参数待整定
 /* 跟随云台PID */
-#define CHASSIS_KP_V_FOLLOW             0.3
+#define CHASSIS_KP_V_FOLLOW             0.4
 #define CHASSIS_KI_V_FOLLOW             0
 #define CHASSIS_KD_V_FOLLOW             0
 #define CHASSIS_INTEGRAL_V_FOLLOW       300

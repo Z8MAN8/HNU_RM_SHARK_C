@@ -100,6 +100,7 @@ void chassis_thread_entry(void *argument)
             {
                 dji_motor_relax(chassis_motor[i]);
             }
+                pid_clear(follow_pid);
             break;
         case CHASSIS_FOLLOW_GIMBAL:
             chassis_cmd.vw = pid_calculate(follow_pid, chassis_cmd.offset_angle, 0);
@@ -110,12 +111,15 @@ void chassis_thread_entry(void *argument)
         case CHASSIS_SPIN:
             absolute_cal(&chassis_cmd, chassis_cmd.offset_angle);
             chassis_calc_moto_speed(&chassis_cmd, motor_ref);
+            pid_clear(follow_pid);
             break;
         case CHASSIS_OPEN_LOOP:
             chassis_calc_moto_speed(&chassis_cmd, motor_ref);
+            pid_clear(follow_pid);
             break;
         case CHASSIS_STOP:
             rt_memset(motor_ref, 0, sizeof(motor_ref));
+            pid_clear(follow_pid);
             break;
         case CHASSIS_FLY:
             break;
@@ -181,7 +185,7 @@ static rt_int16_t motor_control_0(dji_motor_measure_t measure)
     static int16_t chassis_max_current=0;
     if(power_heat_data_t.chassis_power_buffer<20)
     {
-    chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+    chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/50);
     }
     else
     {
@@ -199,7 +203,7 @@ static rt_int16_t motor_control_1(dji_motor_measure_t measure)
     static int16_t chassis_max_current=0;
     if(power_heat_data_t.chassis_power_buffer<20)
     {
-        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/50);
     }
     else
     {
@@ -216,7 +220,7 @@ static rt_int16_t motor_control_2(dji_motor_measure_t measure)
     static int16_t chassis_max_current=0;
     if(power_heat_data_t.chassis_power_buffer<20)
     {
-        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/50);
     }
     else
     {
@@ -233,7 +237,7 @@ static rt_int16_t motor_control_3(dji_motor_measure_t measure)
     static int16_t chassis_max_current=0;
     if(power_heat_data_t.chassis_power_buffer<20)
     {
-        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/40);
+        chassis_max_current=robot_status.chassis_power_limit*CURRENT_POWER_LIMIT_RATE*(power_heat_data_t.chassis_power_buffer/50);
     }
     else
     {

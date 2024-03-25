@@ -34,12 +34,9 @@ static void cmd_sub_pull(void);
 
 /*发射停止标志位*/
 static int trigger_flag=0;
-/*发射停止标志位*/
+/*自瞄鼠标累计操作值*/
 static float mouse_accumulate_x=0;
 static float mouse_accumulate_y=0;
-/*自瞄数据继承继承标志位*/
-static int auto_shoot_offset_flag=0;
-static int gyro_shoot_offset_flag=0;
 /*堵转电流反转记次*/
 static int reverse_cnt;
 static float gyro_yaw_inherit;
@@ -49,7 +46,6 @@ extern robot_status_t robot_status;
 extern ext_power_heat_data_t power_heat_data_t;
 /*案件状态标志位*/
 static int key_e_status=-1;
-static int key_g_status=-1;
 static int key_f_status=-1;
 /*判断上位机角度是否更新数值*/
 static gim_auto_judge yaw_auto;
@@ -60,14 +56,14 @@ static void remote_to_cmd_dbus(void);
 static void remote_to_cmd_sbus(void);
 static void remote_to_cmd_pc_controler(void);
 //TODO: 添加图传链路的自定义控制器控制方式和键鼠控制方式
+/*键盘加速度的斜坡*/
+ramp_obj_t *km_vx_ramp;//x轴控制斜坡
+ramp_obj_t *km_vy_ramp;//y周控制斜坡
 /*储存鼠标坐标数据*/
 First_Order_Filter_t mouse_y_lpf,mouse_x_lpf;
 float Ballistic;  //对自瞄数据进行手动鼠标弹道补偿
 /* --------------------------------- cmd线程入口 -------------------------------- */
 static float cmd_dt;
-/*键盘加速度的斜坡*/
- ramp_obj_t *km_vx_ramp;//x轴控制斜坡
- ramp_obj_t *km_vy_ramp;//y周控制斜坡
 
 void cmd_thread_entry(void *argument)
 {
@@ -84,8 +80,6 @@ void cmd_thread_entry(void *argument)
     /* 初始化拨杆为上位 */
     rc_now->sw1 = RC_UP;
     rc_now->sw2 = RC_UP;
-    //rc_now->sw3 = RC_UP;
-    //rc_now->sw4 = RC_UP;
     km_vx_ramp = ramp_register(100, 2500000);
     km_vy_ramp = ramp_register(100, 2500000);
     LOG_I("Cmd Task Start");
@@ -416,7 +410,7 @@ static void remote_to_cmd_pc_controler(void)
         gim_cmd.yaw +=   (float)rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW + fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW;
         gim_cmd.pitch += (float)rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT- fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;
         gyro_yaw_inherit =gim_cmd.yaw;
-        gyro_pitch_inherit =ins_data.pitch;
+        //gyro_pitch_inherit =ins_data.pitch;
         mouse_accumulate_x=0;
         mouse_accumulate_y=0;
     }
@@ -424,8 +418,8 @@ static void remote_to_cmd_pc_controler(void)
     {
         mouse_accumulate_x+=fx * KB_RATIO * GIMBAL_PC_MOVE_RATIO_YAW;
         mouse_accumulate_y-=fy * KB_RATIO * GIMBAL_PC_MOVE_RATIO_PIT;
-        gim_cmd.yaw = trans_fdb.yaw+gyro_yaw_inherit + mouse_accumulate_x;//上位机自瞄
-        gim_cmd.pitch = trans_fdb.pitch+mouse_accumulate_y ;//上位机自瞄
+        gim_cmd.yaw = trans_fdb.yaw+gyro_yaw_inherit + mouse_accumulate_x/* + 150 * rc_now->ch3 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_YAW*/;//上位机自瞄
+        gim_cmd.pitch = trans_fdb.pitch + mouse_accumulate_y/* +100 * rc_now->ch4 * RC_RATIO * GIMBAL_RC_MOVE_RATIO_PIT */;//上位机自瞄
     }
     /* 限制云台角度 */
 
@@ -449,22 +443,15 @@ static void remote_to_cmd_pc_controler(void)
         else {
             if (gim_fdb.back_mode == BACK_IS_OK)
             {
-                if (gyro_shoot_offset_flag==0)
-                {
-                    //TODO:手动、自动模式下自瞄所需角度值的刷新
-                    //gim_fdb.yaw_offset_angle=ins_data.yaw_total_angle;
-                    gyro_shoot_offset_flag=1;
-                }
                 gim_cmd.ctrl_mode = GIMBAL_GYRO;
                 chassis_cmd.ctrl_mode = CHASSIS_FOLLOW_GIMBAL;
                 shoot_cmd.ctrl_mode=SHOOT_COUNTINUE;
-                auto_shoot_offset_flag=0;
             }
             else if(gim_fdb.back_mode==BACK_STEP)
             {
                 chassis_cmd.ctrl_mode=CHASSIS_RELAX;
                 gim_cmd.ctrl_mode=GIMBAL_INIT;
-            };
+            }
         }
     }
 
@@ -480,16 +467,9 @@ static void remote_to_cmd_pc_controler(void)
         {
             if (gim_fdb.back_mode == BACK_IS_OK)
             {/* 判断归中是否完成 */
-                if (auto_shoot_offset_flag==0)
-                {
-                    //TODO:手动、自动模式下自瞄所需角度值的刷新
-                    //gim_fdb.yaw_offset_angle=ins_data.yaw_total_angle;
-                    auto_shoot_offset_flag=1;
-                }
                 gim_cmd.ctrl_mode = GIMBAL_AUTO;
                 chassis_cmd.ctrl_mode = CHASSIS_FOLLOW_GIMBAL;
                 shoot_cmd.ctrl_mode=SHOOT_COUNTINUE;
-                gyro_shoot_offset_flag=0;
             }
             else if(gim_fdb.back_mode==BACK_STEP)
             {
@@ -555,7 +535,7 @@ static void remote_to_cmd_pc_controler(void)
         shoot_cmd.friction_status=0;
     }
     /*TODO:------------------------------------------------------------扳机连发模式---------------------------------------------------------*/
-    if((rc_now->mouse.l==1||rc_now->wheel>=200)&&shoot_cmd.friction_status==1)
+    if((rc_now->mouse.l==1||rc_now->wheel>=200)&&shoot_cmd.friction_status==1&&(power_heat_data_t.shooter_id1_17mm_cooling_heat < (robot_status.shooter_barrel_heat_limit-10)))
     {
         shoot_cmd.ctrl_mode=SHOOT_COUNTINUE;
         shoot_cmd.shoot_freq=2000;
@@ -609,7 +589,6 @@ static void remote_to_cmd_pc_controler(void)
         gyro_yaw_inherit=0;
         /*案件状态标志位*/
          key_e_status=-1;
-         key_g_status=-1;
          key_f_status=-1;
     }
 
