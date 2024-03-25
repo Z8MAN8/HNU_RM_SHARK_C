@@ -26,7 +26,7 @@ ext_game_robot_HP_t                     game_robot_HP_t;
 ext_event_data_t                        field_event;
 ext_supply_projectile_action_t          supply_projectile_action_t;
 ext_referee_warning_t                   referee_warning_t;
-ext_game_robot_status_t                 robot_status;
+robot_status_t                          robot_status;
 ext_power_heat_data_t                   power_heat_data_t;
 ext_game_robot_pos_t                    game_robot_pos_t;
 ext_buff_t                              buff_musk_t;
@@ -60,7 +60,7 @@ void Referee_system_Init(uint8_t *  rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_
     memset(&referee_warning_t, 0, sizeof(ext_referee_warning_t));
 
 
-    memset(&robot_status, 0, sizeof(ext_game_robot_status_t));
+    memset(&robot_status, 0, sizeof(robot_status_t));
     memset(&power_heat_data_t, 0, sizeof(ext_power_heat_data_t));
     memset(&game_robot_pos_t, 0, sizeof(ext_game_robot_pos_t));
     memset(&buff_musk_t, 0, sizeof(ext_buff_t));
@@ -237,7 +237,7 @@ void Referee_Data_Solve(uint8_t* frame)
             memcpy(&referee_warning_t, frame + index, sizeof(ext_referee_warning_t));
             break;
         case ROBOT_STATUS_CMD_ID:
-            memcpy(&robot_status, frame + index, sizeof(ext_game_robot_status_t));
+            memcpy(&robot_status, frame + index, sizeof(robot_status_t));
             break;
         case POWER_HEAT_DATA_CMD_ID:
             memcpy(&power_heat_data_t, frame + index, sizeof(ext_power_heat_data_t));

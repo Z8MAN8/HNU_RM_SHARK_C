@@ -5,11 +5,14 @@
 /* mouse button long press time */
 #define LONG_PRESS_TIME  800   //ms
 /* key acceleration time */
-#define KEY_ACC_TIME     1000  //ms
+#define KEY_ACC_TIME     1700  //ms
 
 km_control_t km;
 
 int16_t delta_spd = MAX_CHASSIS_VX_SPEED*1.0f/KEY_ACC_TIME*GIMBAL_PERIOD;
+
+extern ramp_obj_t *km_vx_ramp;//x轴控制斜坡
+extern ramp_obj_t *km_vy_ramp;//y周控制斜坡
 
 /**
   * @brief     鼠标按键状态机
@@ -107,18 +110,22 @@ void PC_Handle_kb(void)
 
     //add ramp
     if (rc_dbus_obj[0].kb.bit.W)
-        km.vy += delta_spd;
+        km.vy += (float)delta_spd;
     else if (rc_dbus_obj[0].kb.bit.S)
-        km.vy -= delta_spd;
+        km.vy -= (float)delta_spd;
     else
-        km.vy = 0;
+    {
+        km.vy =(float)km.vy* ( 1 - km_vy_ramp->calc(km_vy_ramp));
+    }
 
     if (rc_dbus_obj[0].kb.bit.A)
-        km.vx += -delta_spd;
+        km.vx -= (float)delta_spd;
     else if (rc_dbus_obj[0].kb.bit.D)
-        km.vx += delta_spd;
+        km.vx += (float)delta_spd;
     else
-        km.vx = 0;
+    {
+        km.vx = (float) km.vx* ( 1 - km_vx_ramp->calc(km_vx_ramp));
+    }
 
     VAL_LIMIT(km.vx, -km.max_spd, km.max_spd);
     VAL_LIMIT(km.vy, -km.max_spd, km.max_spd);
@@ -128,4 +135,6 @@ void PC_Handle_kb(void)
 
     key_fsm(&km.lk_sta, rc_dbus_obj[0].mouse.l);
     key_fsm(&km.rk_sta, rc_dbus_obj[0].mouse.r);
+    key_fsm(&km.e_sta, rc_dbus_obj[0].kb.bit.E);
+    key_fsm(&km.f_sta, rc_dbus_obj[0].kb.bit.F);
 }

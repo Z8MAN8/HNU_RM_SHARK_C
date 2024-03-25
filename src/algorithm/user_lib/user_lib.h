@@ -52,7 +52,7 @@ void MatInit(mat *m, uint8_t row, uint8_t col);
 #define PI 3.14159265354f
 #endif
 /* 角度转弧度系数 */
-#define RADIAN_COEF          57.3f
+#define RADIAN_COEF          57.296f
 
 #define VAL_LIMIT(val, min, max) \
     do                           \

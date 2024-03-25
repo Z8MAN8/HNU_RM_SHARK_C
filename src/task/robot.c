@@ -130,7 +130,7 @@ int robot_task_init(void)
                                             768,15, 10);
      /* 如果获得线程控制块，启动这个线程 */
      if ( referee_thread_handle != RT_NULL)
-         //rt_thread_startup(referee_thread_handle);
+         rt_thread_startup(referee_thread_handle);
 #endif /* BSP_USING_REFEREE_TASK*/
 
      return RT_EOK;

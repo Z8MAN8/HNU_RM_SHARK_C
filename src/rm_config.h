@@ -44,7 +44,7 @@
 
 /* 鼠标键盘模式下的底盘最大速度限制 */
 /* 底盘平移速度 */
-#define CHASSIS_PC_MOVE_RATIO_X 0.5f
+#define CHASSIS_PC_MOVE_RATIO_X 1.0f
 /* 底盘前进速度 */
 #define CHASSIS_PC_MOVE_RATIO_Y 1.0f
 /* 底盘旋转速度，只在底盘开环模式下使用 */
@@ -100,7 +100,7 @@
 #define CHASSIS_MAX_V_MOTOR             16000
 // TODO: 参数待整定
 /* 跟随云台PID */
-#define CHASSIS_KP_V_FOLLOW             0.3
+#define CHASSIS_KP_V_FOLLOW             0.4
 #define CHASSIS_KI_V_FOLLOW             0
 #define CHASSIS_KD_V_FOLLOW             0
 #define CHASSIS_INTEGRAL_V_FOLLOW       300
@@ -110,18 +110,18 @@
 #define YAW_MOTOR_ID     0x207
 #define PITCH_MOTOR_ID   0x208
 
-#define CENTER_ECD_YAW   3706         //云台yaw轴编码器归中值
-#define CENTER_ECD_PITCH 7748         //云台pitch轴编码器归中值
+#define CENTER_ECD_YAW   3818         //云台yaw轴编码器归中值
+#define CENTER_ECD_PITCH 7827         //云台pitch轴编码器归中值
 
 /* pitch轴最大仰角 */
 #define PIT_ANGLE_MAX        31.0f
 /* pitch轴最大俯角 */
-#define PIT_ANGLE_MIN        -15.0f
+#define PIT_ANGLE_MIN        -20.0f
 
 /* 云台控制周期 (ms) */
 #define GIMBAL_PERIOD 1
 /* 云台回中初始化时间 (ms) */
-#define BACK_CENTER_TIME 1000
+#define BACK_CENTER_TIME 500
 
 /* -------------------------------- 云台电机PID参数 ------------------------------- */
 /* 云台yaw轴电机PID参数 */
@@ -152,7 +152,7 @@
 
 /* 云台PITCH轴电机PID参数 */
 /* imu速度环 */
-#define PITCH_KP_V_IMU           4250
+#define PITCH_KP_V_IMU           5000
 #define PITCH_KI_V_IMU           1000
 #define PITCH_KD_V_IMU           3
 #define PITCH_INTEGRAL_V_IMU     1500
@@ -166,7 +166,7 @@
 */
 
 /* imu角度环 */
-#define PITCH_KP_A_IMU           0.5f
+#define PITCH_KP_A_IMU           0.8f
 #define PITCH_KI_A_IMU           0.0f
 #define PITCH_KD_A_IMU           0.005f
 #define PITCH_INTEGRAL_A_IMU     0.2f
