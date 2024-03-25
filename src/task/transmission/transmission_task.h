@@ -59,7 +59,7 @@
   */
 typedef  struct
 {
-    rt_uint8_t HEAD;  				    /*! 帧头 */
+    rt_uint8_t HEAD;                    /*! 帧头 */
     rt_uint8_t D_ADDR;                 /*! 目标地址 */
     rt_uint8_t ID;                     /*! 功能码 */
     rt_uint8_t LEN;                    /*! 数据长度 */
@@ -73,13 +73,13 @@ typedef  struct
   */
 typedef  struct
 {
-    rt_uint16_t head;				    /*! 帧头 */
-/*    float pitchAngleGet;    	    *//*! pitch轴角度 *//*
-    float yawAngleGet;      	    *//*! yaw轴角度 *//*
+    rt_uint16_t head;                   /*! 帧头 */
+/*    float pitchAngleGet;          *//*! pitch轴角度 *//*
+    float yawAngleGet;              *//*! yaw轴角度 *//*
     rt_uint8_t rotateDirection;        *//*! 旋转方向 1 *//*
-    float timeBais;         	    *//*! 预测时间偏置 *//*
-    float compensateBais;   	    *//*! 弹道补偿偏置 *//*
-    rt_uint8_t gimbal_mode;	 	    *//*! 云台模式 *//*
+    float timeBais;                 *//*! 预测时间偏置 *//*
+    float compensateBais;           *//*! 弹道补偿偏置 *//*
+    rt_uint8_t gimbal_mode;         *//*! 云台模式 *//*
     rt_uint32_t index;                 *//*! 帧序号 */
     rt_int8_t DATA[FRAME_AUTO_LEN];  /*! 数据内容 FRAME_AUTO_LEN=18 */
     rt_uint8_t index[4];
@@ -90,7 +90,7 @@ typedef  struct
   */
 typedef  struct
 {
-    rt_uint8_t HEAD;  				   /*! 帧头 */
+    rt_uint8_t HEAD;                   /*! 帧头 */
     rt_uint8_t D_ADDR;                /*! 目标地址 */
     rt_uint8_t ID;                    /*! 功能码 */
     rt_uint8_t LEN;                   /*! 数据长度 */
@@ -104,7 +104,7 @@ typedef  struct
   */
 typedef  struct
 {
-    rt_uint8_t HEAD;  				    /*! 帧头 */
+    rt_uint8_t HEAD;                    /*! 帧头 */
     rt_uint8_t D_ADDR;                 /*! 目标地址 */
     rt_uint8_t ID;                     /*! 功能码 */
     rt_uint8_t LEN;                    /*! 数据长度 */
@@ -118,7 +118,7 @@ typedef  struct
   */
 typedef  struct
 {
-    rt_uint8_t HEAD;  				    /*! 帧头 */
+    rt_uint8_t HEAD;                    /*! 帧头 */
     rt_uint8_t D_ADDR;                 /*! 目标地址 */
     rt_uint8_t ID;                     /*! 功能码 */
     rt_uint8_t LEN;                    /*! 数据长度 */
@@ -132,7 +132,7 @@ typedef  struct
   */
 typedef  struct
 {
-    rt_uint8_t HEAD;  				    /*! 帧头 */
+    rt_uint8_t HEAD;                    /*! 帧头 */
     rt_uint8_t D_ADDR;                 /*! 目标地址 */
     rt_uint8_t ID;                     /*! 功能码 */
     rt_uint8_t LEN;                    /*! 数据长度 */
@@ -146,7 +146,7 @@ typedef  struct
   */
 typedef  struct
 {
-    rt_uint8_t HEAD;  				    /*! 帧头 0XFF */
+    rt_uint8_t HEAD;                    /*! 帧头 0XFF */
     rt_uint8_t D_ADDR;                 /*! 目标地址 0X01 */
     rt_uint8_t ID;                     /*! 功能码 0X13 */
     rt_uint8_t LEN;                    /*! 数据长度 40 */
@@ -160,7 +160,7 @@ typedef  struct
   */
 typedef  struct
 {
-    rt_uint8_t HEAD;  				    /*! 帧头 */
+    rt_uint8_t HEAD;                    /*! 帧头 */
     rt_uint8_t D_ADDR;                 /*! 目标地址 */
     rt_uint8_t ID;                     /*! 功能码 */
     rt_uint8_t LEN;                    /*! 数据长度 */

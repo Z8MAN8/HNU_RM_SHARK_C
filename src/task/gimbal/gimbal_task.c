@@ -160,7 +160,7 @@ void gimbal_thread_entry(void *argument)
                 gim_fdb.yaw_relative_angle = -yaw_motor_relive;
                 break;
 
-        default: 
+        default:
             for (uint8_t i = 0; i < GIM_MOTOR_NUM; i++)
             {
                 dji_motor_relax(gim_motor[i]);
