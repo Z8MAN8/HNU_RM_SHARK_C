@@ -26,6 +26,6 @@ extern char spin_flag;
 extern uint8_t fric_flag;
 extern _Bool fric_wheel_run;
 extern _Bool cap_open_flag;
-extern ext_game_robot_status_t ext_game_robot_status;
+//extern robot_status_t robot_status;
 void referee_thread_entry(void *argument); //线程入口函数
 #endif //RTTHREAD_REFEREE_TASK_H

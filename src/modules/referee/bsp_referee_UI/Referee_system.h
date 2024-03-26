@@ -98,7 +98,7 @@ typedef struct
     uint8_t game_progress : 4;                  /*! 当前比赛阶段 */
     uint16_t stage_remain_time;                 /*! 当前阶段剩余时间 */
     uint64_t SyncTimeStamp;                     /*! 机器人接收到该指令的精确 Unix 时间 */
-} __attribute__((__packed__)) ext_game_status_t;
+} __attribute__((__packed__)) game_status_t;
 
 /**
 *   比赛结果数据         对应的命令码ID为：0x0002
