@@ -152,12 +152,13 @@
 
 /* 云台PITCH轴电机PID参数 */
 /* imu速度环 */
-#define PITCH_KP_V_IMU           4250
-#define PITCH_KI_V_IMU           1000
-#define PITCH_KD_V_IMU           3
+#define PITCH_KP_V_IMU           5100
+#define PITCH_KI_V_IMU           1600
+#define PITCH_KD_V_IMU           1
 #define PITCH_INTEGRAL_V_IMU     1500
 #define PITCH_MAX_V_IMU          20000
 /*
+ *
 #define PITCH_KP_V_IMU           4250
 #define PITCH_KI_V_IMU           1000
 #define PITCH_KD_V_IMU           3
